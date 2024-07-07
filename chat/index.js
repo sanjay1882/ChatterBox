@@ -13,9 +13,9 @@ let sidebar = document.querySelector(".sidebar");
   closeBtn.addEventListener("click", ()=>{
     sidebar.classList.toggle("open");
     document.getElementById("btn1").style.display="block";
-    menuBtnChange();//calling the function(optional)
+    menuBtnChange();
   });
-  searchBtn.addEventListener("click", ()=>{ // Sidebar open when you click on the search iocn
+  searchBtn.addEventListener("click", ()=>{
     sidebar.classList.toggle("open");
       
     menuBtnChange(); 
@@ -96,10 +96,10 @@ document.getElementById('darkmodebtn').addEventListener('click', function() {
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// Fetch your API_KEY
+
 const API_KEY = "";
 
-// Access your API key (see "Set up your API key" above)
+
 const genAI = new GoogleGenerativeAI(API_KEY);
 
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash"});
@@ -124,7 +124,6 @@ async function generateResponse(incomingChatli){
           }
         }
    
-        // Chain split and join operations together for concise handling
         let newResponse6 = newResponse
         .split('*').join('<br/><br/>')
         .split(". <b>").join(". <br/><b>")
@@ -166,38 +165,35 @@ if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
   const startSound = document.getElementById('startSound');
   const stopSound = document.getElementById('stopSound');
 
-  // Create speech recognition object
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   const recognition = new SpeechRecognition();
 
-  // Define what should happen when speech is recognized
   recognition.onresult = function(event) {
       const transcript = event.results[0][0].transcript;
       document.getElementById('inputa').value = transcript;
   }
 
-  // Define what should happen when speech recognition is started
+ 
   recognition.onstart = function() {
       console.log('Speech recognition started');
       startSound.play(); 
       speakAnimationStart();
   }
 
-  // Define what should happen when speech recognition is ended
+
   recognition.onend = function() {
       console.log('Speech recognition ended');
       stopSound.play();
       speakAnimationStop();
   }
 
-  // Define what should happen when there is an error with speech recognition
   recognition.onerror = function(event) {
       console.error('Speech recognition error occurred:', event.error);
   }
 
-  // Add event listener to start button
+  
   document.getElementById('start-btn').addEventListener('click', function() {
-      // Check if microphone permission is granted
+   
       navigator.mediaDevices.getUserMedia({ audio: true })
           .then(function(stream) {
               console.log('Microphone permission granted');
@@ -208,7 +204,7 @@ if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
           });
   });
 
-  // Add event listener to stop button
+
   document.getElementById('stop-btn').addEventListener('click', function() {
       recognition.stop();
   });
@@ -220,13 +216,28 @@ if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
 
 function handleKeyPress(event) {
   if (event.keyCode === 13) {
-    // 13 is the key code for Enter
+    
+    var chatInput = document.getElementById("inputa").value.trim();
+    if (chatInput !== "") {
+      handlechat();
+    }
+  }
+  if (event.keyCode === "Enter") {
+    
+    var chatInput = document.getElementById("inputa").value.trim();
+    if (chatInput !== "") {
+      handlechat();
+    }
+  }
+  if (event.keyCode === "enter") {
+    
     var chatInput = document.getElementById("inputa").value.trim();
     if (chatInput !== "") {
       handlechat();
     }
   }
 }
+
 sendChatBtn.addEventListener("click", handlechat);
 
 
