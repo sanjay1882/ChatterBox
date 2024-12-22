@@ -4,125 +4,146 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chatbot</title>
+  <title>Chatterbox-AI powered Chatbot</title>
+  <link rel="icon" href="/public/assests/Designer.png" type="image/png">
   <link rel="stylesheet" href="index.css">
   <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 
 </head>
+
 <body>
+  <div id="preloader">
+    <div class="container">
+      <h1 style="color: white;"><i class='bx bx-doughnut-chart'></i>Chatterbox </h1>
+      <h4>Hey I Can Assist You!</h4>
+      <h6>Loading Please Wait...</h6>
+    </div>
+  </div>
 
   <div class="sidebar">
     <div class="logo-details">
-      <i class='bx bxs-analyse'></i>
-        <div class="logo_name">Teego</div>
-        <i class='bx bx-menu-alt-right' id="btn"></i>
+      <i class='bx bx-doughnut-chart'></i>
+      <div class="logo_name">Chatterbox</div>
+      <i class='bx bx-menu-alt-right' id="btn"></i>
     </div>
-    <ul class="nav-list">
+    <divclass="nav-list">
       <li>
-          <i class='bx bx-search' style="opacity: 0;" ></i>
-         
-        
+
+        <i class='bx bx-search' style="opacity: 0;"></i>
+
+
       </li>
-      
-      <li>
-        <a href="#">
-          <i class='bx bx-chat' ></i>
+
+      <li onclick="location.reload()">
+        <a href="">
+          <i class='bx bx-chat'></i>
           <span class="links_name">Newchat</span>
         </a>
-   
+
       </li>
       <li>
-       <a href="#">
-         <i class='bx bx-user' ></i>
-         <span class="links_name">User</span>
-       </a>
-  
-     </li>
-     <li>
-       <a href="#">
-         <i class='bx bx-chat' ></i>
-         <span class="links_name">Messages</span>
-       </a>
-   
-     </li>
 
-  
-   
-     <li>
-       <a href="#">
-         <i class='bx bx-heart' ></i>
-         <span class="links_name">Saved</span>
-       </a>
 
-     </li>
-     <li>
-       <a href="#">
-         <i class='bx bx-cog' ></i>
-         <span class="links_name">Setting</span>
-       </a>
-     
-     </li>
-     <li class="profile">
-         <div class="profile-details">
-           <img src="Designer.png" alt="profileImg">
-           <div class="name_job">
-             <div class="name">Sanjay</div>
-             <div class="job">Web developer</div>
-           </div>
-         </div>
-         <i class='bx bx-log-out' id="log_out"  title="Logout" style="cursor: pointer;"></i>
-     </li>
-    </ul>
+      </li>
+      <li>
+        <a href="#">
+          <i class='bx bx-chat'></i>
+          <span class="links_name">Messages</span>
+        </a>
+
+      </li>
+
+
+
+      <li>
+
+
+      </li>
+      <li>
+        <a href="#">
+          <i class='bx bx-cog'></i>
+          <span class="links_name">Settings</span>
+        </a>
+
+      </li>
+      <li class="profile">
+        <div class="profile-details">
+          <img src="assests/Designer.png" alt="profileImg">
+          <div class="name_job" style="display: block;" >
+            <div class="name" ><span id="loggedUserFName" >Sanjay</span></div>
+            <div><span id="loggedUserEmail"style="color: #fff;font-size: 10px">sanjayrajums@gmail.com</span></div>
+          </div>
+         <i class='bx bx-log-out' id="logout" title="Logout" style="cursor: pointer;display: block;float: right;width: 100%;"></i>
+       
+            
+         
+        </div>
   </div>
-  
-<section class="show-chatbot">
-
-  <div class="chatbot">
-    <header>
-      <div>
-      <span>
-        <i class='bx bxs-analyse'></i>
-      <h2>Teego</h2>
-      </span>
-      </div>
-      <div class="right-heder-bar">
-      <i class='bx bxs-sun' id="darkmodebtn"></i>
  
-      <i class='bx bx-menu' id="btn1" ></i>
-      <div>
-    </header>
-    <ul class="chatbox">
+  </li>
+  </ul>
+  </div>
 
-     <div class="home-tag-content" id="home-tag-contentID">
-      <h1 class="Greet-tag">
-        <span style="color:rgb(223, 65, 65);">Hello!</span>
-        How Can I Help You Today?</h1>
- 
-    <div class="sugession-conatiner">
-<div class="div" id="sugg"><h2>Create a code for deign and Implementaion</h2><i class='bx bxs-extension'></i></div>
-<div  class="div" id="sugg2"><h2>Ideas on Technology and Explore NEw things</h2><i class='bx bxs-quote-alt-right'></i></div>
-<div class="div" id="sugg3"><h2>Outline an organized & logical sales pitch for a new product</h2><i class='bx bxl-react'></i></div>
-<div class="div" id="sugg4"><h2>Suggest a Python library to solve a problem</h2><i class='bx bxl-python'></i></div>
-    </div>
-</div>
-    </ul>
-    <div class="chat-input">
-      <textarea placeholder="Enter a message" required id="inputa" rows="4" cols="50"
-        onkeypress="handleKeyPress(event)"></textarea>
-      <span id="send-btn" class="material-symbols-outlined"><i class='bx bx-send' id="send-btn"></i></span>
-      <div class="speak-start" id="start-btn"><i class='bx bx-microphone' id="bx-microphone"></i>
+  <section class="show-chatbot">
 
+    <div class="chatbot">
+      <header>
+        <div>
+          <span>
+            <i class='bx bx-doughnut-chart'></i>
+            <h2>Chatterbox</h2>
+          </span>
+        </div>
+        <div class="right-heder-bar">
+          <a href="Login/index.html" id="userbtn" style="display: block;"> <i class='bx bxs-user-circle'
+              style="font-size: 27px; margin-right: 10px; color: #fff;margin-top: 3px"></i></a>
+          <i class='bx bxs-sun' id="darkmodebtn"></i>
 
+          <i class='bx bx-menu' id="btn1"></i>
+          <div>
+      </header>
+      <div class="chatbox">
+
+        <div class="home-tag-content" id="home-tag-contentID">
+          <h1 class="Greet-tag">
+            <span style="color:rgb(223, 65, 65);">Hello!</span>
+            How Can I Help You Today?
+          </h1>
+
+          <div class="sugession-conatiner">
+            <div class="div" id="sugg">
+              <h2>Create a code for finding subset in all languages</h2><i class='bx bxs-extension'></i>
+            </div>
+            <div class="div" id="sugg2">
+              <h2>Ideas on Technology and Explore New things</h2><i class='bx bxs-quote-alt-right'></i>
+            </div>
+            <div class="div" id="sugg3">
+              <h2>Explain the Features of React and other Frameworks</h2><i class='bx bxl-react'></i>
+            </div>
+            <div class="div" id="sugg4">
+              <h2>Suggest a Python library to solve a problem</h2><i class='bx bxl-python'></i>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="speak-stop" id="stop-btn">
-        <i class='bx bx-stop-circle' id="bx-stop-circle"></i>
+      <div class="chat-input">
         
+        <textarea placeholder="Enter a message" required id="inputa" rows="4" cols="50"
+          onkeypress="handleKeyPress(event)"></textarea>
+        <span id="send-btn" class="material-symbols-outlined"><i class='bx bx-send' id="send-btn"></i></span>
+        <div class="speak-start" id="start-btn"><i class='bx bx-microphone' id="bx-microphone"></i>
+
+
+        </div>
+        <div class="speak-stop" id="stop-btn">
+          <i class='bx bx-stop-circle' id="bx-stop-circle"></i>
+
+        </div>
+        <audio id="startSound" src="assests/start-13691.mp3"></audio>
+        <audio id="stopSound" src="assests/stop-13692.mp3"></audio>
       </div>
-      <audio id="startSound" src="assests/start-13691.mp3"></audio>
-      <audio id="stopSound" src="assests/stop-13692.mp3"></audio>
     </div>
-  </div>
-</section>
+  </section>
   <script type="importmap">
         {
           "imports": {
@@ -141,6 +162,8 @@
       }
     }</script>
   <script type="module" src="index.js"></script>
+  <script type="module" src="Login/homepage.js"></script>
+  <script type="module" src="Login/firebaseauth.js"></script>
   
 </body>
 
