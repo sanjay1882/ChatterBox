@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatterbox Docs</title>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=ABeeZee&family=Poppins:ital,wght@0,200;0,500;0,600;1,200&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: #11101D;
+            color: #fff;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .logo i {
+            font-size: 40px;
+            color: #673ab7;
+        }
+
+        .logo h1 {
+            font-size: 2.5rem;
+            color: #fff;
+        }
+
+        .tagline {
+            color: #ccc;
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .nav {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            background: #1d1b31;
+            border: 1px solid #333;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .nav-btn:hover {
+            background: #673ab7;
+            transform: translateY(-2px);
+        }
+
+        .section {
+            background: #1d1b31;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid #333;
+        }
+
+        .section h2 {
+            color: #673ab7;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section h2 i {
+            font-size: 24px;
+        }
+
+        .feature-list {
+            list-style: none;
+        }
+
+        .feature-list li {
+            padding: 15px 0;
+            border-bottom: 1px solid #333;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+
+        .feature-list i {
+            color: #673ab7;
+            font-size: 20px;
+            margin-top: 2px;
+        }
+
+        .feature-list strong {
+            color: #fff;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .feature-list p {
+            color: #ccc;
+            font-size: 14px;
+        }
+
+        .code-box {
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+
+        .code-box pre {
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .tips {
+            background: #2a2438;
+            border-left: 4px solid #673ab7;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .tips strong {
+            color: #673ab7;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: #111;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th {
+            background: #673ab7;
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #333;
+        }
+
+        tr:hover {
+            background: #2a2438;
+        }
+
+        .back-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: #673ab7;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #512da8;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header {
+                padding: 20px 10px;
+            }
+            
+            .logo h1 {
+                font-size: 2rem;
+            }
+            
+            .nav {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .nav-btn {
+                width: 200px;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+            
+            .back-btn {
+                position: static;
+                margin: 20px auto;
+                width: fit-content;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .section {
+                padding: 15px;
+            }
+            
+            .feature-list li {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <i class='bx bx-doughnut-chart'></i>
+                <h1>Chatterbox Docs</h1>
+            </div>
+            <p class="tagline">Everything you need to know about using Chatterbox AI assistant</p>
+        </div>
+
+        <div class="nav">
+            <button class="nav-btn" onclick="showSection('features')">Features</button>
+            <button class="nav-btn" onclick="showSection('usage')">How to Use</button>
+            <button class="nav-btn" onclick="showSection('examples')">Examples</button>
+            <button class="nav-btn" onclick="showSection('tech')">Tech Info</button>
+        </div>
+
+        <!-- Features Section -->
+        <div class="section" id="features">
+            <h2><i class='bx bx-star'></i>What Can It Do?</h2>
+            
+            <ul class="feature-list">
+                <li>
+                    <i class='bx bx-edit-alt'></i>
+                    <div>
+                        <strong>Write Anything</strong>
+                        <p>Essays, stories, emails, blogs - you name it. Just tell me what you need.</p>
+                    </div>
+                </li>
+                <li>
+                    <i class='bx bx-globe'></i>
+                    <div>
+                        <strong>Translate Languages</strong>
+                        <p>Convert text between English, Hindi, Tamil, and other languages.</p>
+                    </div>
+                </li>
+                <li>
+                    <i class='bx bx-movie'></i>
+                    <div>
+                        <strong>Analyze Content</strong>
+                        <p>Get reviews, summaries, and breakdowns of movies, books, and more.</p>
+                    </div>
+                </li>
+                <li>
+                    <i class='bx bx-microphone'></i>
+                    <div>
+                        <strong>Voice Commands</strong>
+                        <p>Use your microphone to speak instead of typing.</p>
+                    </div>
+                </li>
+                <li>
+                    <i class='bx bx-download'></i>
+                    <div>
+                        <strong>Save & Share</strong>
+                        <p>Copy, download, or share your conversations easily.</p>
+                    </div>
+                </li>
+            </ul>
+
+            <div class="tips">
+                <strong>Pro Tip:</strong> Hover over my responses to see action buttons for copying, sharing, and more.
+            </div>
+        </div>
+
+        <!-- Usage Section -->
+        <div class="section" id="usage">
+            <h2><i class='bx bx-book-open'></i>How to Get the Best Results</h2>
+            
+            <h3 style="color: #ffcc00; margin: 20px 0 10px 0;">Getting Started</h3>
+            <ul class="feature-list">
+                <li><i class='bx bx-check'></i>Type your question in the chat box at the bottom</li>
+                <li><i class='bx bx-check'></i>Click the suggestions for quick ideas</li>
+                <li><i class='bx bx-check'></i>Press Enter or click the send button</li>
+                <li><i class='bx bx-check'></i>Use the microphone icon for voice input</li>
+            </ul>
+
+            <h3 style="color: #ffcc00; margin: 20px 0 10px 0;">Writing Better Prompts</h3>
+            <div class="code-box">
+                <pre>Good: "Write a story about a robot learning emotions"
+Better: "Write a creative story about a robot learning human emotions, make it heartwarming"
+
+Good: "Explain climate change"
+Better: "Explain climate change in simple terms for a 10-year-old"
+
+Good: "Translate this"
+Better: "Translate this paragraph to Tamil, keep it formal"</pre>
+            </div>
+
+            <div class="tips">
+                <strong>Remember:</strong> The more specific you are, the better I can help you!
+            </div>
+        </div>
+
+        <!-- Examples Section -->
+        <div class="section" id="examples">
+            <h2><i class='bx bx-code-alt'></i>Try These Examples</h2>
+            
+            <h3 style="color: #ffcc00; margin: 20px 0 10px 0;">For Writing</h3>
+            <div class="code-box">
+                <pre>"Write a short story about a lost puppy finding its way home"
+
+"Create a blog post about healthy eating habits for students"
+
+"Write a formal email to a professor requesting an extension"
+
+"Make a poem about the changing seasons"</pre>
+            </div>
+
+            <h3 style="color: #ffcc00; margin: 20px 0 10px 0;">For Analysis</h3>
+            <div class="code-box">
+                <pre>"Review the movie 'Vikram' - talk about acting and story"
+
+"Summarize the main themes in Shakespeare's Hamlet"
+
+"Compare Android and iOS in a simple table"
+
+"Explain how solar panels work in basic terms"</pre>
+            </div>
+
+            <h3 style="color: #ffcc00; margin: 20px 0 10px 0;">For Translation</h3>
+            <div class="code-box">
+                <pre>"Translate 'Hello, how are you today?' to Tamil"
+
+"Convert this business document to casual language"
+
+"Translate this recipe from English to Hindi"</pre>
+            </div>
+        </div>
+
+        <!-- Tech Info Section -->
+        <div class="section" id="tech">
+            <h2><i class='bx bx-cog'></i>Under the Hood</h2>
+            
+            <h3 style="color: #ffcc00; margin: 20px 0 10px 0;">How It Works</h3>
+            <ul class="feature-list">
+                <li><i class='bx bx-chip'></i><div><strong>AI Brain:</strong> Google Gemini 2.0</div></li>
+                <li><i class='bx bx-code'></i><div><strong>Built With:</strong> HTML, CSS, JavaScript</div></li>
+                <li><i class='bx bx-microphone'></i><div><strong>Voice:</strong> Web Speech API</div></li>
+                <li><i class='bx bx-palette'></i><div><strong>Icons:</strong> Boxicons</div></li>
+            </ul>
+
+            <h3 style="color: #ffcc00; margin: 20px 0 10px 0;">Works Best On</h3>
+            <table>
+                <tr>
+                    <th>Browser</th>
+                    <th>Notes</th>
+                </tr>
+                <tr>
+                    <td>Chrome</td>
+                    <td>All features work great</td>
+                </tr>
+                <tr>
+                    <td>Firefox</td>
+                    <td>Most features work well</td>
+                </tr>
+                <tr>
+                    <td>Safari</td>
+                    <td>Good support</td>
+                </tr>
+                <tr>
+                    <td>Edge</td>
+                    <td>Works fine</td>
+                </tr>
+            </table>
+
+            <div class="tips">
+                <strong>Note:</strong> Voice features need microphone access and work best on Chrome.
+            </div>
+        </div>
+
+        <a href="index.html" class="back-btn">
+            <i class='bx bx-arrow-back'></i>
+            Back to Chat
+        </a>
+    </div>
+
+    <script>
+        function showSection(sectionName) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            // Show selected section
+            document.getElementById(sectionName).style.display = 'block';
+        }
+
+        // Show features by default
+        document.addEventListener('DOMContentLoaded', function() {
+            showSection('features');
+        });
+
+        // Simple scroll to top when switching sections
+        function scrollToSection(sectionId) {
+            document.getElementById(sectionId).scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+    </script>
+</body>
+</html>
