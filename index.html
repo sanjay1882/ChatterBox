@@ -1,120 +1,202 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register & Login - Chatterbox</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
-    <script type="module" src="firebaseauth.js"></script>
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chatterbox-AI powered Chatbot</title>
+  <link rel="icon" href="/public/assests/Designer.png" type="image/png">
+  <link rel="stylesheet" href="index.css">
+  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
+
 <body>
-    <!-- Logo Header - Outside Container -->
-    <div class="logo-header">
-        <i class='bx bx-doughnut-chart'></i>
-        <h1>Chatterbox</h1>
+  <div id="preloader">
+    <div class="container">
+      <h1 style="color: white;"><i class='bx bx-doughnut-chart'></i>Chatterbox </h1>
+      <h4>Hey I Can Assist You!</h4>
+      <h6>Loading Please Wait...</h6>
     </div>
+  </div>
 
-    <!-- Sign In Form -->
-    <div class="container active" id="signIn">
-        <h1 class="form-title">Sign In</h1>
-        <form method="post" action="">
-            <div id="signInMessage" class="messageDiv" style="display:none;"></div>
-
-            <div class="input-group">
-                <i class="fas fa-envelope"></i>
-                <input type="email" id="email" placeholder="Email" required>
-                <label for="email">Email</label>
-            </div>
-            <div class="input-group">
-                <i class="fas fa-lock"></i>
-                <input type="password" id="password" placeholder="Password" required>
-                <label for="password">Password</label>
-            </div>
-            <p class="recover">
-                <a href="#">Recover Password</a>
-            </p>
-            <button class="btn" id="submitSignIn">Sign In</button>
-        </form>
-        <p class="or">
-            ------------- or -------------
-        </p>
-        <div class="icons">
-            <i class="fab fa-google" id="googleSignInBtn"></i>
-            <i class='bx bxs-phone' id="phone-auth"></i>
-        </div>
-        <div class="links">
-            <p>Don't have account yet?</p>
-            <button id="signUpButton">Sign Up</button>
-        </div>
+  <div class="sidebar">
+    <div class="logo-details">
+      <i class='bx bx-doughnut-chart'></i>
+      <div class="logo_name">Chatterbox</div>
+      <i class='bx bx-menu-alt-right' id="btn"></i>
     </div>
+    <div class="nav-list">
+      <li>
+        <i class='bx bx-search' style="opacity: 0;"></i>
+      </li>
 
-    <!-- Sign Up Form -->
-    <div class="container" id="signup">
-        <h1 class="form-title">Register</h1>
-        <form method="post" action="">
-            <div id="signUpMessage" class="messageDiv" style="display:none;"></div>
-            <div class="input-group">
-                <i class="fas fa-user"></i>
-                <input type="text" id="fName" placeholder="First Name" required>
-                <label for="fName">First Name</label>
-            </div>
-            <div class="input-group">
-                <i class="fas fa-user"></i>
-                <input type="text" id="lName" placeholder="Last Name" required>
-                <label for="lName">Last Name</label>
-            </div>
-            <div class="input-group">
-                <i class="fas fa-envelope"></i>
-                <input type="email" id="rEmail" placeholder="Email" required>
-                <label for="rEmail">Email</label>
-            </div>
-            <div class="input-group">
-                <i class="fas fa-lock"></i>
-                <input type="password" id="rPassword" placeholder="Password" required>
-                <label for="rPassword">Password</label>
-            </div>
-            <button class="btn" id="submitSignUp">Sign Up</button>
-        </form>
-        <p class="or">
-            ----------or--------
-        </p>
-        <div class="links">
-            <p>Already Have Account?</p>
-            <button id="signInButton">Sign In</button>
+      <li onclick="location.reload()">
+        <a href="">
+          <i class='bx bx-chat'></i>
+          <span class="links_name">Newchat</span>
+        </a>
+      </li>
+
+      
+     
+      
+      
+      <li class="profile">
+        <div class="profile-details">
+          <img src="assests/Designer.png" alt="profileImg">
+          <div class="name_job" style="display: block;" >
+            <div class="name" ><span id="loggedUserFName" ></span></div>
+            <div><span id="loggedUserEmail"style="color: #fff;font-size: 10px"></span></div>
+          </div>
+         <i class='bx bx-log-out' id="logout" title="Logout" style="cursor: pointer;float: right;"></i>
         </div>
     </div>
+    
+  </li>
+  </ul>
+  </div>
 
-    <!-- Phone Verification Form -->
-    <div class="container" id="number-verify">
-        <h1 class="form-title">Sign In with Phone</h1>
-        <form method="post" action="">
-            <div id="phoneMessage" class="messageDiv" style="display:none;"></div>
-            <div class="input-group">
-                <i class="fas fa-phone"></i>
-                <input type="tel" id="phone-number" placeholder="+91 1234567890" required>
-                <label for="phone-number">Mobile Number</label>
-            </div>
-            <p style="color: #ccc; text-align: center; margin-bottom: 20px; font-size: 14px;">
-                Enter your phone number with country code
-            </p>
-            <button class="btn" id="submitNumber">Send OTP</button>
-        </form>
-        <p class="or">
-            ------------- or -------------
-        </p>
-        <div class="icons">
-            <i class="fab fa-google" id="googleSignInBtn2"></i>
+  <section class="show-chatbot">
+
+    <div class="chatbot">
+      <header>
+        <div>
+          <span>
+            <h2> <i class='bx bx-doughnut-chart'></i>Chatterbox</h2>
+          </span>
         </div>
-        <div class="links">
-            <button id="backToSignIn">Back to Sign In</button>
-        </div>
+        <div class="right-heder-bar">
+          <a href="Login/index.html" id="userbtn" > <i class='bx bxs-user-circle'
+              style="font-size: 27px; margin-right: 10px; color: #fff;margin-top: 3px"></i></a>
+   
+              <i class='bx bxs-sun' id="darkmodebtn"></i>
+
+          <i class='bx bx-menu' id="btn1"></i>
         
-        <div id="recaptcha-container"></div>
+          <div>
+      </header>
+     <div class="chatbox">
+  <div class="home-tag-content" id="home-tag-contentID">
+    <div class="welcome-section">
+      <div class="welcome-header">
+       
+        <h1 class="Greet-tag">
+          <span id="Hello-txt">Hello!</span>
+          How Can I Help You Today?
+        </h1>
+      </div>
+    
     </div>
 
-    <script src="script.js"></script>
+    <div class="suggestions-grid">
+      <div class="suggestion-card" id="sugg">
+        <div class="card-icon">
+          <i class='bx bxs-extension'></i>
+        </div>
+        <div class="card-content">
+          <h3>Creative Writing Ideas</h3>
+          <p>Exploring the Art of Expression: Creative Ideas for Essays, Blogs, Reels, and Storytelling</p>
+        </div>
+      </div>
+      
+      <div class="suggestion-card" id="sugg2">
+        <div class="card-icon">
+          <i class='bx bxs-quote-alt-right'></i>
+        </div>
+        <div class="card-content">
+          <h3>Animal Fable</h3>
+          <p>The Tale of Two Crows and Two Parrots: A Lesson in Friendship and Wisdom</p>
+        </div>
+      </div>
+      
+      <div class="suggestion-card" id="sugg3">
+        <div class="card-icon">
+          <i class='bx bx-camera'></i>
+        </div>
+        <div class="card-content">
+          <h3>Beach Story</h3>
+          <p>A day at the beach becomes a joyful escape filled with sunshine, laughter, and unforgettable memories</p>
+        </div>
+      </div>
+      
+      <div class="suggestion-card" id="sugg4">
+        <div class="card-icon">
+          <i class='bx bx-movie'></i>
+        </div>
+        <div class="card-content">
+          <h3>Movie Analysis</h3>
+          <p>In-depth Exploration of the Tamil Action Thriller Masterpiece "Vikram" (2022)</p>
+        </div>
+      </div>
+      <div class="suggestion-card" id="sugg5">
+  <div class="card-icon">
+    <i class='bx bx-chart'></i>
+  </div>
+  <div class="card-content">
+    <h3>Business Content</h3>
+    <p>Professional emails, reports, presentations, and marketing content for business needs</p>
+  </div>
+</div>
+
+<div class="suggestion-card" id="sugg6">
+  <div class="card-icon">
+    <i class='bx bx-book-open'></i>
+  </div>
+  <div class="card-content">
+    <h3>Study Help</h3>
+    <p>Academic writing, research summaries, exam preparation and learning resource recommendations</p>
+  </div>
+</div>
+    </div>
+  </div>
+</div>
+      <div class="chat-input">
+        
+        <textarea placeholder="Enter a message" required id="inputa" ></textarea>
+        <span id="send-btn" class="material-symbols-outlined"><i class='bx bx-send' id="send-btn"></i></span>
+        <div class="speak-start" id="start-btn"><i class='bx bx-microphone' id="bx-microphone"></i>
+
+
+        </div>
+        <div class="speak-stop" id="stop-btn">
+          <i class='bx bx-stop-circle' id="bx-stop-circle"></i>
+
+        </div>
+        <audio id="startSound" src="assests/start-13691.mp3"></audio>
+        <audio id="stopSound" src="assests/stop-13692.mp3"></audio>
+      </div>
+    </div>
+  </section>
+  <script type="importmap">
+        {
+          "imports": {
+            "@google/generative-ai": "https://esm.run/@google/generative-ai",
+              "firebase/app": "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js",
+            "firebase/auth": "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js"
+          }
+        }
+      </script>
+
+  <script type="module" src="index.js"></script>
+  <script type="module" src="Login/homepage.js"></script>
+  <script type="module" src="Login/firebaseauth.js"></script>
+  <script>
+
+document.addEventListener('contextmenu', event => event.preventDefault());
+
+
+document.onkeydown = function(e) {
+  if (e.key === "F12" || 
+      (e.ctrlKey && e.shiftKey && e.key === "I") || 
+      (e.ctrlKey && e.shiftKey && e.key === "J") || 
+      (e.ctrlKey && e.key === "U")) {
+    e.preventDefault();
+    return false;
+  }
+};
+</script>
+
 </body>
+
 </html>
