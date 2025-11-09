@@ -1,0 +1,202 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chatterbox-AI powered Chatbot</title>
+  <link rel="icon" href="/public/assests/Designer.png" type="image/png">
+  <link rel="stylesheet" href="index.css">
+  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+
+<body>
+  <div id="preloader">
+    <div class="container">
+      <h1 style="color: white;"><i class='bx bx-doughnut-chart'></i>Chatterbox </h1>
+      <h4>Hey I Can Assist You!</h4>
+      <h6>Loading Please Wait...</h6>
+    </div>
+  </div>
+
+  <div class="sidebar">
+    <div class="logo-details">
+      <i class='bx bx-doughnut-chart'></i>
+      <div class="logo_name">Chatterbox</div>
+      <i class='bx bx-menu-alt-right' id="btn"></i>
+    </div>
+    <div class="nav-list">
+      <li>
+        <i class='bx bx-search' style="opacity: 0;"></i>
+      </li>
+
+      <li onclick="location.reload()">
+        <a href="">
+          <i class='bx bx-chat'></i>
+          <span class="links_name">Newchat</span>
+        </a>
+      </li>
+
+      
+     
+      
+      
+      <li class="profile">
+        <div class="profile-details">
+          <img src="assests/Designer.png" alt="profileImg">
+          <div class="name_job" style="display: block;" >
+            <div class="name" ><span id="loggedUserFName" ></span></div>
+            <div><span id="loggedUserEmail"style="color: #fff;font-size: 10px"></span></div>
+          </div>
+         <i class='bx bx-log-out' id="logout" title="Logout" style="cursor: pointer;float: right;"></i>
+        </div>
+    </div>
+    
+  </li>
+  </ul>
+  </div>
+
+  <section class="show-chatbot">
+
+    <div class="chatbot">
+      <header>
+        <div>
+          <span>
+            <h2> <i class='bx bx-doughnut-chart'></i>Chatterbox</h2>
+          </span>
+        </div>
+        <div class="right-heder-bar">
+          <a href="Login/index.html" id="userbtn" > <i class='bx bxs-user-circle'
+              style="font-size: 27px; margin-right: 10px; color: #fff;margin-top: 3px"></i></a>
+   
+              <i class='bx bxs-sun' id="darkmodebtn"></i>
+
+          <i class='bx bx-menu' id="btn1"></i>
+        
+          <div>
+      </header>
+     <div class="chatbox">
+  <div class="home-tag-content" id="home-tag-contentID">
+    <div class="welcome-section">
+      <div class="welcome-header">
+       
+        <h1 class="Greet-tag">
+          <span id="Hello-txt">Hello!</span>
+          How Can I Help You Today?
+        </h1>
+      </div>
+    
+    </div>
+
+    <div class="suggestions-grid">
+      <div class="suggestion-card" id="sugg">
+        <div class="card-icon">
+          <i class='bx bxs-extension'></i>
+        </div>
+        <div class="card-content">
+          <h3>Creative Writing Ideas</h3>
+          <p>Exploring the Art of Expression: Creative Ideas for Essays, Blogs, Reels, and Storytelling</p>
+        </div>
+      </div>
+      
+      <div class="suggestion-card" id="sugg2">
+        <div class="card-icon">
+          <i class='bx bxs-quote-alt-right'></i>
+        </div>
+        <div class="card-content">
+          <h3>Animal Fable</h3>
+          <p>The Tale of Two Crows and Two Parrots: A Lesson in Friendship and Wisdom</p>
+        </div>
+      </div>
+      
+      <div class="suggestion-card" id="sugg3">
+        <div class="card-icon">
+          <i class='bx bx-camera'></i>
+        </div>
+        <div class="card-content">
+          <h3>Beach Story</h3>
+          <p>A day at the beach becomes a joyful escape filled with sunshine, laughter, and unforgettable memories</p>
+        </div>
+      </div>
+      
+      <div class="suggestion-card" id="sugg4">
+        <div class="card-icon">
+          <i class='bx bx-movie'></i>
+        </div>
+        <div class="card-content">
+          <h3>Movie Analysis</h3>
+          <p>In-depth Exploration of the Tamil Action Thriller Masterpiece "Vikram" (2022)</p>
+        </div>
+      </div>
+      <div class="suggestion-card" id="sugg5">
+  <div class="card-icon">
+    <i class='bx bx-chart'></i>
+  </div>
+  <div class="card-content">
+    <h3>Business Content</h3>
+    <p>Professional emails, reports, presentations, and marketing content for business needs</p>
+  </div>
+</div>
+
+<div class="suggestion-card" id="sugg6">
+  <div class="card-icon">
+    <i class='bx bx-book-open'></i>
+  </div>
+  <div class="card-content">
+    <h3>Study Help</h3>
+    <p>Academic writing, research summaries, exam preparation and learning resource recommendations</p>
+  </div>
+</div>
+    </div>
+  </div>
+</div>
+      <div class="chat-input">
+        
+        <textarea placeholder="Enter a message" required id="inputa" ></textarea>
+        <span id="send-btn" class="material-symbols-outlined"><i class='bx bx-send' id="send-btn"></i></span>
+        <div class="speak-start" id="start-btn"><i class='bx bx-microphone' id="bx-microphone"></i>
+
+
+        </div>
+        <div class="speak-stop" id="stop-btn">
+          <i class='bx bx-stop-circle' id="bx-stop-circle"></i>
+
+        </div>
+        <audio id="startSound" src="assests/start-13691.mp3"></audio>
+        <audio id="stopSound" src="assests/stop-13692.mp3"></audio>
+      </div>
+    </div>
+  </section>
+  <script type="importmap">
+        {
+          "imports": {
+            "@google/generative-ai": "https://esm.run/@google/generative-ai",
+              "firebase/app": "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js",
+            "firebase/auth": "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js"
+          }
+        }
+      </script>
+
+  <script type="module" src="index.js"></script>
+  <script type="module" src="Login/homepage.js"></script>
+  <script type="module" src="Login/firebaseauth.js"></script>
+  <script>
+
+document.addEventListener('contextmenu', event => event.preventDefault());
+
+
+document.onkeydown = function(e) {
+  if (e.key === "F12" || 
+      (e.ctrlKey && e.shiftKey && e.key === "I") || 
+      (e.ctrlKey && e.shiftKey && e.key === "J") || 
+      (e.ctrlKey && e.key === "U")) {
+    e.preventDefault();
+    return false;
+  }
+};
+</script>
+
+</body>
+
+</html>
