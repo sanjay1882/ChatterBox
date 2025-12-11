@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shared Chat - Chatterbox</title>
+    <link rel="icon" href="assests/Designer.png" type="image/png">
+    <link rel="stylesheet" href="index.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <style>
+        /* Overrides for shared view to hide unnecessary elements */
+        .sidebar {
+            display: none !important;
+        }
+
+        /* Ensure chatbox takes full width since sidebar is hidden */
+        .show-chatbot {
+            width: 100%;
+            left: 0;
+        }
+
+        li {
+            color: #fff;
+        }
+
+        .chatbot {
+            transform: scale(1);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Custom styling for the shared footer to look like the input area */
+        .shared-footer-container {
+            position: fixed;
+            bottom: 20px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            z-index: 100;
+            height: 60px;
+        }
+
+        .shared-footer {
+            position: relative;
+
+            border-radius: 40px;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 85%;
+            max-width: 750px;
+            min-height: 80px;
+
+            transition: all 0.3s ease;
+            margin: auto;
+        }
+
+        /* Animated border similar to chat input */
+        .shared-footer::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 40px;
+            padding: 1.1px;
+
+            background-size: 300% 300%;
+            animation: borderGlow 4s linear infinite;
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            pointer-events: none;
+        }
+
+        .shared-footer a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 20px 20px;
+            border-radius: 40px;
+            background: linear-gradient(135deg, #673ab7, #512da8);
+            transition: transform 0.2s;
+            font-size: 0.9rem;
+
+        }
+
+        .shared-footer a:hover {
+            transform: scale(1.05);
+        }
+
+        .shared-info {
+            color: #BBBBBB;
+            font-size: 0.9rem;
+            margin-right: 10px;
+        }
+
+        body.white-mode .shared-footer {
+            background: #e3f2fd;
+        }
+
+        body.white-mode .shared-info {
+            color: #333;
+        }
+
+        /* Ensure headings in shared chat match main chat styles */
+        .chatbox .incoming p h1,
+        .chatbox .incoming p h2,
+        .chatbox .incoming p h3,
+        .chatbox .incoming p h4,
+        .chatbox .incoming p h5,
+        .chatbox .incoming p h6 {
+            margin: 16px 0 12px 0;
+            line-height: 1.3;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <section class="show-chatbot">
+        <div class="chatbot">
+            <header>
+                <div class="left-header" style="display: flex; align-items: center; padding-left: 15px;">
+                    <!-- Placeholder for menu icon if needed, or just empty to balance -->
+                    <h2 id="chat-title" style="font-family: 'Nabla', system-ui; font-size: 1.6rem;">Treevix.ai</h2>
+                </div>
+                <div class="center-header">
+                    <!-- Title is now in left-header to match main app -->
+                </div>
+                <div class="right-heder-bar">
+                    <i class='bx bxs-sun' id="darkmodebtn"></i>
+                </div>
+            </header>
+
+            <div class="chatbox" id="chatbox">
+                <div id="loading" style="text-align: center; margin-top: 50px; color: var(--text-color);">Loading shared
+                    session...</div>
+            </div>
+
+            <div class="shared-footer-container">
+                <div class="shared-footer">
+
+                    <a href="index.html">Start Your Own Chat</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Dark mode toggle
+        document.getElementById('darkmodebtn').addEventListener('click', function () {
+            document.body.classList.toggle('white-mode');
+        });
+
+        function formatStreamedText(text) {
+            const escapeHTML = (str) =>
+                String(str).replace(/[&<>"']/g, (tag) => (
+                    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[tag]
+                ));
+
+            function createTableHTMLFromLines(rows) {
+                if (!rows || !rows.length) return '';
+                const parse = (r) => r.replace(/^\|/, '').replace(/\|$/, '').split('|').map(c => c.trim());
+                const header = parse(rows[0]);
+                let alignments = new Array(header.length).fill(null);
+                if (rows.length > 1) {
+                    const divider = rows[1].replace(/\s+/g, '');
+                    if (/^[:\-|]+$/.test(divider)) {
+                        const divCells = parse(rows[1]);
+                        alignments = divCells.map(cell => {
+                            const left = cell.startsWith(':');
+                            const right = cell.endsWith(':');
+                            if (left && right) return 'center';
+                            if (right) return 'right';
+                            if (left) return 'left';
+                            return null;
+                        });
+                        rows.splice(1, 1);
+                    }
+                }
+                let html = '<table class="md-table"><thead><tr>';
+                for (let i = 0; i < header.length; i++) {
+                    const align = alignments[i] ? ` style="text-align:${alignments[i]}"` : '';
+                    html += `<th${align}>${header[i] || ''}</th>`;
+                }
+                html += '</tr></thead><tbody>';
+                for (let r = 1; r < rows.length; r++) {
+                    const cells = parse(rows[r]);
+                    html += '<tr>';
+                    for (let i = 0; i < header.length; i++) {
+                        const cell = (cells[i] !== undefined) ? cells[i] : '';
+                        const align = alignments[i] ? ` style="text-align:${alignments[i]}"` : '';
+                        html += `<td${align}>${cell}</td>`;
+                    }
+                    html += '</tr>';
+                }
+                html += '</tbody></table><br>';
+                return html;
+            }
+
+            text = escapeHTML(text)
+                .replace(/^###### (.*$)/gim, '<h6>$1</h6>\n')
+                .replace(/^##### (.*$)/gim, '<h5>$1</h5>\n')
+                .replace(/^#### (.*$)/gim, '<h4>$1</h4>\n')
+                .replace(/^### (.*$)/gim, '<h3>$1</h3>\n')
+                .replace(/^## (.*$)/gim, '<h2>$1</h2>\n')
+                .replace(/^# (.*$)/gim, '<h1>$1</h1>\n')
+                .replace(/\*\*\*(.*?)\*\*\*/gim, '<b><i>$1</i></b>')
+                .replace(/\*\*(.*?)\*\*/gim, '<b>$1</b>')
+                .replace(/\*(.*?)\*/gim, '<i>$1</i>')
+                .replace(/`([^`]+)`/gim, '<code>$1</code>')
+                .replace(/```(\w+)?\n?([\s\S]*?)```/gim, (match, lang, code) => {
+                    const language = lang ? ` class="language-${lang}"` : '';
+                    return `<pre><code${language}>${code}</code></pre>`;
+                })
+                .replace(/^\s*[-*]\s+(.*)/gim, '<li>$1</li>');
+
+            const lines = text.split('\n');
+            let html = '';
+            let inList = false;
+            let inTable = false;
+            let tableLines = [];
+
+            for (let line of lines) {
+                const trimmed = line.trim();
+                const pipeCount = (line.match(/\|/g) || []).length;
+                const looksLikeTableRow = pipeCount >= 2 && !/^<pre><code>/.test(line) && !/<\/code><\/pre>/.test(line);
+
+                if (looksLikeTableRow) {
+                    inTable = true;
+                    tableLines.push(line);
+                    continue;
+                }
+
+                if (inTable && tableLines.length) {
+                    html += createTableHTMLFromLines(tableLines);
+                    tableLines = [];
+                    inTable = false;
+                }
+
+                if (line.match(/<li>/)) {
+                    if (!inList) {
+                        html += '<ul class="list-unstyled">';
+                        inList = true;
+                    }
+                    html += line;
+                    continue;
+                } else {
+                    if (inList) {
+                        html += '</ul>';
+                        inList = false;
+                    }
+                }
+
+                if (line.match(/<h[1-6]/)) {
+                    html += `${line}<br>`;
+                    continue;
+                }
+                if (line.match(/^<pre><code>/)) {
+                    html += `${line}\n`;
+                    continue;
+                }
+                if (trimmed) {
+                    html += `<p>${line}</p>`;
+                } else {
+                    html += ``;
+                }
+            }
+            if (inTable && tableLines.length) {
+                html += createTableHTMLFromLines(tableLines);
+            }
+            if (inList) html += '</ul>';
+            return html;
+        }
+
+        async function loadSharedSession() {
+            // Fix visibility issue
+            document.body.style.visibility = 'visible';
+            document.body.style.overflow = 'auto';
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const shareId = urlParams.get('id');
+
+            if (!shareId) {
+                document.getElementById('loading').textContent = "Invalid share link.";
+                return;
+            }
+
+            try {
+                const res = await fetch(`http://localhost:3000/shared/${shareId}`);
+                if (!res.ok) throw new Error("Session not found");
+
+                const session = await res.json();
+                // document.getElementById('chat-title').textContent = session.title || "Shared Chat"; // Keep Treevix.ai title
+                document.getElementById('loading').style.display = 'none';
+
+                const chatbox = document.getElementById('chatbox');
+
+                session.messages.forEach(msg => {
+                    const li = document.createElement("li");
+                    li.classList.add("chat", msg.role === "user" ? "outgoing" : "incoming");
+
+                    let text = "";
+                    if (msg.parts) {
+                        text = msg.parts.find(p => !p.text.startsWith("System-Time") && !p.text.startsWith("Web-Scraped-Data"))?.text || msg.parts[0].text;
+                    }
+
+                    if (msg.role === "user") {
+                        li.innerHTML = `<p>${text}</p>`;
+                    } else {
+                        // Ensure incoming messages are wrapped in <p> to match index.css selectors
+                        li.innerHTML = `<p>${formatStreamedText(text)}</p>`;
+                    }
+                    chatbox.appendChild(li);
+                });
+
+            } catch (error) {
+                document.getElementById('loading').textContent = "Failed to load shared session.";
+                console.error(error);
+            }
+        }
+
+        loadSharedSession();
+    </script>
+</body>
+
+</html>

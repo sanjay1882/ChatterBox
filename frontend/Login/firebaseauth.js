@@ -1,28 +1,27 @@
- 
 
- 
- import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
-import { 
-    getAuth, 
-    createUserWithEmailAndPassword, 
-    signInWithEmailAndPassword, 
-    signInWithPopup, 
+
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
+import {
+    getAuth,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signInWithPopup,
     GoogleAuthProvider,
-    onAuthStateChanged, 
+    onAuthStateChanged,
     signOut,
     RecaptchaVerifier,
     signInWithPhoneNumber,
     PhoneAuthProvider,
     signInWithCredential
 } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
-import { 
-    getFirestore, 
-    setDoc, 
-    doc 
+import {
+    getFirestore,
+    setDoc,
+    doc
 } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
+import { firebaseConfig } from './firebaseConfig.js';
 
-
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -31,25 +30,26 @@ const provider = new GoogleAuthProvider();
 let confirmationResult = null;
 let recaptchaVerifier = null;
 
-// Initialize reCAPTCHA
+
 function initializeRecaptcha() {
     recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
         'size': 'invisible',
         'callback': (response) => {
-            // reCAPTCHA solved, allow signInWithPhoneNumber.
-            console.log('reCAPTCHA solved');
+
+
         }
     });
 }
 
-// Message display functions
+
 function showMessage(message, divId) {
     const messageDiv = document.getElementById(divId);
     messageDiv.style.display = "block";
     messageDiv.style.backgroundColor = "red";
     messageDiv.innerHTML = message;
     messageDiv.style.opacity = 1;
-    setTimeout(function() {
+    messageDiv.style.borderRadius = "18px";
+    setTimeout(function () {
         messageDiv.style.opacity = 0;
     }, 5000);
 }
@@ -60,12 +60,13 @@ function CreatedMessage(message, divId) {
     messageDiv.style.backgroundColor = "green";
     messageDiv.innerHTML = message;
     messageDiv.style.opacity = 1;
-    setTimeout(function() {
+    messageDiv.style.borderRadius = "18px";
+    setTimeout(function () {
         messageDiv.style.opacity = 0;
     }, 5000);
 }
 
-// Google Sign In
+
 document.getElementById('googleSignInBtn')?.addEventListener('click', () => {
     signInWithPopup(auth, provider)
         .then((result) => {
@@ -81,7 +82,7 @@ document.getElementById('googleSignInBtn')?.addEventListener('click', () => {
         });
 });
 
-// Sign Up with Email
+
 document.getElementById('submitSignUp')?.addEventListener('click', (event) => {
     event.preventDefault();
     const email = document.getElementById('rEmail').value;
@@ -98,9 +99,9 @@ document.getElementById('submitSignUp')?.addEventListener('click', (event) => {
                 lastName: lastName,
                 createdAt: new Date().toISOString()
             };
-            
+
             CreatedMessage('Account Created Successfully', 'signUpMessage');
-            
+
             const docRef = doc(db, "users", user.uid);
             setDoc(docRef, userData)
                 .then(() => {
@@ -124,7 +125,7 @@ document.getElementById('submitSignUp')?.addEventListener('click', (event) => {
         });
 });
 
-// Sign In with Email
+
 document.getElementById('submitSignIn')?.addEventListener('click', (event) => {
     event.preventDefault();
     const email = document.getElementById('email').value;
@@ -134,8 +135,9 @@ document.getElementById('submitSignIn')?.addEventListener('click', (event) => {
         .then((userCredential) => {
             CreatedMessage('Login successful', 'signInMessage');
             const user = userCredential.user;
+
             localStorage.setItem('loggedInUserId', user.uid);
-            
+
             setTimeout(() => {
                 window.location.href = '../index.html';
             }, 2000);
@@ -152,34 +154,34 @@ document.getElementById('submitSignIn')?.addEventListener('click', (event) => {
         });
 });
 
-// Phone Number Authentication
+
 document.getElementById('submitNumber')?.addEventListener('click', async (event) => {
     event.preventDefault();
     const phoneNumber = document.getElementById('phone-number').value;
-    
+
     if (!phoneNumber) {
         showMessage('Please enter a phone number', 'phoneMessage');
         return;
     }
 
-    // Format phone number (add country code if missing)
+
     let formattedNumber = phoneNumber;
     if (!phoneNumber.startsWith('+')) {
-        formattedNumber = '+91' + phoneNumber; // Default to India, you can change this
+        formattedNumber = '+91' + phoneNumber;
     }
 
     try {
-        // Initialize reCAPTCHA if not already done
+
         if (!recaptchaVerifier) {
             initializeRecaptcha();
         }
 
-        // Send verification code
+
         confirmationResult = await signInWithPhoneNumber(auth, formattedNumber, recaptchaVerifier);
-        
-        // Show OTP verification form
+
+
         showOTPVerificationForm(formattedNumber);
-        
+
     } catch (error) {
         console.error('Error sending verification code:', error);
         if (error.code === 'auth/invalid-phone-number') {
@@ -189,8 +191,8 @@ document.getElementById('submitNumber')?.addEventListener('click', async (event)
         } else {
             showMessage('Error sending verification code: ' + error.message, 'phoneMessage');
         }
-        
-        // Reset reCAPTCHA on error
+
+
         if (recaptchaVerifier) {
             recaptchaVerifier.clear();
             recaptchaVerifier = null;
@@ -198,7 +200,7 @@ document.getElementById('submitNumber')?.addEventListener('click', async (event)
     }
 });
 
-// Show OTP verification form
+
 function showOTPVerificationForm(phoneNumber) {
     const phoneForm = document.getElementById('number-verify');
     phoneForm.innerHTML = `
@@ -222,23 +224,22 @@ function showOTPVerificationForm(phoneNumber) {
         <div id="recaptcha-container"></div>
     `;
 
-    // Verify OTP
+
     document.getElementById('verifyOtp').addEventListener('click', verifyOTP);
-    
-    // Resend OTP
+
+
     document.getElementById('resendOtp').addEventListener('click', resendOTP);
-    
-    // Back to phone number entry
+
+
     document.getElementById('backToPhone').addEventListener('click', () => {
-        window.location.reload(); // Reload to show original phone form
+        window.location.reload();
     });
 }
 
-// Verify OTP
 async function verifyOTP(event) {
     event.preventDefault();
     const otpCode = document.getElementById('otp-code').value;
-    
+
     if (!otpCode || otpCode.length !== 6) {
         showMessage('Please enter a valid 6-digit OTP', 'otpMessage');
         return;
@@ -247,24 +248,24 @@ async function verifyOTP(event) {
     try {
         const result = await confirmationResult.confirm(otpCode);
         const user = result.user;
-        
+
         CreatedMessage('Phone verification successful!', 'otpMessage');
-        
+
         // Save user to Firestore
         const userData = {
             phoneNumber: user.phoneNumber,
             createdAt: new Date().toISOString()
         };
-        
+
         const docRef = doc(db, "users", user.uid);
         await setDoc(docRef, userData);
-        
+
         localStorage.setItem('loggedInUserId', user.uid);
-        
+
         setTimeout(() => {
             window.location.href = '../index.html';
         }, 2000);
-        
+
     } catch (error) {
         console.error('Error verifying OTP:', error);
         if (error.code === 'auth/invalid-verification-code') {
@@ -281,7 +282,7 @@ async function verifyOTP(event) {
 async function resendOTP() {
     const phoneNumber = document.getElementById('phone-number').value;
     let formattedNumber = phoneNumber;
-    
+
     if (!phoneNumber.startsWith('+')) {
         formattedNumber = '+91' + phoneNumber;
     }
@@ -293,7 +294,7 @@ async function resendOTP() {
 
         confirmationResult = await signInWithPhoneNumber(auth, formattedNumber, recaptchaVerifier);
         CreatedMessage('OTP resent successfully!', 'otpMessage');
-        
+
     } catch (error) {
         console.error('Error resending OTP:', error);
         showMessage('Error resending OTP: ' + error.message, 'otpMessage');
@@ -303,17 +304,21 @@ async function resendOTP() {
 // Auth State Listener
 onAuthStateChanged(auth, (user) => {
     if (user) {
-        console.log('User is logged in:', user.phoneNumber || user.email);
+
+        document.getElementById("loggedUserFName").innerText = user.displayName || user.email;
+        document.getElementById("loggedUserEmail").innerText = user.email;
+
+
     } else {
-        console.log('User is logged out');
+
     }
 });
 
 // Initialize reCAPTCHA when phone form is loaded
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // This will be called when the phone form becomes active
-    const observer = new MutationObserver(function(mutations) {
-        mutations.forEach(function(mutation) {
+    const observer = new MutationObserver(function (mutations) {
+        mutations.forEach(function (mutation) {
             if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
                 const phoneForm = document.getElementById('number-verify');
                 if (phoneForm.classList.contains('active')) {
@@ -333,3 +338,24 @@ document.addEventListener('DOMContentLoaded', function() {
         observer.observe(phoneForm, { attributes: true });
     }
 });
+
+window.auth = auth;
+window.db = db;
+window.provider = provider;
+window.onAuthStateChanged = onAuthStateChanged;
+window.signOut = signOut;
+
+
+
+
+setTimeout(() => {
+
+    const imgField = document.getElementById("_imgField");
+    if (imgField) {
+        if (auth.currentUser && auth.currentUser.photoURL) {
+            imgField.src = auth.currentUser.photoURL;
+        } else {
+            imgField.src = "../assests/Designer.png";
+        }
+    }
+}, 1000);

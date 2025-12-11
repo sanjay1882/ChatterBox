@@ -1,0 +1,151 @@
+/* Settings Modal */
+.settings-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    /* Backdrop */
+    display: flex;
+    /* Hidden by default, toggle with class */
+    justify-content: center;
+    align-items: center;
+    z-index: 1002;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+
+.settings-modal.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.settings-modal-content {
+    background: #fff;
+    width: 90%;
+    max-width: 500px;
+    border-radius: 12px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+}
+
+.settings-modal.show .settings-modal-content {
+    transform: translateY(0);
+}
+
+.settings-header {
+    padding: 20px;
+    background: #6d4aff;
+    /* Brand color */
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.settings-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.settings-header .bx-x {
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.settings-header .bx-x:hover {
+    transform: rotate(90deg);
+}
+
+.settings-body {
+    padding: 24px;
+    background: #f9f9f9;
+}
+
+/* Dark mode support for modal */
+.white-mode .settings-modal-content {
+    background: #fff;
+    color: #333;
+}
+
+/* Default dark mode styles if body is dark */
+body:not(.white-mode) .settings-modal-content {
+    background: #1e1e2d;
+    color: #fff;
+}
+
+body:not(.white-mode) .settings-body {
+    background: #11101d;
+}
+
+body:not(.white-mode) .settings-header {
+    background: #11101d;
+    border-bottom: 1px solid #2c2c3e;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+body:not(.white-mode) .form-group input,
+body:not(.white-mode) .form-group select {
+    background: #2b2b3b;
+    /* Dark input bg */
+    border-color: #3b3b4f;
+    color: #fff;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #6d4aff;
+}
+
+.settings-actions {
+    margin-top: 30px;
+    text-align: right;
+}
+
+.save-btn {
+    background: #6d4aff;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.save-btn:hover {
+    background: #5a3bd6;
+}
