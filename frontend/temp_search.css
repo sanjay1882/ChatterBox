@@ -1,0 +1,213 @@
+/* --- Variables & Theme --- */
+:root {
+    /* Default (Dark Mode) */
+    --search-bg: #11101D;
+    --search-text: #fff;
+    --search-border: #333;
+    --search-card-bg: #1d1b31;
+    --google-blue: #8ab4f8;
+    --google-green: #4caf50;
+    /* Greenish */
+    --link-color: #8ab4f8;
+}
+
+body:not(.dark-mode) {
+    /* Light Mode (based on index.css logic which seems to invert)
+       Wait, index.css says body.dark-mode gets #f4f4f4 (Light!). 
+       The user's index.css has body { background: #11101D } (Dark default).
+       And body.dark-mode { background: #f4f4f4 } (Actually Light!). 
+       Confusing naming in index.css, but I must follow it. 
+       "dark-mode" class actually makes it LIGHT? 
+       Let's verify index.css: 
+       body { background: #11101D } -> Dark
+       body.dark-mode { background: #f4f4f4 } -> Light
+       Okay, so "dark-mode" class = Light Theme. logic is inverted.
+    */
+    --search-bg: #11101D;
+    --search-text: #fff;
+    --search-border: #333;
+    --search-card-bg: #1d1b31;
+    --google-blue: #8ab4f8;
+    --link-color: #8ab4f8;
+    --snippet-color: #ccc;
+}
+
+body.dark-mode {
+    /* Actually Light Theme per index.css */
+    --search-bg: #ffffff;
+    --search-text: #171616;
+    --search-border: #ddd;
+    --search-card-bg: #fff;
+    --google-blue: #1a0dab;
+    --google-green: #006621;
+    --link-color: #1a0dab;
+    --snippet-color: #4d5156;
+}
+
+/* --- Search Side Panel --- */
+.search-side-panel {
+    position: fixed;
+    top: 0;
+    right: -450px;
+    width: 400px;
+    height: 100vh;
+    background: var(--search-bg);
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    transition: right 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid var(--search-border);
+}
+
+.search-side-panel.open {
+    right: 0;
+}
+
+.panel-header {
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--search-border);
+    background: var(--search-bg);
+    color: var(--search-text);
+}
+
+.panel-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+}
+
+.panel-header button {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--search-text);
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.panel-header button:hover {
+    color: var(--google-blue);
+}
+
+.panel-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+/* Search Result Card - Google Style */
+.search-result-card {
+    background: transparent;
+    border-radius: 0;
+    padding: 0;
+    margin-bottom: 25px;
+    /* Spacing like Google */
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.search-result-card:hover {
+    opacity: 0.8;
+}
+
+.search-result-title {
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: var(--google-blue);
+    margin-bottom: 2px;
+    line-height: 1.3;
+    text-decoration: none;
+}
+
+.search-result-card:hover .search-result-title {
+    text-decoration: underline;
+}
+
+.search-result-link {
+    font-size: 0.85rem;
+    color: var(--search-text);
+    opacity: 0.8;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.search-result-snippet {
+    font-size: 0.9rem;
+    color: var(--snippet-color);
+    line-height: 1.58;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.search-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--search-text);
+    opacity: 0.5;
+    text-align: center;
+}
+
+.search-loader {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* Toggle Button Active State - Fix */
+.input-actions-menu .menu-item .menu-icon-btn.active {
+    background-color: var(--primary-color, #4caf50) !important;
+    color: #fff !important;
+    box-shadow: 0 0 10px var(--primary-color, #4caf50);
+}
+
+.input-actions-menu .menu-item .menu-icon-btn.active i,
+.input-actions-menu .menu-item .menu-icon-btn.active span {
+    color: #fff !important;
+}
+
+/* --- Layout Resizing --- */
+/* When Search Panel is Open */
+body.search-panel-open .show-chatbot {
+    margin-right: 400px;
+    /* Push content to left */
+    width: calc(100% - 78px - 400px) !important;
+    /* Adjust width: 100% - sidebar(78) - panel(400) */
+    transition: all 0.3s ease-in-out;
+}
+
+body.search-panel-open .sidebar.open~.show-chatbot {
+    width: calc(100% - 250px - 400px) !important;
+    /* Adjust when sidebar is fully open */
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .search-side-panel {
+        width: 100%;
+        right: -100%;
+    }
+
+    body.search-panel-open .show-chatbot {
+        margin-right: 0;
+        width: 100% !important;
+        /* On mobile, panel covers content, no resize */
+    }
+}

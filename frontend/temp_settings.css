@@ -1,4 +1,4 @@
-/* Settings Modal */
+
 .settings-modal {
     position: fixed;
     top: 0;
@@ -6,9 +6,9 @@
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
-    /* Backdrop */
+
     display: flex;
-    /* Hidden by default, toggle with class */
+  
     justify-content: center;
     align-items: center;
     z-index: 1002;
@@ -41,7 +41,7 @@
 .settings-header {
     padding: 20px;
     background: #6d4aff;
-    /* Brand color */
+
     color: #fff;
     display: flex;
     justify-content: space-between;
@@ -71,13 +71,13 @@
     background: #f9f9f9;
 }
 
-/* Dark mode support for modal */
+
 .white-mode .settings-modal-content {
     background: #fff;
     color: #333;
 }
 
-/* Default dark mode styles if body is dark */
+
 body:not(.white-mode) .settings-modal-content {
     background: #1e1e2d;
     color: #fff;

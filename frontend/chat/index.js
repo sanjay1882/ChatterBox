@@ -1,10 +1,11 @@
+import { API_BASE_URL } from '../config.js';
+
 let chatInput = document.querySelector(".chat-input textarea");
 const chatbox = document.querySelector(".chatbox");
 const hometagContent = document.getElementById("home-tag-contentID");
 
 
-// Streaming Speed Factor: Lower = Faster, Higher = Slower
-// A value of 5 provides a snappy, ChatGPT-like feel.
+
 const STREAMING_SPEED_MODIFIER = 500;
 
 const alertMessages = [
@@ -20,8 +21,20 @@ const alertMessages = [
     "This space is reserved for your genius — don’t skip it!"
 ];
 
+async function getAuthToken() {
+    if (window.auth && window.auth.currentUser) {
+        try {
+            return await window.auth.currentUser.getIdToken();
+        } catch (e) {
+            console.error("Error getting auth token", e);
+        }
+    }
+    return null;
+}
+
 let userMessage;
 let currentSessionId = null;
+let allSessions = [];
 let isTemporaryMode = false;
 
 let sidebar = document.querySelector(".sidebar");
@@ -70,28 +83,44 @@ function init() {
     document.getElementById('preloader').style.display = 'none';
     document.body.style.visibility = 'visible';
     document.body.style.overflow = 'auto';
-    // Load User Preferences
-    // We need to wait for email, but assuming loadSessions handles getting email or it's global?
-    // loggedUserEmail is often set in login logic. If init() runs on reload, we might need to get it from localStorage or wait.
-    // Let's assume loggedUserEmail is available or handled by authentication flow first.
-    // If not, we might need to call this after login/auth check.
-    // For now, let's call it if email exists globally or in local storage.
-    const storedEmail = localStorage.getItem('chat_user_email'); // Assuming we store it
-    if (storedEmail) {
-        loadUserPreferences(storedEmail);
-    }
 
-    loadSessions();
-    initSettings();
+    // Wait for Auth to Initialize BEFORE fetching data
+    const waitForAuth = () => {
+        return new Promise((resolve) => {
+            if (window.auth && window.onAuthStateChanged) {
+                const unsubscribe = window.onAuthStateChanged(window.auth, (user) => {
+                    unsubscribe(); // Unsubscribe immediately, we just needed the first event
+                    resolve(user);
+                });
+            } else {
+                // If firebasescripts aren't loaded yet (unlikely with order, but safe)
+                setTimeout(() => resolve(null), 2000);
+            }
+        });
+    };
+
+    waitForAuth().then((user) => {
+        if (!user) {
+            window.location.href = '/login/';
+            return;
+        }
+
+        // Ensure email in localStorage matches the authenticated user
+        const storedEmail = localStorage.getItem('loggedInUserEmail');
+        if (user.email && user.email !== storedEmail) {
+            localStorage.setItem('loggedInUserEmail', user.email);
+        }
+
+        const emailToUse = user.email || storedEmail;
+
+        if (emailToUse) {
+            loadUserPreferences(emailToUse);
+            loadSessions();
+        }
+        initSettings();
+    });
 }
 
-if (document.readyState === 'complete') {
-    init();
-} else {
-    window.addEventListener('load', init);
-}
-
-// Initial random greeting
 if (document.getElementById("Greet-tag")) {
     const greetings = [
         "How can I assist you today?",
@@ -123,9 +152,13 @@ if (themeToggle) {
         const mode = isWhite ? 'white' : 'dark';
         document.getElementById('theme-status').textContent = isWhite ? 'White Mode' : 'Dark Mode';
 
-        // Auto-save theme
         saveUserPreferences({ theme: mode });
     });
+}
+
+const shareChatBtn = document.querySelector(".bx-forward-big");
+if (shareChatBtn) {
+    shareChatBtn.addEventListener('click', shareChatSession);
 }
 
 
@@ -404,14 +437,12 @@ function showTranslationResult(translatedText, langName, messageId) {
 
     function formatStreamedText(text) {
 
-        // Temporary placeholder for think blocks to avoid regex conflicts during markdown parsing
         const thinkBlocks = [];
         let processedText = text.replace(/<think>([\s\S]*?)<\/think>/g, (match, content) => {
             thinkBlocks.push(content);
             return `__THINK_BLOCK_${thinkBlocks.length - 1}__`;
         });
 
-        // Also handle incomplete/streaming think tag at the end
         const openThinkMatch = processedText.match(/<think>([\s\S]*)$/);
         if (openThinkMatch) {
             const content = openThinkMatch[1];
@@ -419,7 +450,6 @@ function showTranslationResult(translatedText, langName, messageId) {
             processedText = processedText.replace(/<think>([\s\S]*)$/, `__THINK_BLOCK_${thinkBlocks.length - 1}__`);
         }
 
-        // Math block extraction
         const mathBlocks = [];
         processedText = processedText.replace(/\$\$([\s\S]*?)\$\$/g, (match, content) => {
             mathBlocks.push({ content: content, display: true });
@@ -573,7 +603,6 @@ function showTranslationResult(translatedText, langName, messageId) {
 
         if (inList) html += '</ul>';
 
-        // Restore Math blocks
         html = html.replace(/__MATH_BLOCK_(\d+)__/g, (match, index) => {
             const block = mathBlocks[index];
             if (!block) return match;
@@ -603,7 +632,7 @@ function showTranslationResult(translatedText, langName, messageId) {
         return html;
     }
 
-    const formattedText = formatTranslatedText(translatedText);
+    const formattedText = formatStreamedText(translatedText);
 
     translationEl.innerHTML = `
         <div class="translation-header">
@@ -625,7 +654,7 @@ async function regenerateResponse(messageId, originalMessage) {
         const messageElement = document.getElementById(messageId);
         const chatLi = messageElement.closest('.chat.incoming');
 
-        const newIncomingChatli = createList('<span class="material-symbols-outlined"><img src="assests/Star-icon.png" class="chatbot-img" id="Loading_out_Icon"></span>', "incoming");
+        const newIncomingChatli = createList('<span class="material-symbols-outlined"><img src="/public/assests/Star-icon.png" class="chatbot-img" id="Loading_out_Icon"></span>', "incoming");
 
         chatLi.parentNode.replaceChild(newIncomingChatli, chatLi);
 
@@ -643,7 +672,6 @@ let currentSpeech = null;
 let currentUtterance = null;
 let synthesis = window.speechSynthesis;
 
-// Settings Logic
 const settingsModal = document.getElementById('settings-modal');
 const settingsTabs = document.querySelectorAll('.settings-tab-btn');
 const settingsContents = document.querySelectorAll('.settings-tab-content');
@@ -653,31 +681,27 @@ const saveVoiceBtn = document.getElementById('save-voice-btn');
 let voices = [];
 let preferredVoiceName = localStorage.getItem('chat_preferred_voice');
 
-// Initialize Settings
 function initSettings() {
-    // Tab Switching
+
     settingsTabs.forEach(tab => {
         tab.addEventListener('click', () => {
-            // Remove active
+
             settingsTabs.forEach(t => t.classList.remove('active'));
             settingsContents.forEach(c => c.classList.remove('active'));
 
-            // Add active
+
             tab.classList.add('active');
             const target = tab.getAttribute('data-tab');
             document.getElementById(`tab-${target}`).classList.add('active');
         });
     });
 
-    // Voice Loading
+
     loadVoices();
     if (synthesis.onvoiceschanged !== undefined) {
         synthesis.onvoiceschanged = loadVoices;
     }
 
-
-
-    // Settings Modal Save
     const settingsForm = document.getElementById('settings-form');
     if (settingsForm) {
         settingsForm.addEventListener('submit', (e) => {
@@ -692,7 +716,7 @@ function initSettings() {
         });
     }
 
-    // Custom Dropdown Logic
+
     const voiceWrapper = document.getElementById('voice-wrapper');
     const voiceTrigger = document.getElementById('voice-trigger');
     const voiceOptions = document.getElementById('voice-options');
@@ -702,7 +726,6 @@ function initSettings() {
             voiceWrapper.classList.toggle('open');
         });
 
-        // Close when clicking outside
         document.addEventListener('click', (e) => {
             if (!voiceWrapper.contains(e.target)) {
                 voiceWrapper.classList.remove('open');
@@ -710,7 +733,6 @@ function initSettings() {
         });
     }
 
-    // Save Voice
     if (saveVoiceBtn) {
         saveVoiceBtn.addEventListener('click', () => {
             const selectedOption = voiceOptions.querySelector('.voice-option.selected');
@@ -722,7 +744,7 @@ function initSettings() {
         });
     }
 
-    // Test Voice
+
     if (testVoiceBtn) {
         testVoiceBtn.addEventListener('click', () => {
             const testText = "Hello! This is how I sound.";
@@ -738,14 +760,9 @@ function loadVoices() {
 
     voiceOptionsContainer.innerHTML = '';
 
-    // Filter Voices: Tamil, Telugu, Malayalam, English (IN), English (US)
-    // Note: Codes might be ta-IN, te-IN, ml-IN, en-IN, en-US.
     const allowedLangs = ['ta-IN', 'ta', 'te-IN', 'te', 'ml-IN', 'ml', 'en-IN', 'en-US', 'en-GB'];
 
-    // Filter and Deduplicate (sometimes multiple variants exist)
     const filteredVoices = voices.filter(voice => {
-        // Check if lang starts with allowed codes (handling locale variants)
-        // Normalize voice.lang: replace '_' with '-' and lower case
         const voiceLang = voice.lang.replace('_', '-');
         return allowedLangs.some(lang => voiceLang.includes(lang));
     });
@@ -755,7 +772,6 @@ function loadVoices() {
         return;
     }
 
-    // Sort to group by language
     filteredVoices.sort((a, b) => a.lang.localeCompare(b.lang));
 
     filteredVoices.forEach(voice => {
@@ -770,18 +786,13 @@ function loadVoices() {
         }
 
         option.addEventListener('click', () => {
-            // visual selection
             voiceOptionsContainer.querySelectorAll('.voice-option').forEach(opt => opt.classList.remove('selected'));
             option.classList.add('selected');
 
-            // Update display
             document.getElementById('voice-display').textContent = voice.name;
 
-            // Update preferredVoiceName immediately for testing (preview)
-            // But don't save to localStorage/DB until Save button is clicked
             preferredVoiceName = voice.name;
 
-            // Close dropdown
             document.getElementById('voice-wrapper').classList.remove('open');
         });
 
@@ -789,17 +800,15 @@ function loadVoices() {
     });
 }
 
-// Call initSettings when DOM matches
 if (document.getElementById('save-voice-btn')) {
     initSettings();
 } else {
-    // Retry if loaded too early
     setTimeout(() => {
         if (document.getElementById('save-voice-btn')) initSettings();
     }, 1000);
 }
 
-// --- Custom Model Dropdown Logic ---
+
 function initModelDropdown() {
     const modelWrapper = document.getElementById('model-wrapper');
     const modelTrigger = document.getElementById('model-trigger');
@@ -812,27 +821,24 @@ function initModelDropdown() {
             modelWrapper.classList.toggle('open');
         });
 
-        // Close when clicking outside
         document.addEventListener('click', (e) => {
             if (!modelWrapper.contains(e.target)) {
                 modelWrapper.classList.remove('open');
             }
         });
 
-        // Option click handlers
+
         const options = modelOptions.querySelectorAll('.model-option');
         options.forEach(option => {
             option.addEventListener('click', () => {
-                // Remove selected from others
+
                 options.forEach(opt => opt.classList.remove('selected'));
                 option.classList.add('selected');
 
-                // Update display and hidden input
+
                 const value = option.getAttribute('data-value');
-                const text = option.textContent; // Or use title if preferred for display
-                // For display, maybe just the name part? Let's use text content.
-                // Text content includes tooltip in original? No, title attribute is tooltip.
-                // inner text is "Claude Sonnet 4" etc.
+                const text = option.textContent;
+
 
                 modelDisplay.textContent = text;
                 modelSelectInput.value = value;
@@ -844,26 +850,23 @@ function initModelDropdown() {
     }
 }
 
-// Call init functions
+
 if (document.readyState === 'complete') {
-    // Already loaded
+
 }
 
-// Append to init sequence or call if elements exist
-// We can hook this into init() if possible, or just call it here if script runs after body.
-// Script is at bottom?
-// Let's add it to init() or existing DOMContentLoaded listener.
-// Search for initSettings usage. It's called when 'save-voice-btn' exists.
-// Let's make a new initUI function or just append this logic.
 
-// Since I am replacing content, I can just define it and call it.
 initModelDropdown();
 
-// --- Persistence Helpers ---
+
 async function loadUserPreferences(email) {
     if (!email) return;
     try {
-        const response = await fetch(`http://localhost:3000/user/preferences/${email}`);
+        const token = await getAuthToken();
+        const headers = {};
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+
+        const response = await fetch(`${API_BASE_URL}/user/preferences/${email}`, { headers });
         if (response.ok) {
             const prefs = await response.json();
             applyUserPreferences(prefs);
@@ -874,10 +877,10 @@ async function loadUserPreferences(email) {
 }
 
 function applyUserPreferences(prefs) {
-    // Theme
+
     if (prefs.theme) {
         const isWhite = prefs.theme === 'white';
-        // Only toggle if different
+
         const currentWhite = document.body.classList.contains('white-mode');
         if (isWhite !== currentWhite) {
             document.body.classList.toggle('white-mode', isWhite);
@@ -890,7 +893,7 @@ function applyUserPreferences(prefs) {
         }
     }
 
-    // Voice
+
     if (prefs.voice) {
         preferredVoiceName = prefs.voice;
         localStorage.setItem('chat_preferred_voice', prefs.voice);
@@ -898,23 +901,21 @@ function applyUserPreferences(prefs) {
         if (voiceDisplay) voiceDisplay.textContent = prefs.voice;
     }
 
-    // Settings Form Fields
     if (prefs.gender) {
         const genderInput = document.getElementById('user-gender');
         if (genderInput) genderInput.value = prefs.gender;
         const display = document.querySelector('#gender-wrapper .custom-select-trigger span');
-        // Map value to text if needed, or simple display
+
         if (display) display.textContent = prefs.gender || "Prefer not to say";
     }
-    // ... similarly for other fields if needed
+
 }
 
 async function saveUserPreferences(updates) {
-    // Fallback: get from localStorage if available there from Login logic
-    // or try getting text content of the element or global var
+
     let email = localStorage.getItem('chat_user_email');
 
-    // If not in local storage (maybe legacy), try DOM
+
     if (!email) {
         email = document.getElementById('loggedUserEmail')?.textContent;
     }
@@ -922,9 +923,13 @@ async function saveUserPreferences(updates) {
     if (!email) return;
 
     try {
-        await fetch('http://localhost:3000/user/preferences', {
+        const token = await getAuthToken();
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+
+        await fetch(`${API_BASE_URL}/user/preferences`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: headers,
             body: JSON.stringify({ email, ...updates })
         });
         showToast('Settings saved');
@@ -945,23 +950,23 @@ function speakMessage(rawHtml, messageId, btn) {
         return;
     }
 
-    synthesis.cancel(); // Stop active speech
+    synthesis.cancel();
 
-    // Cleanup previous highlights if different message
+
     document.querySelectorAll('.speaking-highlight').forEach(el => {
-        el.outerHTML = el.innerHTML; // Remove partial wrappers
+        el.outerHTML = el.innerHTML;
     });
 
     const messageEl = document.getElementById(messageId);
     if (!messageEl) return;
 
-    // Use textContent for speech to match DOM TextNodes exactly for highlighting
+
     const textToSpeak = messageEl.textContent;
 
     const utterance = new SpeechSynthesisUtterance(textToSpeak);
     currentUtterance = utterance;
 
-    // Set Voice
+
     if (preferredVoiceName) {
         const chosenVoice = voices.find(v => v.name === preferredVoiceName);
         if (chosenVoice) utterance.voice = chosenVoice;
@@ -982,7 +987,7 @@ function speakMessage(rawHtml, messageId, btn) {
         if (btn) btn.innerHTML = '<i class="bx bx-volume-full" title="Listen"></i>';
         currentSpeech = null;
         removeHighlight(messageId);
-        // showToast('Text-to-speech interrupted'); // Optional
+
     };
 
     utterance.onboundary = (event) => {
@@ -1005,7 +1010,7 @@ function speakTextSimple(text) {
 }
 
 function highlightWord(rootEl, charIndex, charLength) {
-    // Remove previous highlight within this root
+
     removeHighlight(rootEl.id);
 
     if (!rootEl) return;
@@ -1016,7 +1021,6 @@ function highlightWord(rootEl, charIndex, charLength) {
     let targetNode = null;
     let targetOffset = 0;
 
-    // Find the text node containing the charIndex
     while (treeWalker.nextNode()) {
         const node = treeWalker.currentNode;
         const nodeLength = node.textContent.length;
@@ -1030,8 +1034,7 @@ function highlightWord(rootEl, charIndex, charLength) {
     }
 
     if (targetNode) {
-        // Check if word fits in this node, else it might span (ignoring span case for simplicity)
-        // We will wrap the specific range
+
         const range = document.createRange();
         try {
             const endOffset = Math.min(targetOffset + charLength, targetNode.textContent.length);
@@ -1202,6 +1205,7 @@ function formatStreamedText(text) {
         .replace(/\*\*\*(.*?)\*\*\*/gim, '<b><i>$1</i></b>')
         .replace(/\*\*(.*?)\*\*/gim, '<b>$1</b>')
         .replace(/\*(.*?)\*/gim, '<i>$1</i>')
+        .replace(/\[([^\]]+)\]\(([^)]+)\)/gim, '<a href="$2" target="_blank" class="styled-link"><i class="bx bx-link"></i> $1</a>')
         .replace(/`([^`]+)`/gim, '<code>$1</code>')
         .replace(/```(\w+)?\n?([\s\S]*?)```/gim, (match, lang, code) => {
             const language = lang ? ` class="language-${lang}"` : '';
@@ -1315,7 +1319,7 @@ function formatStreamedText(text) {
 
 let response;
 let file = null;
-async function generateResponse(incomingChatli) {
+async function generateResponse(incomingChatli, fileToUpload) {
     const messageElement = incomingChatli.querySelector('p');
     try {
         const selectedModel = document.getElementById("model-select").value;
@@ -1371,11 +1375,11 @@ async function generateResponse(incomingChatli) {
             formData.append("webSearch", "false");
         }
 
-        if (file) {
-            formData.append("image", file);
+        if (fileToUpload) {
+            formData.append("image", fileToUpload);
         }
 
-        // Add settings to formData
+
         const savedSettings = localStorage.getItem("chatSettings");
         if (savedSettings) {
             const settings = JSON.parse(savedSettings);
@@ -1385,8 +1389,13 @@ async function generateResponse(incomingChatli) {
             if (settings.culture) formData.append('culture', settings.culture);
         }
 
-        response = await fetch("http://localhost:3000/stream", {
+        const token = await getAuthToken();
+        const headers = {};
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+
+        response = await fetch(`${API_BASE_URL}/stream`, {
             method: "POST",
+            headers: headers,
             body: formData
         });
 
@@ -1403,7 +1412,6 @@ async function generateResponse(incomingChatli) {
         let isStreaming = true;
         const animationSpeed = 50; // ms per character
 
-        // Animation loop
         const animateText = () => {
             // Capture state of all think blocks in this message
             const openIndices = new Set();
@@ -1558,6 +1566,380 @@ function renderSources(sources, messageElement) {
     messageElement.parentNode.insertBefore(sourcesDiv, messageElement);
 }
 
+// --- Advanced Search Logic ---
+let isSearchMode = false;
+const webSearchBtn = document.getElementById("web-search");
+const searchSidePanel = document.getElementById("search-side-panel");
+const closeSidePanelBtn = document.getElementById("close-side-panel");
+const searchResultsContainer = document.getElementById("search-results-container");
+const toggleSearchPanelBtn = document.getElementById("toggle-search-panel-btn");
+
+// Function to open panel and adjust layout
+function openSearchPanel() {
+    searchSidePanel.classList.add("open");
+    document.body.classList.add("search-panel-open");
+    if (toggleSearchPanelBtn) toggleSearchPanelBtn.style.color = "var(--primary-color, #4caf50)"; // Highlight
+}
+
+// Function to close panel and adjust layout
+function closeSearchPanel() {
+    searchSidePanel.classList.remove("open");
+    document.body.classList.remove("search-panel-open");
+    if (toggleSearchPanelBtn) toggleSearchPanelBtn.style.color = "white"; // Reset
+}
+
+if (webSearchBtn) {
+    webSearchBtn.addEventListener("click", () => {
+        isSearchMode = !isSearchMode;
+        const chatInputContainer = document.querySelector(".chat-input"); // Use class selector for safety if ID varies
+        if (isSearchMode) {
+            webSearchBtn.classList.add("active");
+            if (chatInputContainer) chatInputContainer.classList.add("active");
+        } else {
+            webSearchBtn.classList.remove("active");
+            if (chatInputContainer) chatInputContainer.classList.remove("active");
+        }
+
+        const chatInput = document.getElementById("inputa");
+        if (chatInput) {
+            chatInput.placeholder = isSearchMode ? "Search Google..." : "Ask anything...";
+        }
+
+        showToast(isSearchMode ? "Search Mode ON" : "Search Mode OFF");
+    });
+}
+
+if (closeSidePanelBtn) {
+    closeSidePanelBtn.addEventListener("click", () => {
+        closeSearchPanel();
+        // Show the toggle button if we have results so user can re-open
+        if (searchResultsContainer.children.length > 0 && toggleSearchPanelBtn) {
+            toggleSearchPanelBtn.style.display = "block";
+        }
+    });
+}
+
+if (toggleSearchPanelBtn) {
+    toggleSearchPanelBtn.addEventListener("click", () => {
+        if (searchSidePanel.classList.contains("open")) {
+            closeSearchPanel();
+        } else {
+            openSearchPanel();
+        }
+    });
+}
+
+
+// Function to reset search mode on load
+function resetSearchMode() {
+    isSearchMode = false;
+    if (webSearchBtn) webSearchBtn.classList.remove("active");
+    const chatInputContainer = document.querySelector(".chat-input");
+    if (chatInputContainer) chatInputContainer.classList.remove("active");
+    const chatInput = document.getElementById("inputa");
+    if (chatInput) chatInput.placeholder = "Ask anything...";
+}
+
+async function handleSearchFlow(prompt, incomingChatli) {
+    try {
+        // Open Side Panel
+        openSearchPanel();
+        if (toggleSearchPanelBtn) toggleSearchPanelBtn.style.display = "block"; // Ensure it's available
+
+        // Auto-disable search mode after triggering
+        if (webSearchBtn) {
+            isSearchMode = false;
+            webSearchBtn.classList.remove("active");
+            const chatInputContainer = document.getElementById("chat-input");
+            if (chatInputContainer) chatInputContainer.classList.remove("active");
+            // Optional: toast to say search executed? Maybe redundant.
+        }
+
+        searchResultsContainer.innerHTML = `
+            <div class="search-loader">
+                <i class='bx bx-loader-alt bx-spin' style="font-size: 2rem; color: var(--primary-color);"></i>
+            </div>
+            <p style="text-align:center; color: var(--sub-text-color);">Generating queries...</p>
+        `;
+
+        // 1. Generate Queries
+        const token = await getAuthToken();
+        const headers = { "Content-Type": "application/json" };
+        if (token) headers["Authorization"] = `Bearer ${token}`;
+
+        // Initial feedback in chat
+        incomingChatli.querySelector("p").textContent = "Analyzing prompt and generating search queries...";
+
+        const queryRes = await fetch(`${API_BASE_URL}/generate-search-queries`, {
+            method: "POST",
+            headers: headers,
+            body: JSON.stringify({ prompt: prompt })
+        });
+
+        if (!queryRes.ok) {
+            const errData = await queryRes.json().catch(() => ({}));
+            throw new Error(errData.error || `Server error: ${queryRes.status}`);
+        }
+
+        const queryData = await queryRes.json();
+
+        if (!queryData.queries || queryData.queries.length === 0) {
+            throw new Error("No queries generated");
+        }
+
+        const queries = queryData.queries;
+        incomingChatli.querySelector("p").textContent = `Searching for:\n${queries.map(q => "- " + q).join("\n")}`;
+
+        searchResultsContainer.innerHTML = ""; // Clear loader
+
+        // --- AI Overview Button ---
+        const overviewBtn = document.createElement("button");
+        overviewBtn.className = "ai-overview-btn";
+        overviewBtn.innerHTML = "<i class='bx bx-brain'></i> Generate AI Overview";
+        overviewBtn.onclick = () => handleOverviewClick(prompt);
+        searchResultsContainer.appendChild(overviewBtn);
+        // --------------------------
+
+        // 2. Fetch Results for each query (or just first 2 for speed)
+        // Let's do parallel fetch
+        const searchPromises = queries.slice(0, 2).map(q =>
+            fetch(`${API_BASE_URL}/search-results?query=${encodeURIComponent(q)}`, { headers })
+                .then(r => r.json())
+        );
+
+        const resultsArray = await Promise.all(searchPromises);
+        let allResults = [];
+        resultsArray.forEach(data => {
+            if (data.results) allResults.push(...data.results);
+        });
+
+        // Deduplicate by link
+        const uniqueResults = [];
+        const seenLinks = new Set();
+        for (const r of allResults) {
+            if (!seenLinks.has(r.link)) {
+                seenLinks.add(r.link);
+                uniqueResults.push(r);
+            }
+        }
+
+        if (uniqueResults.length === 0) {
+            searchResultsContainer.innerHTML = "<p>No results found.</p>";
+            incomingChatli.querySelector("p").textContent = "No search results found.";
+            return;
+        }
+
+        // Render Results
+        uniqueResults.forEach(result => {
+            const card = document.createElement("div");
+            card.className = "search-result-card";
+            card.innerHTML = `
+                <div class="search-result-title">${result.title}</div>
+                <div class="search-result-link">${result.link}</div>
+                <div class="search-result-snippet">${result.snippet || "No snippet available."}</div>
+            `;
+            card.addEventListener("click", () => handleResultClick(result.link, prompt));
+            searchResultsContainer.appendChild(card);
+        });
+
+        // Generate Dynamic AI Response
+        const contextPrompt = `
+            User Prompt: "${prompt}"
+            Search Results Found: ${uniqueResults.length}
+            Top Result: "${uniqueResults[0]?.title}"
+            
+            Task: Write a short, natural, and helpful response (1-2 sentences) telling the user that you found relevant results and they are available in the side panel. Mention the top result briefly if relevant. Do NOT list all results. Encourage them to click a result to analyze it.
+        `;
+
+        const completionRes = await fetch(`${API_BASE_URL}/chat-completion`, {
+            method: "POST",
+            headers: headers,
+            body: JSON.stringify({ prompt: contextPrompt })
+        });
+
+        if (completionRes.ok) {
+            const completionData = await completionRes.json();
+            // Simulate typing effect or just set text
+            incomingChatli.querySelector("p").innerText = completionData.text;
+        } else {
+            // Fallback
+            incomingChatli.querySelector("p").textContent = "All set! Your search results are ready in the side panel. Click any link to explore!";
+        }
+
+    } catch (error) {
+        console.error("Search flow error:", error);
+        searchResultsContainer.innerHTML = `<p style="color:var(--text-color); opacity: 0.7;">Oops! I hit a snag while searching.</p>`;
+        incomingChatli.querySelector("p").textContent = "My apologies, I ran into a little trouble finding that for you. Mind trying again?";
+    } finally {
+        // Auto-disable search mode after triggering
+        if (webSearchBtn && isSearchMode) {
+            isSearchMode = false;
+            webSearchBtn.classList.remove("active");
+            const chatInputContainer = document.getElementById("chat-input");
+            if (chatInputContainer) chatInputContainer.classList.remove("active");
+            showToast("Search Mode Auto-Disabled");
+        }
+    }
+}
+
+async function handleResultClick(url, originalPrompt) {
+    try {
+        // Create new incoming chat li
+        const incomingChatli = createList('<span class="material-symbols-outlined"><img src="/assests/Star-icon.png" class="chatbot-img" id="Loading_out_Icon"></span>', "incoming");
+        chatbox.appendChild(incomingChatli);
+        chatbox.scrollTo(0, chatbox.scrollHeight);
+
+        const messageElement = incomingChatli.querySelector('p');
+        messageElement.innerHTML = `Analyzing <a href="${url}" target="_blank">${url}</a>...<br><i class='bx bx-loader-alt bx-spin'></i>`;
+
+        const token = await getAuthToken();
+        const headers = { "Content-Type": "application/json" };
+        if (token) headers["Authorization"] = `Bearer ${token}`;
+
+        const res = await fetch(`${API_BASE_URL}/analyze-url-stream`, {
+            method: "POST",
+            headers: headers,
+            body: JSON.stringify({
+                url: url,
+                email: localStorage.getItem("loggedInUserEmail"),
+                prompt: originalPrompt,
+                sessionId: currentSessionId
+            })
+        });
+
+        if (!res.ok) throw new Error("Failed to start analysis stream");
+
+        await streamResponseToChat(res, incomingChatli);
+
+    } catch (error) {
+        console.error("Analysis error:", error);
+        showToast("Oops! Couldn't analyze that link just now.");
+        incomingChatli.querySelector('p').innerHTML = "I had a bit of trouble reading that link. Maybe try another one?";
+    }
+}
+
+async function handleOverviewClick(originalPrompt) {
+    try {
+        const incomingChatli = createList('<span class="material-symbols-outlined"><img src="/public/assests/Star-icon.png" class="chatbot-img" id="Loading_out_Icon"></span>', "incoming");
+        chatbox.appendChild(incomingChatli);
+        chatbox.scrollTo(0, chatbox.scrollHeight);
+
+        const messageElement = incomingChatli.querySelector('p');
+        messageElement.innerHTML = `Generating AI Overview...<br><i class='bx bx-loader-alt bx-spin'></i>`;
+
+        const token = await getAuthToken();
+        const headers = { "Content-Type": "application/json" };
+        if (token) headers["Authorization"] = `Bearer ${token}`;
+
+        const res = await fetch(`${API_BASE_URL}/search-overview-stream`, {
+            method: "POST",
+            headers: headers,
+            body: JSON.stringify({
+                query: originalPrompt,
+                email: localStorage.getItem("loggedInUserEmail"),
+                sessionId: currentSessionId
+            })
+        });
+
+        if (!res.ok) throw new Error("Failed to start overview stream");
+
+        await streamResponseToChat(res, incomingChatli);
+
+    } catch (error) {
+        console.error("Overview error:", error);
+        showToast("Hiccup! Couldn't generate an overview.");
+        incomingChatli.querySelector('p').innerHTML = "I struggled to summarize everything this time. Want to try a slightly different search?";
+    }
+}
+
+// Helper to handle streaming response (duplicated from generateResponse to avoid refactoring risk)
+async function streamResponseToChat(response, incomingChatli) {
+    const messageElement = incomingChatli.querySelector('p');
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+
+    let fullText = "";
+    let displayedText = "";
+    let isStreaming = true;
+
+    // Animation loop
+    const animateText = () => {
+        // Capture state of all think blocks in this message
+        const openIndices = new Set();
+        messageElement.querySelectorAll('details.think-block-details').forEach((el, index) => {
+            if (el.hasAttribute('open')) openIndices.add(index);
+        });
+
+        if (displayedText.length < fullText.length) {
+            const bufferSize = fullText.length - displayedText.length;
+            const chunkSize = Math.max(1, Math.min(bufferSize, Math.ceil(bufferSize / STREAMING_SPEED_MODIFIER) + 1));
+            displayedText += fullText.slice(displayedText.length, displayedText.length + chunkSize);
+            let html = formatStreamedText(displayedText);
+
+            // Restore open state
+            let count = 0;
+            html = html.replace(/<details class="think-block-details">/g, (match) => {
+                const isOpen = openIndices.has(count++);
+                return isOpen ? '<details class="think-block-details" open>' : match;
+            });
+
+            messageElement.innerHTML = html;
+            chatbox.scrollTo(0, chatbox.scrollHeight);
+            requestAnimationFrame(animateText);
+        } else if (!isStreaming) {
+            let html = formatStreamedText(fullText);
+
+            // Restore open state
+            let count = 0;
+            html = html.replace(/<details class="think-block-details">/g, (match) => {
+                const isOpen = openIndices.has(count++);
+                return isOpen ? '<details class="think-block-details" open>' : match;
+            });
+
+            messageElement.innerHTML = html;
+            chatbox.scrollTo(0, chatbox.scrollHeight);
+
+            // Add actions
+            const actionButtons = incomingChatli.querySelector('.chat-actions');
+            if (actionButtons) {
+                const newActionButtons = createActionButtons(messageElement.id, fullText, true);
+                actionButtons.parentNode.replaceChild(newActionButtons, actionButtons);
+                newActionButtons.style.display = 'flex';
+            }
+        } else {
+            requestAnimationFrame(animateText);
+        }
+    };
+    animateText();
+
+    while (true) {
+        const { done, value } = await reader.read();
+        if (done) {
+            isStreaming = false;
+            break;
+        }
+        const chunk = decoder.decode(value, { stream: true });
+        const lines = chunk.split("\n\n");
+        for (const line of lines) {
+            if (line.startsWith("event: session_id")) {
+                currentSessionId = line.split("\n")[1].replace("data: ", "").trim();
+                loadSessions();
+            } else if (line.startsWith("data: ")) {
+                const dataStr = line.replace("data: ", "").trim();
+                if (dataStr === "done") break;
+                try {
+                    const data = JSON.parse(dataStr);
+                    if (data.text) fullText += data.text;
+                    if (data.error) {
+                        messageElement.innerHTML += `<br><span style="color:red">Error: ${data.error}</span>`;
+                        isStreaming = false;
+                    }
+                } catch (e) { }
+            }
+        }
+    }
+}
+
 function ChatHandle() {
 
     userMessage = chatInput.value.trim();
@@ -1574,11 +1956,23 @@ function ChatHandle() {
 
     chatInput.value = "";
     chatbox.scrollTo(0, chatbox.scrollHeight);
+    const currentFile = file;
+
+    // Clear styles and file
+    file = null;
+    fileUpload.value = '';
+    filePreview.classList.add('hidden');
+    // webSearch.style.display = 'flex'; // This line was causing issues if webSearch isn't defined or needed
 
     setTimeout(() => {
         const incomingChatli = createList('<span class="material-symbols-outlined"><img src="assests/Star-icon.png" class="chatbot-img" id="Loading_out_Icon"></span>', "incoming")
         chatbox.appendChild(incomingChatli);
-        generateResponse(incomingChatli);
+
+        if (isSearchMode) {
+            handleSearchFlow(userMessage, incomingChatli);
+        } else {
+            generateResponse(incomingChatli, currentFile);
+        }
     }, 600);
 
 }
@@ -1599,69 +1993,112 @@ async function loadSessions() {
     if (!userEmail) return;
 
     try {
-        const res = await fetch(`http://localhost:3000/sessions/${userEmail}`);
+        const token = await getAuthToken();
+        const headers = {};
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+
+        const res = await fetch(`${API_BASE_URL}/sessions/${userEmail}`, { headers });
         const sessions = await res.json();
 
-        const list = document.getElementById("chat-history-list");
-        list.innerHTML = "";
+        if (!Array.isArray(sessions)) {
+            console.error("Expected array of sessions but got:", sessions);
+            return;
+        }
 
-        const today = new Date();
-        const yesterday = new Date(today);
-        yesterday.setDate(yesterday.getDate() - 1);
+        allSessions = sessions;
+        renderSessions(allSessions);
 
-        const groups = {
-            "Today": [],
-            "Yesterday": [],
-            "Previous 7 Days": [],
-            "Previous 30 Days": [],
-            "Older": []
-        };
+    } catch (error) {
+        console.error("Failed to load sessions", error);
+    }
+}
 
-        sessions.forEach(session => {
-            const date = new Date(session.updatedAt);
-            const diffTime = Math.abs(today - date);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+function renderSessions(sessionsToRender) {
+    const list = document.getElementById("chat-history-list");
+    if (!list) return;
+    list.innerHTML = "";
 
-            if (date.toDateString() === today.toDateString()) {
-                groups["Today"].push(session);
-            } else if (date.toDateString() === yesterday.toDateString()) {
-                groups["Yesterday"].push(session);
-            } else if (diffDays <= 7) {
-                groups["Previous 7 Days"].push(session);
-            } else if (diffDays <= 30) {
-                groups["Previous 30 Days"].push(session);
-            } else {
-                groups["Older"].push(session);
-            }
-        });
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
 
-        for (const [key, group] of Object.entries(groups)) {
-            if (group.length > 0) {
-                const header = document.createElement("li");
-                header.className = "history-header";
-                header.textContent = key;
-                list.appendChild(header);
+    const groups = {
+        "Google Searches": [],
+        "Today": [],
+        "Yesterday": [],
+        "Previous 7 Days": [],
+        "Previous 30 Days": [],
+        "Older": []
+    };
 
-                group.forEach(session => {
-                    const li = document.createElement("li");
-                    li.className = `history-item ${session._id === currentSessionId ? 'active' : ''}`;
-                    li.id = `session-${session._id}`;
+    sessionsToRender.forEach(session => {
+        if (session.isWebSearchEnabled) {
+            groups["Google Searches"].push(session);
+            return;
+        }
 
-                    li.innerHTML = `
-                        <i class='bx bx-message-square-detail'></i>
+        const date = new Date(session.updatedAt);
+        const diffTime = Math.abs(today - date);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        if (date.toDateString() === today.toDateString()) {
+            groups["Today"].push(session);
+        } else if (date.toDateString() === yesterday.toDateString()) {
+            groups["Yesterday"].push(session);
+        } else if (diffDays <= 7) {
+            groups["Previous 7 Days"].push(session);
+        } else if (diffDays <= 30) {
+            groups["Previous 30 Days"].push(session);
+        } else {
+            groups["Older"].push(session);
+        }
+    });
+
+    for (const [key, group] of Object.entries(groups)) {
+        if (group.length > 0) {
+            const header = document.createElement("li");
+            header.className = "history-header";
+            header.textContent = key;
+            list.appendChild(header);
+
+            group.forEach(session => {
+                const li = document.createElement("li");
+                li.className = `history-item ${session._id === currentSessionId ? 'active' : ''}`;
+                li.id = `session-${session._id}`;
+
+                // Icon based on type
+                let iconClass = 'bx bx-message-square-detail';
+                if (session.isWebSearchEnabled) {
+                    iconClass = 'bx bx-planet';
+                }
+
+                li.innerHTML = `
+                        <i class='${iconClass}'></i>
                         <span class="session-title" onclick="loadSession('${session._id}')">${session.title}</span>
                         <button class="delete-session-btn" onclick="deleteSession('${session._id}')" title="Delete Chat">
                             <i class='bx bx-trash'></i>
                         </button>
                     `;
-                    list.appendChild(li);
-                });
-            }
+                list.appendChild(li);
+            });
+        }
+    }
+}
+
+const sidebarSearchInput = document.getElementById('sidebar-search-input');
+if (sidebarSearchInput) {
+    sidebarSearchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        if (!query) {
+            renderSessions(allSessions);
+            return;
         }
 
-    } catch (error) {
-        console.error("Failed to load sessions", error);
-    }
+        const filteredSessions = allSessions.filter(session =>
+            session.title.toLowerCase().includes(query)
+        );
+        renderSessions(filteredSessions);
+    });
 }
 
 
@@ -1679,8 +2116,13 @@ async function deleteSession(sessionId) {
     }
 
     try {
-        const res = await fetch(`http://localhost:3000/sessions/${userEmail}/${sessionId}/soft-delete`, {
-            method: 'PATCH'
+        const token = await getAuthToken();
+        const headers = {};
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+
+        const res = await fetch(`${API_BASE_URL}/sessions/${userEmail}/${sessionId}/soft-delete`, {
+            method: 'PATCH',
+            headers: headers
         });
 
         if (res.ok) {
@@ -1754,11 +2196,32 @@ async function loadSession(sessionId) {
     if (!userEmail) return;
 
     try {
-        const res = await fetch(`http://localhost:3000/session/${userEmail}/${sessionId}`);
+        const token = await getAuthToken();
+        const headers = {};
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+
+        const res = await fetch(`${API_BASE_URL}/session/${userEmail}/${sessionId}`, { headers });
         if (!res.ok) throw new Error("Failed to fetch session");
         const session = await res.json();
 
         currentSessionId = sessionId;
+
+        // Restore Search Mode State
+        const webSearchBtn = document.getElementById("web-search");
+        const chatInputContainer = document.querySelector(".chat-input");
+        const chatInput = document.getElementById("inputa");
+
+        if (session.isWebSearchEnabled) {
+            isSearchMode = true;
+            if (webSearchBtn) webSearchBtn.classList.add("active");
+            if (chatInputContainer) chatInputContainer.classList.add("active");
+            if (chatInput) chatInput.placeholder = "Ask Google Search...";
+        } else {
+            isSearchMode = false;
+            if (webSearchBtn) webSearchBtn.classList.remove("active");
+            if (chatInputContainer) chatInputContainer.classList.remove("active");
+            if (chatInput) chatInput.placeholder = "Ask anything...";
+        }
 
         document.querySelectorAll(".history-item").forEach(el => el.classList.remove("active"));
         loadSessions();
@@ -1817,8 +2280,9 @@ async function loadSession(sessionId) {
 
         chatbox.scrollTo(0, chatbox.scrollHeight);
 
-        if (window.innerWidth <= 768) {
+        if (sidebar.classList.contains("open")) {
             sidebar.classList.remove("open");
+            document.getElementById("btn1").style.display = "block";
         }
 
     } catch (error) {
@@ -1855,6 +2319,15 @@ function startNewChat() {
     document.getElementById("chat-input").classList.remove("hide-before");
     setRandomGreeting(); // Set random greeting
     loadSessions();
+    if (sidebar.classList.contains("open")) {
+        sidebar.classList.remove("open");
+        if (typeof closeBtn !== 'undefined') {
+            // Ensure the menu button icon is reset if needed, though toggle usually handles it
+            // Based on index.js lines 45-55, resizing or toggling logic might need checking
+            // But simple remove "open" is safe.
+            document.getElementById("btn1").style.display = "block";
+        }
+    }
 }
 
 
@@ -1904,9 +2377,7 @@ cancelFile.addEventListener('click', () => {
 });
 
 
-webSearch.addEventListener('click', () => {
-    webSearch.classList.toggle('active');
-});
+
 
 
 const resizetextarea = document.querySelector('.chat-input textarea');
@@ -2060,6 +2531,10 @@ document.addEventListener("DOMContentLoaded", () => {
             e.preventDefault();
             loadSettings(); // Load saved values
             settingsModal.classList.add("show");
+            if (sidebar.classList.contains("open")) {
+                sidebar.classList.remove("open");
+                document.getElementById("btn1").style.display = "block";
+            }
         });
     }
 
@@ -2166,9 +2641,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
             try {
                 showToast("Generating share link...");
-                const res = await fetch("http://localhost:3000/share", {
+                const token = await getAuthToken();
+                const headers = { "Content-Type": "application/json" };
+                if (token) headers['Authorization'] = `Bearer ${token}`;
+
+                const res = await fetch("${API_BASE_URL}/share", {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
+                    headers: headers,
                     body: JSON.stringify({ email: userEmail, sessionId: currentSessionId })
                 });
 
@@ -2188,3 +2667,67 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
+
+async function shareChatSession() {
+    if (!currentSessionId) {
+        showToast("Start a chat to share it!");
+        return;
+    }
+
+    const email = localStorage.getItem('loggedInUserEmail');
+    if (!email) {
+        showToast("Please login share.");
+        return;
+    }
+
+    let shareBtn = document.querySelector(".bx-forward-big");
+    if (!shareBtn) {
+
+        shareBtn = document.querySelector(".right-heder-bar .bx-forward-big") || document.querySelector(".bx-share");
+    }
+
+
+    const originalIconClass = shareBtn ? shareBtn.className : "bx bx-forward-big";
+
+    if (shareBtn) {
+        shareBtn.className = "bx bx-loader-alt bx-spin";
+    }
+
+    try {
+        const token = await getAuthToken();
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+
+        const response = await fetch(`${API_BASE_URL}/share`, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify({ email, sessionId: currentSessionId })
+        });
+
+        if (!response.ok) throw new Error("Share failed");
+
+        const data = await response.json();
+        const shareLink = `${window.location.origin}/share.html?id=${data.shareId}`;
+
+        await navigator.clipboard.writeText(shareLink);
+        showToast("Link copied to clipboard!");
+
+        if (shareBtn) shareBtn.className = originalIconClass;
+
+    } catch (error) {
+        console.error(error);
+        showToast("Failed to generate share link");
+        if (shareBtn) shareBtn.className = originalIconClass;
+    }
+}
+
+
+if (document.readyState === 'complete') {
+    init();
+    resetSearchMode();
+} else {
+    window.addEventListener('load', () => {
+        init();
+        resetSearchMode();
+    });
+}

@@ -10,7 +10,7 @@ const ChatSessionSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
-        index: true
+        index: true // Indexed for fast lookup by user
     },
     title: {
         type: String,
@@ -25,34 +25,17 @@ const ChatSessionSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    createdAt: {
-        type: Date,
-        default: Date.now
+    isWebSearchEnabled: {
+        type: Boolean,
+        default: false
     },
-    updatedAt: {
-        type: Date,
-        default: Date.now
-    }
+}, {
+    timestamps: true // Automatically manages createdAt and updatedAt
 });
 
-// Update 'updatedAt' on save
-ChatSessionSchema.pre('save', function (next) {
-    this.updatedAt = Date.now();
-    next();
-});
+// Compound index for efficient sorting by update time per user
+ChatSessionSchema.index({ email: 1, updatedAt: -1 });
 
-// Function to get a model for a specific user's collection
-const getSessionModel = (email) => {
-    // Sanitize email to create a valid collection name (replace special chars)
-    const safeEmail = email.replace(/[^a-zA-Z0-9]/g, '_');
-    const collectionName = `sessions_${safeEmail}`;
+const ChatSession = mongoose.model("ChatSession", ChatSessionSchema);
 
-    // Check if model already exists to avoid OverwriteModelError
-    if (mongoose.models[collectionName]) {
-        return mongoose.models[collectionName];
-    }
-
-    return mongoose.model(collectionName, ChatSessionSchema, collectionName);
-};
-
-export default getSessionModel;
+export default ChatSession;

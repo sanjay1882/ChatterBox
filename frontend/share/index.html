@@ -4,21 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shared Chat - Treevit</title>
+    <title>Shared Chat - Chatterbox</title>
     <link rel="icon" href="assests/Designer.png" type="image/png">
-    <!-- Updated CSS link to point to chat/index.css -->
-    <link rel="stylesheet" href="chat/index.css">
+    <link rel="stylesheet" href="index.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <link href='https://cdn.boxicons.com/3.0.3/fonts/basic/boxicons.min.css' rel='stylesheet'>
-    <link href='https://cdn.boxicons.com/3.0.3/fonts/brands/boxicons-brands.min.css' rel='stylesheet'>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
-        integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
-        crossorigin="anonymous"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Damion&family=Hind+Madurai:wght@300;400;500;600;700&family=Playwrite+VN:wght@100..400&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-
         .sidebar {
             display: none !important;
         }
@@ -129,13 +119,11 @@
         <div class="chatbot">
             <header>
                 <div class="left-header" style="display: flex; align-items: center; padding-left: 15px;">
-                    <i class='bx bx-doughnut-chart' style="color:white; font-size: 24px; margin-right: 10px;"></i>
-                    <!-- Using same font styling as chat/index.html if possible, or just standardizing header -->
-                    <h2 id="chat-title" style="font-family: 'Nabla', system-ui; font-size: 1.6rem;">Treevit</h2>
+
+                    <h2 id="chat-title" style="font-family: 'Nabla', system-ui; font-size: 1.6rem;">Treevix.ai</h2>
                 </div>
                 <div class="center-header">
-                    <!-- matching center header from chat/index.html -->
-                    <h2>Treevit</h2>
+
                 </div>
                 <div class="right-heder-bar">
                     <i class='bx bxs-sun' id="darkmodebtn"></i>
@@ -150,7 +138,7 @@
             <div class="shared-footer-container">
                 <div class="shared-footer">
 
-                    <a href="index.html">Start Your Own Chat</a>
+                    <a href="chat.html">Start Your Own Chat</a>
                 </div>
             </div>
         </div>
@@ -159,38 +147,15 @@
     <script type="module">
         import { API_BASE_URL } from './config.js';
 
+
         document.getElementById('darkmodebtn').addEventListener('click', function () {
             document.body.classList.toggle('white-mode');
         });
 
+
+
+
         function formatStreamedText(text) {
-
-            // Think block extraction
-            const thinkBlocks = [];
-            let processedText = text.replace(/<think>([\s\S]*?)<\/think>/g, (match, content) => {
-                thinkBlocks.push(content);
-                return `__THINK_BLOCK_${thinkBlocks.length - 1}__`;
-            });
-
-            const openThinkMatch = processedText.match(/<think>([\s\S]*)$/);
-            if (openThinkMatch) {
-                const content = openThinkMatch[1];
-                thinkBlocks.push(content);
-                processedText = processedText.replace(/<think>([\s\S]*)$/, `__THINK_BLOCK_${thinkBlocks.length - 1}__`);
-            }
-
-            // Math block extraction
-            const mathBlocks = [];
-            processedText = processedText.replace(/\$\$([\s\S]*?)\$\$/g, (match, content) => {
-                mathBlocks.push({ content: content, display: true });
-                return `__MATH_BLOCK_${mathBlocks.length - 1}__`;
-            });
-
-            processedText = processedText.replace(/\$([^$\n]+?)\$/g, (match, content) => {
-                mathBlocks.push({ content: content, display: false });
-                return `__MATH_INLINE_${mathBlocks.length - 1}__`;
-            });
-
             const escapeHTML = (str) =>
                 String(str).replace(/[&<>"']/g, (tag) => (
                     { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[tag]
@@ -198,12 +163,9 @@
 
             function createTableHTMLFromLines(rows) {
                 if (!rows || !rows.length) return '';
-
                 const parse = (r) => r.replace(/^\|/, '').replace(/\|$/, '').split('|').map(c => c.trim());
-
                 const header = parse(rows[0]);
                 let alignments = new Array(header.length).fill(null);
-
                 if (rows.length > 1) {
                     const divider = rows[1].replace(/\s+/g, '');
                     if (/^[:\-|]+$/.test(divider)) {
@@ -216,16 +178,15 @@
                             if (left) return 'left';
                             return null;
                         });
+                        rows.splice(1, 1);
                     }
                 }
-
-                let html = '<br><table class="md-table"><thead><tr>';
+                let html = '<table class="md-table"><thead><tr>';
                 for (let i = 0; i < header.length; i++) {
                     const align = alignments[i] ? ` style="text-align:${alignments[i]}"` : '';
                     html += `<th${align}>${header[i] || ''}</th>`;
                 }
                 html += '</tr></thead><tbody>';
-
                 for (let r = 1; r < rows.length; r++) {
                     const cells = parse(rows[r]);
                     html += '<tr>';
@@ -236,14 +197,11 @@
                     }
                     html += '</tr>';
                 }
-
                 html += '</tbody></table><br>';
                 return html;
             }
 
-            processedText = escapeHTML(processedText)
-                .replace(/(\p{Emoji_Presentation}|\p{Extended_Pictographic})/gu, '<span class="emoji-reset">$1</span>')
-                .replace(/^[-*_]{3,}\s*$/gm, '') // Remove horizontal rules
+            text = escapeHTML(text)
                 .replace(/^###### (.*$)/gim, '<h6>$1</h6>\n')
                 .replace(/^##### (.*$)/gim, '<h5>$1</h5>\n')
                 .replace(/^#### (.*$)/gim, '<h4>$1</h4>\n')
@@ -253,7 +211,6 @@
                 .replace(/\*\*\*(.*?)\*\*\*/gim, '<b><i>$1</i></b>')
                 .replace(/\*\*(.*?)\*\*/gim, '<b>$1</b>')
                 .replace(/\*(.*?)\*/gim, '<i>$1</i>')
-                .replace(/\[([^\]]+)\]\(([^)]+)\)/gim, '<a href="$2" target="_blank" class="styled-link"><i class="bx bx-link"></i> $1</a>')
                 .replace(/`([^`]+)`/gim, '<code>$1</code>')
                 .replace(/```(\w+)?\n?([\s\S]*?)```/gim, (match, lang, code) => {
                     const language = lang ? ` class="language-${lang}"` : '';
@@ -261,7 +218,7 @@
                 })
                 .replace(/^\s*[-*]\s+(.*)/gim, '<li>$1</li>');
 
-            const lines = processedText.split('\n');
+            const lines = text.split('\n');
             let html = '';
             let inList = false;
             let inTable = false;
@@ -269,7 +226,6 @@
 
             for (let line of lines) {
                 const trimmed = line.trim();
-
                 const pipeCount = (line.match(/\|/g) || []).length;
                 const looksLikeTableRow = pipeCount >= 2 && !/^<pre><code>/.test(line) && !/<\/code><\/pre>/.test(line);
 
@@ -287,7 +243,7 @@
 
                 if (line.match(/<li>/)) {
                     if (!inList) {
-                        html += '<ul id="list-unstyled">';
+                        html += '<ul class="list-unstyled">';
                         inList = true;
                     }
                     html += line;
@@ -299,67 +255,24 @@
                     }
                 }
 
-                if (line.match(/<h[1-6]>/)) {
+                if (line.match(/<h[1-6]/)) {
                     html += `${line}<br>`;
                     continue;
                 }
-
                 if (line.match(/^<pre><code>/)) {
                     html += `${line}\n`;
                     continue;
                 }
-
                 if (trimmed) {
-                    html += `<p style="background:rgba(255,255,255,0);">${line}</p>`;
+                    html += `<p>${line}</p>`;
                 } else {
-                    html += `<br>`;
+                    html += ``;
                 }
             }
-
             if (inTable && tableLines.length) {
                 html += createTableHTMLFromLines(tableLines);
             }
-
             if (inList) html += '</ul>';
-
-            // Restore Think Blocks
-            html = html.replace(/__THINK_BLOCK_(\d+)__/g, (match, index) => {
-                const content = thinkBlocks[index];
-                return `<div class="think-block-wrapper">
-                    <details class="think-block-details">
-                        <summary>Thought Process</summary>
-                        <div class="think-block-content">${content}</div>
-                    </details>
-                </div>`;
-            });
-
-            // Restore Math Blocks
-            html = html.replace(/__MATH_BLOCK_(\d+)__/g, (match, index) => {
-                const block = mathBlocks[index];
-                if (!block) return match;
-                try {
-                    return katex.renderToString(block.content, {
-                        displayMode: true,
-                        throwOnError: false
-                    });
-                } catch (e) {
-                    return match;
-                }
-            });
-
-            html = html.replace(/__MATH_INLINE_(\d+)__/g, (match, index) => {
-                const block = mathBlocks[index];
-                if (!block) return match;
-                try {
-                    return katex.renderToString(block.content, {
-                        displayMode: false,
-                        throwOnError: false
-                    });
-                } catch (e) {
-                    return match;
-                }
-            });
-
             return html;
         }
 
@@ -396,13 +309,10 @@
                     }
 
                     if (msg.role === "user") {
-                        // User message rendering
-                        const messageID = "msg_" + Math.random().toString(36).substr(2, 9);
-                        li.innerHTML = `<p id="${messageID}" class="user-message">${text}</p>`;
+                        li.innerHTML = `<p>${text}</p>`;
                     } else {
-                        // Model message rendering
-                        const messageID = "msg_" + Math.random().toString(36).substr(2, 9);
-                        li.innerHTML = `<p id="${messageID}" class="chat-content">${formatStreamedText(text)}</p>`;
+
+                        li.innerHTML = `<p>${formatStreamedText(text)}</p>`;
                     }
                     chatbox.appendChild(li);
                 });

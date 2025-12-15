@@ -53,7 +53,11 @@ def google_search_links(query: str, max_links: int = 10):
         link = it.get("link")
         title = it.get("title", "")
         if link:
-            links.append({"link": link, "title": title})
+            links.append({
+                "link": link,
+                "title": title,
+                "snippet": it.get("snippet", "")
+            })
     return links
 
 
@@ -76,6 +80,32 @@ def fetch_and_extract(link: str):
         return text
     except Exception:
         return None
+
+
+@app.route("/search", methods=["GET"])
+def search_only():
+    query = request.args.get("query", "").strip()
+    if not query:
+        return jsonify({"error": "Query parameter is required"}), 400
+    max_links = request.args.get("max", default=10, type=int)
+    try:
+        links = google_search_links(query, max_links=max_links)
+        return jsonify({"query": query, "results": links})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/fetch", methods=["GET"])
+def fetch_only():
+    url = request.args.get("url", "").strip()
+    if not url:
+        return jsonify({"error": "URL parameter is required"}), 400
+    
+    text = fetch_and_extract(url)
+    if not text:
+        return jsonify({"error": "Failed to fetch or extract content"}), 400
+        
+    return jsonify({"url": url, "content": text})
 
 
 @app.route("/scrape", methods=["GET"])

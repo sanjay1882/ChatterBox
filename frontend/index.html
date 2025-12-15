@@ -2,415 +2,173 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chatterbox-AI powered Chatbot</title>
-  <link rel="icon" href="/public/assests/Designer.png" type="image/png">
-  <link rel="stylesheet" href="index.css">
-  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-  <link href='https://cdn.boxicons.com/3.0.3/fonts/basic/boxicons.min.css' rel='stylesheet'>
-  <link href='https://cdn.boxicons.com/3.0.3/fonts/brands/boxicons-brands.min.css' rel='stylesheet'>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
-    integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
-    crossorigin="anonymous"></script>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Damion&family=Hind+Madurai:wght@300;400;500;600;700&family=Playwrite+VN:wght@100..400&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Treevit - AI Powered Chatbot</title>
+    <link rel="icon" href="/public/assests/Designer.png" type="image/png">
+    <link rel="stylesheet" href="landing.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+<link href='https://cdn.boxicons.com/3.0.6/fonts/basic/boxicons.min.css' rel='stylesheet'>
+<link href='https://cdn.boxicons.com/3.0.6/fonts/brands/boxicons-brands.min.css' rel='stylesheet'>
 </head>
 
 <body>
-  <script>
 
-
-
-
-
-  </script>
-
-  <div id="preloader">
-    <div class="container">
-      <h1 style="color: white;"><i class='bx bx-doughnut-chart'></i>Chatterbox </h1>
-      <h4>Hey I Can Assist You!</h4>
-      <h6>Loading Please Wait...</h6>
-    </div>
-  </div>
-
-  <div class="sidebar">
-    <div class="logo-details">
-      <i class='bx bx-doughnut-chart'></i>
-
-      <i class='bx bx-menu-alt-right' id="btn"></i>
-    </div>
-    <ul class="nav-list">
-      <li>
-        <i class='bx bx-search' style="opacity: 0;"></i>
-      </li>
-      <li class="Newchat-Btn">
-        <a href="#">
-          <i class='bx bx-chat'></i>
-          <span class="links_name">New Chat</span>
+    <header>
+        <a href="#" class="logo">
+            <i class='bx bx-doughnut-chart' style="color: #fff;"></i> Treevit
         </a>
-      </li>
-
-      <div class="history-container">
-        <ul id="chat-history-list">
-
-        </ul>
-      </div>
-
-      <li id="settings-li">
-        <a href="#" id="settings-btn" title="Settings">
-          <i class='bx bx-cog'></i>
-          <span class="links_name">Settings</span>
-        </a>
-      </li>
-      <li class="profile">
-        <div class="profile-details">
-          <img id="_imgField" src="assests/Designer.png" alt="Profile Image" />
-          <div class="name_job">
-            <div class="name"><span id="loggedUserFName"></span></div>
-            <div class="job"><span id="loggedUserEmail" style="font-size: 10px; color: #fff;"></span></div>
-          </div>
-          <i class='bx bx-log-out' id="logout" title="Logout"></i>
+        <div class="mobile-menu-btn">
+            <i class='bx bx-menu'></i>
         </div>
-      </li>
-    </ul>
-  </div>
+        <nav class="nav-links">
+            <a href="#features">Features</a>
+            <a href="#models">Models</a>
+            <a href="#about">About</a>
+            <a href="/chat/" class="mobile-wishlist-btn">Get Started</a>
+        </nav>
+        <a href="/chat/" class="btn-wishlist desktop-only">Get Started <i class='bx bx-right-arrow-alt'></i></a>
+    </header>
 
-  <section class="show-chatbot">
-
-    <div class="chatbot">
-      <header>
-        <div class="left-header" style="display: flex; align-items: center; padding-left: 15px;">
-          <i class='bx bx-menu' id="btn1"></i>
-
-
-
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">Introducing <br> <span class="gradient-text">Treevit-1</span></h1>
+            <p class="hero-description">
+                A language model engineered for autonomous reasoning, seamless conversation, and advanced assistance at
+                scale.
+            </p>
+            <div class="hero-actions">
+                <a href="/chat/" class="btn-primary">Try Treevit</a>
+                <a href="#" class="btn-secondary"><i class='bx bxl-github'></i> on GitHub</a>
+            </div>
         </div>
-        <div class="center-header">
-          <h2>Chatterbox.ai</h2>
-        </div>
-        <div class="right-heder-bar">
-          <img id="_imgField" src="assests/Designer.png" alt="Profile Image" />
-          <i class='bx  bxs-message-bubble-notification'></i>
-          <i class='bx  bx-share'></i>
 
-          <div>
-      </header>
-
-
-      <div class="chatbox">
-        <div class="home-tag-content" id="home-tag-contentID">
-          <div class="welcome-section">
-            <div class="welcome-header">
-
-              <h1 class="Greet-tag" id="Greet-tag">
-
-                Hello,How Can I Help?
-              </h1>
-              <br>
+        <div class="visual-container">
+            <div class="ring-wrapper">
+                <div class="glowing-ring"></div>
+                <div class="ring-inner" style="
+                text-align: center;align-items: center
+                ;justify-content: center;display: flex;">
+            
+                <i class="bx bx-plant-pot bx-beat"    style="color: #fff;font-size: 120px;"></i>
+                </div>
+            </div>
+            <div class="stat-float">
 
             </div>
+        </div>
+    </section>
 
-          </div>
-
-          <div class="suggestions-grid">
-            <div class="suggestion-card" id="sugg">
-              <div class="card-icon">
-                <i class='bx bxs-extension'></i>
-              </div>
-              <div class="card-content">
-                <h3>Creative Writing Ideas</h3>
-                <p>Exploring the Art of Expression: Creative Ideas for Essays, Blogs, Reels, and Storytelling</p>
-              </div>
-            </div>
-
-            <div class="suggestion-card" id="sugg2">
-              <div class="card-icon">
-                <i class='bx bxs-quote-alt-right'></i>
-              </div>
-              <div class="card-content">
-                <h3>Animal Fable</h3>
-                <p>The Tale of Two Crows and Two Parrots: A Lesson in Friendship and Wisdom</p>
-              </div>
-            </div>
-
-            <div class="suggestion-card" id="sugg3">
-              <div class="card-icon">
-                <i class='bx bx-camera'></i>
-              </div>
-              <div class="card-content">
-                <h3>Beach Story</h3>
-                <p>A day at the beach becomes a joyful escape filled with sunshine, laughter, and unforgettable memories
+    
+    <section id="features" class="section-container">
+        <h2 class="section-title">Powerful <span class="gradient-text">Features</span></h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="card-icon"><i class='bx bx-brain'></i></div>
+                <h3>Multi-Model Logic</h3>
+                <p>Switch seamlessly between top-tier models like Qwen, Llama 3, and Gemini for tailored intelligence.
                 </p>
-              </div>
             </div>
-
-            <div class="suggestion-card" id="sugg4">
-              <div class="card-icon">
-                <i class='bx bx-movie'></i>
-              </div>
-              <div class="card-content">
-                <h3>Movie Analysis</h3>
-                <p>In-depth Exploration of the Tamil Action Thriller Masterpiece Movies</p>
-              </div>
+            <div class="feature-card">
+                <div class="card-icon"><i class='bx bx-microphone'></i></div>
+                <h3>Voice Interaction</h3>
+                <p>Speak naturally to Treevit and hear it reply with realistic text-to-speech capabilities.</p>
             </div>
-            <div class="suggestion-card" id="sugg5">
-              <div class="card-icon">
-                <i class='bx bx-chart'></i>
-              </div>
-              <div class="card-content">
-                <h3>Business Content</h3>
-                <p>Professional emails, reports, presentations, and marketing content for business needs</p>
-              </div>
+            <div class="feature-card">
+                <div class="card-icon"><i class='bx bx-file-find'></i></div>
+                <h3>File Analysis</h3>
+                <p>Upload documents, code, or images. Treevit analyzes them instantly to provide deep insights.</p>
             </div>
-
-            <div class="suggestion-card" id="sugg6">
-              <div class="card-icon">
-                <i class='bx bx-book-open'></i>
-              </div>
-              <div class="card-content">
-                <h3>Study Help</h3>
-                <p>Academic writing, research summaries, exam preparation and learning resource recommendations</p>
-              </div>
+            <div class="feature-card">
+                <div class="card-icon"><i class='bx bx-history'></i></div>
+                <h3>Smart Context</h3>
+                <p>Never lose the thread. Advanced context retention ensures coherent long-form conversations.</p>
             </div>
-          </div>
+            
         </div>
+    </section>
 
-      </div>
-      <div class="chat-input-container">
-        <div class="chat-input" id="chat-input">
-
-          <div class="icon-btn" id="plus-btn" title="More Options">
-            <i class='bx bx-plus'></i>
-          </div>
-
-          <div class="input-actions-menu" id="input-actions-menu">
-            <div class="menu-item">
-              <label for="file-upload" class="menu-icon-btn" title="Upload File">
-                <i class="bx bx-paperclip"></i>
-                <span>Upload File</span>
-              </label>
-              <input type="file" id="file-upload"
-                accept="image/*, audio/*, video/*, .pdf, .txt, .js, .py, .java, .c, .cpp, .html, .css, .json, .md, .csv, .xml, .rtf"
-                hidden />
+  
+    <section id="models" class="section-container">
+        <h2 class="section-title">Supported <span class="gradient-text">Models</span></h2>
+        <p class="section-subtitle">Access the world's most advanced open and closed source models.</p>
+        <div class="models-grid">
+            <div class="model-item">
+                <i class='bx bxl-meta'></i>
+                <span>Llama 3.3</span>
             </div>
-
-            <div class="menu-item">
-              <div class="menu-icon-btn" id="web-search" title="Google Web Search">
-                <i class='bx bxl-google'></i>
-                <span>Google Search</span>
-              </div>
+            <div class="model-item">
+                <i class='bx bxs-chip'></i>
+                <span>Qwen 2.5</span>
             </div>
-
-            <div class="menu-item">
-              <div class="model-select-wrapper" id="model-wrapper">
-                <div class="model-select-trigger" id="model-trigger">
-                  <span id="model-display">Qwen 3 32B</span>
-                  <i class='bx bx-chevron-down'></i>
-                </div>
-                <div class="model-options" id="model-options">
-                  <div class="model-option" data-value="moonshotai/kimi-k2-instruct-0905"
-                    title="🧠 Claude Sonnet 4. Powerful reasoning and coding capabilities.">Claude Sonnet 4</div>
-                  <div class="model-option" data-value="openai/gpt-oss-120b"
-                    title="🚀 Groq Hosted. Ultra-fast inference.">GPT-OSS 120B</div>
-                  <div class="model-option" data-value="llama-3.3-70b-versatile"
-                    title="🦙 Llama 3.3 70B. Powerful open model by Meta on Groq.">Llama 3.3 70B</div>
-                  <div class="model-option selected" data-value="qwen/qwen3-32b"
-                    title="🧠 Qwen 3 32B. High performance open model.">Qwen 3 32B</div>
-                  <div class="model-option" data-value="moonshotai/kimi-k2-instruct-0905"
-                    title="🌙 Kimi K2. Advanced instruction following.">Kimi K2 Instruct</div>
-                  <div class="model-option" data-value="gemini-2.5-flash-lite"
-                    title="🧠 Most Powerful. Best for complex reasoning, advanced coding, detailed writing, and multi-step problem solving.">
-                    Gemini 2.5 Flash-Lite</div>
-                  <div class="model-option" data-value="gemini-2.5-flash"
-                    title="⚡ Fastest and Cost-Effective. Excellent for quick chat, general questions, and low-latency applications.">
-                    Gemini 2.5 Flash</div>
-                </div>
-                <input type="hidden" id="model-select" value="qwen/qwen3-32b">
-              </div>
+            <div class="model-item">
+                <i class='bx bxs-cloud'></i>
+                <span>Gemini 2.0 Flash</span>
             </div>
-          </div>
-
-          <div id="file-preview" class="file-preview hidden">
-            <span id="file-name"></span>
-            <i class="bx bx-x cancel-file" title="Remove file"></i>
-          </div>
-
-          <textarea placeholder="Ask anything..." required id="inputa"></textarea>
-
-          <span>
-            <i class='bx  bxs-arrow-up-circle' id="send-button"></i>
-
-          </span>
-
-          <div class="mic-btn" id="mic-btn" title="Start speaking">
-            <i class='bx  bxs-microphone-big'></i>
-          </div>
+            <div class="model-item">
+                <i class='bx bxs-brain'></i>
+                <span>Claude 3.5 Sonnet</span>
+            </div>
         </div>
+    </section>
 
-        <audio id="startSound" src="assests/start-13691.mp3"></audio>
-        <audio id="stopSound" src="assests/stop-13692.mp3"></audio>
-      </div>
-
-
-    </div>
-  </section>
-  <script type="importmap">
-        {
-          "imports": {
-          
-              "firebase/app": "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js",
-            "firebase/auth": "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js"
-          }
-        }
-      </script>
-
-  <script type="module" src="index.js"></script>
-  <script type="module" src="Login/homepage.js"></script>
-  <script type="module" src="Login/firebaseauth.js"></script>
-
-
-  <script>
-
-    document.addEventListener('contextmenu', event => event.preventDefault());
-
-  </script>
-
-
-
-  <div id="delete-confirm-modal" class="confirm-modal">
-    <div class="confirm-modal-content">
-      <div class="confirm-modal-header">
-        <i class='bx bx-error-circle'></i>
-        <h3>Delete Chat</h3>
-      </div>
-      <div class="confirm-modal-body">
-        <p>Are you sure you want to delete this chat? This action cannot be undone.</p>
-      </div>
-      <div class="confirm-modal-footer">
-        <button class="confirm-btn-cancel" id="confirm-cancel">Cancel</button>
-        <button class="confirm-btn-delete" id="confirm-delete">Delete</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Settings Modal -->
-  <div id="settings-modal" class="settings-modal">
-    <div class="settings-modal-content">
-      <div class="settings-header">
-        <h3> <i class='bx bx-cog'></i> Settings</h3>
-        <i class='bx bx-x' id="close-settings"></i>
-      </div>
-      <div class="settings-container">
-        <div class="settings-sidebar">
-          <button class="settings-tab-btn active" data-tab="general">
-            <i class='bx bx-user'></i> General
-          </button>
-          <button class="settings-tab-btn" data-tab="voice">
-            <i class='bx bx-volume-full'></i> Voice
-          </button>
+   
+    <section id="about" class="section-container about-wrapper">
+        <div class="about-content">
+            <h2 class="section-title">About <span class="gradient-text">Treevit</span></h2>
+            <p>
+                Treevit is an open-source initiative designed to democratize access to advanced AI assistance.
+                Built with privacy and performance in mind, it bridges the gap between complex model inference and
+                user-friendly experience.
+            </p>
+            <p>
+                Whether you are a developer debugging code, a writer crafting stories, or a student learning new
+                concepts,
+                Treevit is engineered to be your ultimate intelligent companion.
+            </p>
         </div>
-        <div class="settings-body">
-          <div id="tab-general" class="settings-tab-content active">
-            <form id="settings-form">
-              <div class="form-group">
-                <label for="user-gender">Gender</label>
-                <div class="custom-select-wrapper" id="gender-wrapper">
-                  <div class="custom-select-trigger" tabindex="0">
-                    <span id="gender-display">Prefer not to say</span>
-                    <i class='bx bx-chevron-down'></i>
-                  </div>
-                  <div class="custom-options">
-                    <div class="custom-option selected" data-value="">Prefer not to say</div>
-                    <div class="custom-option" data-value="male">Male</div>
-                    <div class="custom-option" data-value="female">Female</div>
-                    <div class="custom-option" data-value="other">Other</div>
-                  </div>
-                  <input type="hidden" id="user-gender" value="">
-                </div>
-              </div>
+    </section>
 
-              <div class="form-group">
-                <label for="user-age">Age Group</label>
-                <div class="custom-select-wrapper" id="age-wrapper">
-                  <div class="custom-select-trigger" tabindex="0">
-                    <span id="age-display">Select Age Group</span>
-                    <i class='bx bx-chevron-down'></i>
-                  </div>
-                  <div class="custom-options">
-                    <div class="custom-option selected" data-value="">Select Age Group</div>
-                    <div class="custom-option" data-value="child">Child (≤12)</div>
-                    <div class="custom-option" data-value="teen">Teen / Gen-Z (13-22)</div>
-                    <div class="custom-option" data-value="adult">Adult (23-45)</div>
-                    <div class="custom-option" data-value="older">Older Adult (46+)</div>
-                  </div>
-                  <input type="hidden" id="user-age" value="">
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label for="user-language">Mother Tongue / Primary Language</label>
-                <input type="text" id="user-language" placeholder="e.g., Tamil, Spanish, Hindi">
-              </div>
-
-              <div class="form-group">
-                <label for="user-culture">Cultural Background</label>
-                <input type="text" id="user-culture" placeholder="e.g., South Indian, Western, Japanese">
-              </div>
-
-              <div class="form-group">
-                <label for="theme-toggle">App Theme</label>
-                <div class="theme-switch-wrapper">
-                  <label class="theme-switch" for="theme-toggle">
-                    <input type="checkbox" id="theme-toggle" />
-                    <div class="slider round">
-                      <i class='bx bxs-moon'></i>
-                      <i class='bx bxs-sun'></i>
-                    </div>
-                  </label>
-                  <span id="theme-status">Dark Mode</span>
-                </div>
-              </div>
-
-              <div class="settings-actions">
-                <button type="submit" class="save-btn">Save Preferences</button>
-              </div>
-            </form>
-          </div>
-
-          <div id="tab-voice" class="settings-tab-content">
-            <div class="form-group">
-              <label for="voice-select">Preferred Voice</label>
-
-              <div class="custom-select-wrapper" id="voice-wrapper">
-                <div class="custom-select-trigger" id="voice-trigger" tabindex="0">
-                  <span id="voice-display">Select Voice</span>
-                  <i class='bx bx-chevron-down'></i>
-                </div>
-                <div class="custom-options" id="voice-options">
-                  <!-- Options populated by JS -->
-                </div>
-                <input type="hidden" id="voice-value" value="">
-              </div>
-
-              <p class="settings-hint">Select the voice you want to hear when using the "Speak" feature.</p>
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">
+                <i class='bx bx-doughnut-chart'></i> Treevit
             </div>
-
-            <div class="form-group">
-              <button id="test-voice-btn" class="secondary-btn"><i class='bx bx-play'></i> Test Voice</button>
+            <p>&copy; 2024 Treevit AI. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="#"><i class='bx bxl-github'></i></a>
+                <a href="#"><i class='bx bxl-twitter'></i></a>
+                <a href="#"><i class='bx bxl-discord'></i></a>
             </div>
-            <div class="settings-actions">
-              <button id="save-voice-btn" class="save-btn">Save Voice Settings</button>
-            </div>
-          </div>
         </div>
-      </div>
-    </div>
-  </div>
+    </footer>
 
+    <script>
+        const mobileBtn = document.querySelector('.mobile-menu-btn');
+        const navLinks = document.querySelector('.nav-links');
+
+        mobileBtn.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            const icon = mobileBtn.querySelector('i');
+            if (navLinks.classList.contains('active')) {
+                icon.classList.remove('bx-menu');
+                icon.classList.add('bx-x');
+            } else {
+                icon.classList.remove('bx-x');
+                icon.classList.add('bx-menu');
+            }
+        });
+
+        
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('active');
+                const icon = mobileBtn.querySelector('i');
+                icon.classList.remove('bx-x');
+                icon.classList.add('bx-menu');
+            });
+        });
+    </script>
 </body>
 
 </html>

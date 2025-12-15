@@ -3,7 +3,7 @@ function getInitialPrompt(settings = {}) {
 
   let personalityInstruction = "";
 
-  // Age-based Personalization
+
   if (ageGroup === "child") {
     personalityInstruction += `
 - **User is a Child (≤12):**
@@ -33,14 +33,14 @@ function getInitialPrompt(settings = {}) {
 - Be very polite and patient.
 `;
   } else {
-    // Default / Fallback
+
     personalityInstruction += `
 - **General Audience:**
 - Maintain a warm, friendly, and helpful tone.
 `;
   }
 
-  // Language & Culture Personalization
+
   if (language) {
     personalityInstruction += `
 - **Language Adaptation:**
@@ -57,7 +57,7 @@ function getInitialPrompt(settings = {}) {
 `;
   }
 
-  // Gender Personalization
+
   if (gender && gender !== "other") {
     personalityInstruction += `
 - **Gender Context:**
@@ -71,7 +71,7 @@ function getInitialPrompt(settings = {}) {
       parts: [
         {
           text: `
-You are **Chatterbox**, an AI writing assistant with a warm, friendly personality.
+You are **Treevit**, an AI writing assistant with a warm, friendly personality.
 
 ${personalityInstruction}
 
@@ -112,6 +112,8 @@ You are an AI writing assistant created by **Sanjay** (full name: *Sanjayraju*),
 Contact:  
 - LinkedIn: *sanjayrajup*  
 - Website: *sanjayrajudev.web.app*
+- Leetcode: *sanjayrajup*
+- Github: *sanjay1882*
 
 🧠 **Core Identity:**  
 End of instruction.
@@ -126,7 +128,7 @@ You are Gemini. Respond in Markdown only with short, streaming-friendly lines.
       role: "model",
       parts: [
         {
-          text: "Hello! I'm Chatterbox, your friendly AI assistant. How can I help you today? 😄"
+          text: "Hello! I'm Treevit, your friendly AI assistant. How can I help you today? 😄"
         }
       ]
     }

@@ -73,7 +73,7 @@ document.getElementById('googleSignInBtn')?.addEventListener('click', () => {
             const user = result.user;
             CreatedMessage('Login successful!', 'signInMessage');
             setTimeout(() => {
-                window.location.href = '../index.html';
+                window.location.href = '/chat/';
             }, 2000);
         })
         .catch((error) => {
@@ -106,7 +106,7 @@ document.getElementById('submitSignUp')?.addEventListener('click', (event) => {
             setDoc(docRef, userData)
                 .then(() => {
                     setTimeout(() => {
-                        window.location.href = '../index.html';
+                        window.location.href = '/chat/';
                     }, 2000);
                 })
                 .catch((error) => {
@@ -139,7 +139,7 @@ document.getElementById('submitSignIn')?.addEventListener('click', (event) => {
             localStorage.setItem('loggedInUserId', user.uid);
 
             setTimeout(() => {
-                window.location.href = '../index.html';
+                window.location.href = '/chat/';
             }, 2000);
         })
         .catch((error) => {
@@ -153,6 +153,7 @@ document.getElementById('submitSignIn')?.addEventListener('click', (event) => {
             }
         });
 });
+
 
 
 document.getElementById('submitNumber')?.addEventListener('click', async (event) => {
@@ -202,39 +203,30 @@ document.getElementById('submitNumber')?.addEventListener('click', async (event)
 
 
 function showOTPVerificationForm(phoneNumber) {
-    const phoneForm = document.getElementById('number-verify');
-    phoneForm.innerHTML = `
-        <h1 class="form-title">Verify OTP</h1>
-        <form method="post" action="">
-            <div id="otpMessage" class="messageDiv" style="display:none;"></div>
-            <div class="input-group">
-                <i class="fas fa-sms"></i>
-                <input type="text" id="otp-code" placeholder="Enter 6-digit OTP" required maxlength="6">
-                <label for="otp-code">OTP Code</label>
-            </div>
-            <p style="color: #ccc; text-align: center; margin-bottom: 20px;">
-                OTP sent to ${phoneNumber}
-            </p>
-            <button class="btn" id="verifyOtp">Verify OTP</button>
-        </form>
-        <div class="links" style="margin-top: 20px;">
-            <button id="resendOtp">Resend OTP</button>
-            <button id="backToPhone" style="margin-top: 10px;">Change Phone Number</button>
-        </div>
-        <div id="recaptcha-container"></div>
-    `;
+    document.getElementById('phone-input-section').style.display = 'none';
+    document.getElementById('otp-verify-section').style.display = 'block';
 
-
-    document.getElementById('verifyOtp').addEventListener('click', verifyOTP);
-
-
-    document.getElementById('resendOtp').addEventListener('click', resendOTP);
-
-
-    document.getElementById('backToPhone').addEventListener('click', () => {
-        window.location.reload();
-    });
+    const otpSentText = document.getElementById('otp-sent-text');
+    if (otpSentText) {
+        otpSentText.textContent = `OTP sent to ${phoneNumber}`;
+    }
 }
+
+document.getElementById('verifyOtp')?.addEventListener('click', verifyOTP);
+
+document.getElementById('resendOtp')?.addEventListener('click', resendOTP);
+
+document.getElementById('backToPhone')?.addEventListener('click', (event) => {
+    event.preventDefault();
+    document.getElementById('otp-verify-section').style.display = 'none';
+    document.getElementById('phone-input-section').style.display = 'block';
+    // Optionally clear the previous Recaptcha widget if needed, or just let it be reused.
+    // If we want to force re-render/reset:
+    if (recaptchaVerifier) {
+        recaptchaVerifier.clear();
+        recaptchaVerifier = null;
+    }
+});
 
 async function verifyOTP(event) {
     event.preventDefault();
@@ -258,12 +250,14 @@ async function verifyOTP(event) {
         };
 
         const docRef = doc(db, "users", user.uid);
-        await setDoc(docRef, userData);
+        // Use setDoc with merge: true to avoid overwriting existing data if any (though usually strictly new for phone login if not linked)
+        // But here we just follow original logic
+        await setDoc(docRef, userData, { merge: true });
 
         localStorage.setItem('loggedInUserId', user.uid);
 
         setTimeout(() => {
-            window.location.href = '../index.html';
+            window.location.href = '/chat';
         }, 2000);
 
     } catch (error) {
@@ -279,7 +273,8 @@ async function verifyOTP(event) {
 }
 
 // Resend OTP
-async function resendOTP() {
+async function resendOTP(event) {
+    event.preventDefault();
     const phoneNumber = document.getElementById('phone-number').value;
     let formattedNumber = phoneNumber;
 
@@ -300,6 +295,7 @@ async function resendOTP() {
         showMessage('Error resending OTP: ' + error.message, 'otpMessage');
     }
 }
+
 
 // Auth State Listener
 onAuthStateChanged(auth, (user) => {

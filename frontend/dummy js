@@ -3,21 +3,20 @@ async function generateResponse(incomingChatli) {
     let fullText = "";
 
     try {
-        // Create EventSource to stream response from backend
+       
         const source = new EventSource(`http://localhost:3000/stream?message=${encodeURIComponent(userMessage)}`);
 
-        // Handle incoming chunks
         source.onmessage = (event) => {
             fullText += event.data;
             messageElement.innerHTML = formatStreamedText(fullText);
             chatbox.scrollTo(0, chatbox.scrollHeight);
         };
 
-        // Handle stream completion
+      
         source.addEventListener("done", () => {
             source.close();
 
-            // Add action buttons after stream completes
+          
             const actionButtons = incomingChatli.querySelector('.chat-actions');
             if (actionButtons) {
                 const newActionButtons = createActionButtons(messageElement.id, fullText, true);
@@ -25,7 +24,7 @@ async function generateResponse(incomingChatli) {
                 newActionButtons.style.display = 'flex';
             }
 
-            // Save chat history
+          
             if (activeChatId) {
                 const chat = chatSections.find(c => c.id === activeChatId);
                 chat.messages.push({ role: "ai", text: fullText });
