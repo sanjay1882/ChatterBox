@@ -22,7 +22,7 @@ function truncate(text, maxChars = 12000) {
     return text.substring(0, half) + "\n\n...[truncated]...\n\n" + text.substring(text.length - half);
 }
 
-// 1. Google Search
+
 export async function googleSearch(query, maxLinks = 10) {
     const API_KEY_SE = process.env.API_KEY_SE;
     const CX = process.env.CX_ID || process.env.CX;
@@ -37,7 +37,7 @@ export async function googleSearch(query, maxLinks = 10) {
                 q: query,
                 key: API_KEY_SE,
                 cx: CX,
-                num: Math.min(10, maxLinks) // API max is 10
+                num: Math.min(10, maxLinks) 
             },
             timeout: 10000
         });
@@ -70,7 +70,6 @@ export async function fetchAndExtract(url) {
 
         const $ = cheerio.load(response.data);
 
-        // Remove noisy tags
         $('script, style, noscript, header, footer, nav, iframe, form, aside').remove();
 
         let text = $('body').text();
@@ -80,24 +79,24 @@ export async function fetchAndExtract(url) {
         return text;
 
     } catch (error) {
-        // console.error(`Failed to fetch ${url}:`, error.message);
-        return null; // Return null on failure so caller can handle
+        
+        return null; 
     }
 }
 
-// 3. Scrape (Search + Fetch) equivalent to /scrape endpoint
+
 export async function scrapeQuery(query, maxLinks = 5) {
     const links = await googleSearch(query, maxLinks);
     const results = [];
 
-    // Parallel fetch
+
     const fetchPromises = links.map(async (item) => {
         const text = await fetchAndExtract(item.link);
         if (text) {
             results.push({
                 title: item.title,
                 link: item.link,
-                snippet: item.snippet, // Keep original snippet or make new one? Python kept original + text
+                snippet: item.snippet, 
                 text: text
             });
         }

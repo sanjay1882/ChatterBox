@@ -35,7 +35,12 @@ async function getAuthToken() {
 let userMessage;
 let currentSessionId = null;
 let allSessions = [];
+// let userMessage; // Removed duplicate
+// let currentSessionId = null; // Removed duplicate
+// let allSessions = []; // Removed duplicate
+
 let isTemporaryMode = false;
+let abortController = null; // Controller for stopping generation
 
 let sidebar = document.querySelector(".sidebar");
 let closeBtn = document.querySelector("#btn");
@@ -740,6 +745,8 @@ function initSettings() {
                 preferredVoiceName = selectedOption.getAttribute('data-value');
                 localStorage.setItem('chat_preferred_voice', preferredVoiceName);
                 saveUserPreferences({ voice: preferredVoiceName });
+                document.getElementById("settings-modal").classList.remove("show"); // Dismiss on save
+                showToast("Voice preference saved!");
             }
         });
     }
@@ -774,22 +781,36 @@ function loadVoices() {
 
     filteredVoices.sort((a, b) => a.lang.localeCompare(b.lang));
 
-    filteredVoices.forEach(voice => {
+    const coolVoiceNames = [
+        "Aura", "Nova", "Echo", "Flux", "Bolt", "Zen", "Onyx", "Ruby", "Slate", "Jade",
+        "Luna", "Sol", "Mars", "Vega", "Orion", "Lyra", "Atlas", "Titan", "Siren", "Muse",
+        "Ion", "Pulse", "Vibe", "Drift", "Glow", "Mist", "Rift", "Spark", "Tide", "Wind"
+    ];
+
+    filteredVoices.forEach((voice, index) => {
         const option = document.createElement('div');
         option.className = 'voice-option';
-        option.textContent = `${voice.name} (${voice.lang})`;
+
+        // Deterministically assign a cool name
+        const customName = coolVoiceNames[index % coolVoiceNames.length];
+
+        // Check if there are multiple voices with the same name (e.g. if list loops), maybe append lang code for clarity?
+        // User asked for "one word", so let's stick to the name, maybe use a title attribute for details?
+        option.textContent = customName;
+        option.title = `${voice.name} (${voice.lang})`; // Tooltip for power users
+
         option.setAttribute('data-value', voice.name);
 
         if (voice.name === preferredVoiceName) {
             option.classList.add('selected');
-            document.getElementById('voice-display').textContent = voice.name;
+            document.getElementById('voice-display').textContent = customName;
         }
 
         option.addEventListener('click', () => {
             voiceOptionsContainer.querySelectorAll('.voice-option').forEach(opt => opt.classList.remove('selected'));
             option.classList.add('selected');
 
-            document.getElementById('voice-display').textContent = voice.name;
+            document.getElementById('voice-display').textContent = customName;
 
             preferredVoiceName = voice.name;
 
@@ -1319,8 +1340,17 @@ function formatStreamedText(text) {
 
 let response;
 let file = null;
+
 async function generateResponse(incomingChatli, fileToUpload) {
     const messageElement = incomingChatli.querySelector('p');
+    let fullText = ""; // Scoped for access in catch block
+
+    // Stop any existing generation
+    if (abortController) {
+        abortController.abort();
+    }
+    abortController = new AbortController();
+
     try {
         const selectedModel = document.getElementById("model-select").value;
 
@@ -1393,10 +1423,31 @@ async function generateResponse(incomingChatli, fileToUpload) {
         const headers = {};
         if (token) headers['Authorization'] = `Bearer ${token}`;
 
+        // Update UI to Stop Button
+        const micBtn = document.getElementById('mic-btn');
+        const originalMicContent = micBtn.innerHTML;
+        const originalMicTitle = micBtn.title;
+        let isStopped = false;
+
+        micBtn.innerHTML = "<i class='bx bxs-stop'></i>";
+        micBtn.title = "Stop generating";
+        micBtn.classList.add('stop-generating');
+
+        // Remove old listeners to prevent recording toggle (handled by class check in global listener or separate replacement)
+        // Since global listener toggles recording, we might need a flag or separate handling.
+        // Assuming global listener checks class or we replace element. 
+        // Better: Update global listener to check for 'stop-generating' class. 
+        // For now, let's assume we need to handle the stop logic in the existing listener or here.
+        // Actually, best to handle it by updating the global micBtn listener, but let's see where it is.
+        // Line 2370 adds click listener. We should modify that one.
+
+        // Let's implement the abort logic in the fetch signal
+
         response = await fetch(`${API_BASE_URL}/stream`, {
             method: "POST",
             headers: headers,
-            body: formData
+            body: formData,
+            signal: abortController.signal
         });
 
         if (!response.ok) {
@@ -1407,7 +1458,8 @@ async function generateResponse(incomingChatli, fileToUpload) {
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
 
-        let fullText = "";
+        fullText = ""; // Reset
+
         let displayedText = "";
         let isStreaming = true;
         const animationSpeed = 50; // ms per character
@@ -1506,13 +1558,32 @@ async function generateResponse(incomingChatli, fileToUpload) {
 
     }
 
+
+
     catch (error) {
-        showToast('Error: ' + error.message);
-        console.error(error);
-        messageElement.innerHTML = `<span style="color: red;">Error: ${error.message}</span>`;
+        if (error.name === 'AbortError') {
+            messageElement.innerHTML += `<br><span style="color:var(--text-color); opacity: 0.7;">[Stopped]</span>`;
+            const actionButtons = incomingChatli.querySelector('.chat-actions');
+            if (actionButtons) {
+                const newActionButtons = createActionButtons(messageElement.id, fullText, true);
+                actionButtons.parentNode.replaceChild(newActionButtons, actionButtons);
+                newActionButtons.style.display = 'flex';
+            }
+        } else {
+            showToast('Error: ' + error.message);
+            console.error(error);
+            messageElement.innerHTML = `<span style="color: red;">Error: ${error.message}</span>`;
+        }
     } finally {
         sendButton.style.display = "block";
         chatInput.value = "";
+        abortController = null;
+
+        // Reset Mic Button
+        const micBtn = document.getElementById('mic-btn');
+        micBtn.innerHTML = "<i class='bx bxs-microphone-big'></i>";
+        micBtn.title = "Start speaking";
+        micBtn.classList.remove('stop-generating');
     }
 }
 
@@ -1659,7 +1730,7 @@ async function handleSearchFlow(prompt, incomingChatli) {
             <div class="search-loader">
                 <i class='bx bx-loader-alt bx-spin' style="font-size: 2rem; color: var(--primary-color);"></i>
             </div>
-            <p style="text-align:center; color: var(--sub-text-color);">Generating queries...</p>
+            <p style="text-align:center; color: white;">Generating queries...</p>
         `;
 
         // 1. Generate Queries
@@ -1771,7 +1842,7 @@ async function handleSearchFlow(prompt, incomingChatli) {
         searchResultsContainer.innerHTML = `<p style="color:var(--text-color); opacity: 0.7;">Oops! I hit a snag while searching.</p>`;
         incomingChatli.querySelector("p").textContent = "My apologies, I ran into a little trouble finding that for you. Mind trying again?";
     } finally {
-        // Auto-disable search mode after triggering
+
         if (webSearchBtn && isSearchMode) {
             isSearchMode = false;
             webSearchBtn.classList.remove("active");
@@ -1784,13 +1855,29 @@ async function handleSearchFlow(prompt, incomingChatli) {
 
 async function handleResultClick(url, originalPrompt) {
     try {
-        // Create new incoming chat li
+        closeSearchPanel();
         const incomingChatli = createList('<span class="material-symbols-outlined"><img src="/assests/Star-icon.png" class="chatbot-img" id="Loading_out_Icon"></span>', "incoming");
         chatbox.appendChild(incomingChatli);
         chatbox.scrollTo(0, chatbox.scrollHeight);
 
         const messageElement = incomingChatli.querySelector('p');
-        messageElement.innerHTML = `Analyzing <a href="${url}" target="_blank">${url}</a>...<br><i class='bx bx-loader-alt bx-spin'></i>`;
+        // Hide paragraph to fix alignment issues
+        messageElement.style.display = "none";
+
+        const cardDiv = document.createElement("div");
+        cardDiv.innerHTML = `
+        <div class="analyzing-link-card">
+            <div class="analyzing-icon">
+                <i class='bx bx-radar bx-spin'></i>
+            </div>
+            <div class="analyzing-info">
+                <span class="analyzing-label">Analyzing Source</span>
+                <a href="${url}" target="_blank" class="analyzing-url">
+                    <i class='bx bx-link-external'></i> ${url}
+                </a>
+            </div>
+        </div>`;
+        incomingChatli.appendChild(cardDiv);
 
         const token = await getAuthToken();
         const headers = { "Content-Type": "application/json" };
@@ -1852,7 +1939,6 @@ async function handleOverviewClick(originalPrompt) {
     }
 }
 
-// Helper to handle streaming response (duplicated from generateResponse to avoid refactoring risk)
 async function streamResponseToChat(response, incomingChatli) {
     const messageElement = incomingChatli.querySelector('p');
     const reader = response.body.getReader();
@@ -1862,9 +1948,9 @@ async function streamResponseToChat(response, incomingChatli) {
     let displayedText = "";
     let isStreaming = true;
 
-    // Animation loop
+
     const animateText = () => {
-        // Capture state of all think blocks in this message
+
         const openIndices = new Set();
         messageElement.querySelectorAll('details.think-block-details').forEach((el, index) => {
             if (el.hasAttribute('open')) openIndices.add(index);
@@ -1876,7 +1962,7 @@ async function streamResponseToChat(response, incomingChatli) {
             displayedText += fullText.slice(displayedText.length, displayedText.length + chunkSize);
             let html = formatStreamedText(displayedText);
 
-            // Restore open state
+
             let count = 0;
             html = html.replace(/<details class="think-block-details">/g, (match) => {
                 const isOpen = openIndices.has(count++);
@@ -1889,7 +1975,7 @@ async function streamResponseToChat(response, incomingChatli) {
         } else if (!isStreaming) {
             let html = formatStreamedText(fullText);
 
-            // Restore open state
+
             let count = 0;
             html = html.replace(/<details class="think-block-details">/g, (match) => {
                 const isOpen = openIndices.has(count++);
@@ -1899,7 +1985,7 @@ async function streamResponseToChat(response, incomingChatli) {
             messageElement.innerHTML = html;
             chatbox.scrollTo(0, chatbox.scrollHeight);
 
-            // Add actions
+
             const actionButtons = incomingChatli.querySelector('.chat-actions');
             if (actionButtons) {
                 const newActionButtons = createActionButtons(messageElement.id, fullText, true);
@@ -1965,7 +2051,7 @@ function ChatHandle() {
     // webSearch.style.display = 'flex'; // This line was causing issues if webSearch isn't defined or needed
 
     setTimeout(() => {
-        const incomingChatli = createList('<span class="material-symbols-outlined"><img src="assests/Star-icon.png" class="chatbot-img" id="Loading_out_Icon"></span>', "incoming")
+        const incomingChatli = createList('<span class="material-symbols-outlined"><img src="../assests/Star-icon.png" class="chatbot-img" id="Loading_out_Icon"></span>', "incoming")
         chatbox.appendChild(incomingChatli);
 
         if (isSearchMode) {
@@ -2065,8 +2151,12 @@ function renderSessions(sessionsToRender) {
                 const li = document.createElement("li");
                 li.className = `history-item ${session._id === currentSessionId ? 'active' : ''}`;
                 li.id = `session-${session._id}`;
+                li.onclick = function (e) {
+                    // Prevent loading session if delete button is clicked (double safety)
+                    if (e.target.closest('.delete-session-btn')) return;
+                    loadSession(session._id);
+                };
 
-                // Icon based on type
                 let iconClass = 'bx bx-message-square-detail';
                 if (session.isWebSearchEnabled) {
                     iconClass = 'bx bx-planet';
@@ -2074,8 +2164,8 @@ function renderSessions(sessionsToRender) {
 
                 li.innerHTML = `
                         <i class='${iconClass}'></i>
-                        <span class="session-title" onclick="loadSession('${session._id}')">${session.title}</span>
-                        <button class="delete-session-btn" onclick="deleteSession('${session._id}')" title="Delete Chat">
+                        <span class="session-title">${session.title}</span>
+                        <button class="delete-session-btn" onclick="event.stopPropagation(); deleteSession('${session._id}')" title="Delete Chat">
                             <i class='bx bx-trash'></i>
                         </button>
                     `;
@@ -2317,14 +2407,12 @@ function startNewChat() {
     chatbox.innerHTML = "";
     hometagContent.style.display = "block";
     document.getElementById("chat-input").classList.remove("hide-before");
-    setRandomGreeting(); // Set random greeting
+    setRandomGreeting();
     loadSessions();
     if (sidebar.classList.contains("open")) {
         sidebar.classList.remove("open");
         if (typeof closeBtn !== 'undefined') {
-            // Ensure the menu button icon is reset if needed, though toggle usually handles it
-            // Based on index.js lines 45-55, resizing or toggling logic might need checking
-            // But simple remove "open" is safe.
+
             document.getElementById("btn1").style.display = "block";
         }
     }
@@ -2351,6 +2439,13 @@ const textarea = document.getElementById('inputa');
 
 
 micBtn.addEventListener('click', () => {
+    if (micBtn.classList.contains('stop-generating')) {
+        if (abortController) {
+            abortController.abort();
+            return;
+        }
+    }
+
     micBtn.classList.toggle('recording');
     const isRecording = micBtn.classList.contains('recording');
     micBtn.innerHTML = `<i class='bx ${isRecording ? 'bx-pause' : 'bx-microphone'}'></i>`;
@@ -2384,8 +2479,10 @@ const resizetextarea = document.querySelector('.chat-input textarea');
 const maxHeight = 145;
 const defaultHeight = 45;
 resizetextarea.addEventListener('input', () => {
-    resizetextarea.style.height = defaultHeight + 'px';
-    resizetextarea.style.height = Math.min(resizetextarea.scrollHeight, maxHeight) + 'px';
+    resizetextarea.style.height = 'auto';
+    const newHeight = Math.min(resizetextarea.scrollHeight, maxHeight);
+    resizetextarea.style.height = newHeight + 'px';
+    resizetextarea.style.overflowY = newHeight >= maxHeight ? 'auto' : 'hidden'; // Enable scroll only at max height
 });
 
 
@@ -2458,13 +2555,13 @@ function saveSettings(e) {
     showToast("Preferences saved!");
 }
 
-// Load Settings
+
 function loadSettings() {
     const savedSettings = localStorage.getItem("chatSettings");
     if (savedSettings) {
         const settings = JSON.parse(savedSettings);
 
-        // Load Gender
+
         if (settings.gender !== undefined) {
             const genderWrapper = document.getElementById('gender-wrapper');
             const input = document.getElementById('user-gender');
@@ -2484,7 +2581,7 @@ function loadSettings() {
             }
         }
 
-        // Load Age
+
         if (settings.ageGroup !== undefined) {
             const ageWrapper = document.getElementById('age-wrapper');
             const input = document.getElementById('user-age');
@@ -2528,8 +2625,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (settingsBtn && settingsModal) {
         settingsBtn.addEventListener("click", (e) => {
+            console.log("Settings button clicked");
             e.preventDefault();
-            loadSettings(); // Load saved values
+            try {
+                loadSettings(); // Load saved values
+            } catch (err) {
+                console.error("Error loading settings:", err);
+            }
             settingsModal.classList.add("show");
             if (sidebar.classList.contains("open")) {
                 sidebar.classList.remove("open");

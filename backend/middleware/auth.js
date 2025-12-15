@@ -14,8 +14,10 @@ if (!admin.apps.length) {
             });
             console.log("Firebase Admin Initialized with Service Account");
         } else {
-            admin.initializeApp(); // Tries default GCP credentials
-            console.log("Firebase Admin Initialized (Default Credentials)");
+            // Explicitly set projectId to avoid metadata service lookup on localhost
+            const projectId = process.env.FIREBASE_PROJECT_ID || 'treevit';
+            admin.initializeApp({ projectId });
+            console.log(`Firebase Admin Initialized (Project ID: ${projectId})`);
         }
     } catch (error) {
         console.warn("Firebase Admin initialization failed. Auth verification will be skipped/mocked.", error.message);

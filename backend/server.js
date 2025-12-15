@@ -8,7 +8,6 @@ import { Groq } from 'groq-sdk';
 import mongoose from "mongoose";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
-
 import ChatSession from "./models/ChatSession.js";
 import SharedSession from "./models/SharedSession.js";
 import UserPreferences from "./models/UserPreferences.js";
@@ -589,14 +588,12 @@ app.post("/scrape-and-vectorize", verifyToken, async (req, res) => {
         const summaryPrompt = `Summarize the following web page content in a concise manner (approx 200 words), focusing on information relevant to the user's original request: "${originalPrompt || "General overview"}".
         
         Web Page Content:
-        ${rawContent.substring(0, 10000)}...`; // Truncate just in case
+        ${rawContent.substring(0, 10000)}...`;
 
         const summaryResult = await genModel.generateContent(summaryPrompt);
         const summary = summaryResult.response.text();
 
-        // Save to Vector DB
-        // Save both abstract summary and some raw chunks if needed, for now just summary + raw snippet
-        // We'll save the raw content as a "web-scraped" source
+
         await saveContextChunk(email, `[Source: ${url}]\n${rawContent}`, "web-scraped");
 
         res.json({
@@ -611,9 +608,7 @@ app.post("/scrape-and-vectorize", verifyToken, async (req, res) => {
 });
 
 
-// --- Streaming Analysis Endpoints ---
 
-// 4. Analyze URL Stream
 app.post("/analyze-url-stream", verifyToken, async (req, res) => {
     const { url, email, sessionId, prompt } = req.body;
     if (!url || !email) return res.status(400).send("URL and Email are required");
@@ -624,11 +619,7 @@ app.post("/analyze-url-stream", verifyToken, async (req, res) => {
     res.setHeader("Connection", "keep-alive");
 
     try {
-        // 1. Fetch Content
-        // 1. Fetch Content
-        // const scraperUrl = process.env.SCRAPER_URL || "http://localhost:3001";
-        // const scrapeRes = await fetch(`${scraperUrl}/fetch?url=${encodeURIComponent(url)}`);
-        // const scrapeData = await scrapeRes.json();
+
 
         const content = await scraper.fetchAndExtract(url);
         const scrapeData = { content }; // Shim
@@ -638,11 +629,10 @@ app.post("/analyze-url-stream", verifyToken, async (req, res) => {
             return res.end();
         }
 
-        // const content = scrapeData.content.substring(0, 15000); // Limit context
-        // Context already limited in fetchAndExtract but let's ensure:
+
         const truncatedContent = content.substring(0, 15000);
 
-        // 2. Get/Create Session
+
         let sessionDoc;
         let isNewSession = false;
         if (sessionId) {
@@ -660,12 +650,11 @@ app.post("/analyze-url-stream", verifyToken, async (req, res) => {
             await sessionDoc.save();
         }
 
-        // Send session ID if new
         if (isNewSession) {
             res.write(`event: session_id\ndata: ${sessionDoc._id}\n\n`);
         }
 
-        // 3. Prepare History for Context
+
         const dbHistory = sessionDoc.messages.map(h => ({
             role: h.role,
             parts: h.parts.map(p => ({ text: p.text }))
@@ -687,14 +676,10 @@ app.post("/analyze-url-stream", verifyToken, async (req, res) => {
 
         const history = [...dbHistory, systemPart];
 
-        // 4. Stream Response
+
         const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
         const chatSession = model.startChat({ history: [] }); // We bake history into the first message for single-turn feel or just use history param
-        // Actually, let's use sendMessageStream with the full history as specific to this turn isn't quite right, 
-        // we want to append this interaction.
-        // Better interact mode: 
-        // We push the "System Instruction" as if it's the user's latest message or a system injection.
-        // Let's treat it as the user asking for analysis.
+
 
         const finalHistory = dbHistory;
         const chat = model.startChat({ history: finalHistory });
@@ -709,10 +694,10 @@ app.post("/analyze-url-stream", verifyToken, async (req, res) => {
             res.write(`data: ${JSON.stringify({ text })}\n\n`);
         }
 
-        // 5. Save Interaction
+
         sessionDoc.messages.push({
             role: "user",
-            parts: [{ text: userMsg }] // Save big context? Maybe truncate for DB? Let's save it for full context.
+            parts: [{ text: userMsg }]
         });
         sessionDoc.messages.push({
             role: "model",
@@ -723,7 +708,7 @@ app.post("/analyze-url-stream", verifyToken, async (req, res) => {
         res.write(`event: end\ndata: done\n\n`);
         res.end();
 
-        // Vectorize in background
+
         (async () => {
             await saveContextChunk(email, `[Analyzed Link: ${url}]\n${fullResponse}`, "web-analysis");
         })();
@@ -735,7 +720,7 @@ app.post("/analyze-url-stream", verifyToken, async (req, res) => {
     }
 });
 
-// 5. Search Overview Stream
+
 app.post("/search-overview-stream", verifyToken, async (req, res) => {
     const { query, email, sessionId } = req.body;
     if (!query || !email) return res.status(400).send("Query and Email required");
@@ -746,11 +731,6 @@ app.post("/search-overview-stream", verifyToken, async (req, res) => {
     res.setHeader("Connection", "keep-alive");
 
     try {
-        // 1. Search
-        // 1. Search
-        // const scraperUrl = process.env.SCRAPER_URL || "http://localhost:3001";
-        // const searchRes = await fetch(`${scraperUrl}/search?query=${encodeURIComponent(query)}&max=4`);
-        // const searchData = await searchRes.json();
 
         const results = await scraper.googleSearch(query, 4);
         const searchData = { results }; // Shim
@@ -763,12 +743,9 @@ app.post("/search-overview-stream", verifyToken, async (req, res) => {
 
         res.write(`data: ${JSON.stringify({ text: "Gathering sources...\n" })}\n\n`);
 
-        // 2. Fetch Content (Parallel)
+
         const fetchPromises = searchData.results.map(async (r) => {
             try {
-                // const fRes = await fetch(`${scraperUrl}/fetch?url=${encodeURIComponent(r.link)}`);
-                // const fData = await fRes.json();
-                // return fData.content ? `Source: ${r.title} (${r.link})\nContent: ${fData.content.substring(0, 3000)}` : null;
 
                 const content = await scraper.fetchAndExtract(r.link);
                 return content ? `Source: ${r.title} (${r.link})\nContent: ${content.substring(0, 3000)}` : null;
@@ -813,7 +790,7 @@ app.post("/search-overview-stream", verifyToken, async (req, res) => {
             res.write(`data: ${JSON.stringify({ text })}\n\n`);
         }
 
-        // 5. Save
+
         sessionDoc.messages.push({ role: "user", parts: [{ text: userMsg }] });
         sessionDoc.messages.push({ role: "model", parts: [{ text: fullResponse }] });
         await sessionDoc.save();
@@ -840,7 +817,7 @@ app.get("/user/preferences/:email", verifyToken, async (req, res) => {
 
         let prefs = await UserPreferences.findOne({ email });
         if (!prefs) {
-            // Return defaults if not found, don't create yet
+
             return res.json({ theme: 'dark' });
         }
         res.json(prefs);
