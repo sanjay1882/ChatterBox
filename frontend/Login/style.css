@@ -9,7 +9,7 @@
 
 body {
   background: #11101D;
-  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -46,6 +46,7 @@ body.white-mode {
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -95,6 +96,7 @@ body.white-mode {
     opacity: 0;
     transform: translateY(-20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -176,8 +178,8 @@ body.white-mode {
   color: #666;
 }
 
-.input-group input:focus + label,
-.input-group input:not(:placeholder-shown) + label {
+.input-group input:focus+label,
+.input-group input:not(:placeholder-shown)+label {
   top: -10px;
   left: 15px;
   font-size: 12px;
@@ -186,8 +188,8 @@ body.white-mode {
   padding: 0 8px;
 }
 
-.white-mode .input-group input:focus + label,
-.white-mode .input-group input:not(:placeholder-shown) + label {
+.white-mode .input-group input:focus+label,
+.white-mode .input-group input:not(:placeholder-shown)+label {
   background: #E3F2FD;
 }
 
@@ -347,6 +349,7 @@ body.white-mode {
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -373,7 +376,7 @@ body.white-mode {
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%;
+  height: 100dvh;
   background: #1d1b31;
   color: #fff;
   display: flex;
@@ -394,43 +397,43 @@ body.white-mode {
   body {
     padding: 15px;
   }
-  
+
   .logo-header {
     margin-bottom: 20px;
   }
-  
+
   .logo-header i {
     font-size: 35px;
     margin-right: 12px;
   }
-  
+
   .logo-header h1 {
     font-size: 30px;
   }
-  
+
   .container {
     padding: 30px 25px;
     margin: 10px;
   }
-  
+
   .form-title {
     font-size: 24px;
   }
-  
+
   .input-group input {
     padding: 12px 12px 12px 45px;
     font-size: 14px;
   }
-  
+
   .btn {
     padding: 12px;
     font-size: 15px;
   }
-  
+
   .icons {
     gap: 15px;
   }
-  
+
   .icons i {
     width: 45px;
     height: 45px;
@@ -443,31 +446,31 @@ body.white-mode {
     padding: 25px 20px;
     border-radius: 15px;
   }
-  
+
   .logo-header {
     flex-direction: column;
     text-align: center;
   }
-  
+
   .logo-header i {
     margin-right: 0;
     margin-bottom: 10px;
     font-size: 32px;
   }
-  
+
   .logo-header h1 {
     font-size: 26px;
   }
-  
+
   .form-title {
     font-size: 22px;
     margin-bottom: 25px;
   }
-  
+
   .input-group {
     margin-bottom: 20px;
   }
-  
+
   .links button {
     padding: 8px 20px;
     font-size: 14px;
@@ -478,24 +481,24 @@ body.white-mode {
   .container {
     padding: 20px 15px;
   }
-  
+
   .logo-header i {
     font-size: 28px;
   }
-  
+
   .logo-header h1 {
     font-size: 22px;
   }
-  
+
   .form-title {
     font-size: 20px;
   }
-  
+
   .input-group input {
     padding: 10px 10px 10px 40px;
     font-size: 13px;
   }
-  
+
   .btn {
     padding: 10px;
     font-size: 14px;
@@ -541,5 +544,7 @@ body.white-mode {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }

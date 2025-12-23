@@ -32,7 +32,7 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // CORS Configuration
-const allowedOrigins = [process.env.FRONTEND_URL || "http://localhost:5173", "http://localhost:3000"];
+const allowedOrigins = [process.env.FRONTEND_URL, "https://treevit.web.app", "http://localhost:5173", "http://localhost:3000"];
 app.use(cors({
     origin: function (origin, callback) {
         if (!origin || allowedOrigins.indexOf(origin) !== -1) {
@@ -44,6 +44,16 @@ app.use(cors({
 }));
 
 app.use(express.json());
+
+app.use((req, res, next) => {
+    console.log(`Incoming ${req.method} ${req.path}`);
+    console.log(`Origin: ${req.headers.origin}`);
+    next();
+});
+
+app.get("/", (req, res) => {
+    res.send("Chatterbox Backend is Running!");
+});
 
 mongoose.connect(process.env.MONGO_URI || "mongodb://localhost:27017/chatterbox").then(() => console.log("MongoDB Connected"))
     .catch(err => console.log(err));
@@ -109,7 +119,7 @@ app.get("/sessions/:email", verifyToken, async (req, res) => {
         res.json(sessions);
     } catch (error) {
         console.error("Error fetching sessions:", error);
-        res.status(500).json({ error: "Failed to fetch sessions" });
+        res.status(500).json({ error: "Failed to fetch sessions", details: error.message });
     }
 });
 
@@ -123,7 +133,7 @@ app.get("/session/:email/:id", verifyToken, async (req, res) => {
         res.json(session);
     } catch (error) {
         console.error("Error fetching session:", error);
-        res.status(500).json({ error: "Failed to fetch session" });
+        res.status(500).json({ error: "Failed to fetch session", details: error.message });
     }
 });
 
@@ -323,34 +333,30 @@ app.post("/stream", verifyToken, upload.single("image"), async (req, res) => {
             });
 
             const stream = await anthropic.messages.stream({
-                model: selectedModel, // e.g., 'claude-3-sonnet-20240229' - wait, user passed full ID
+                model: selectedModel,
                 max_tokens: 1024,
                 messages: finalClaudeMessages,
-                // system: "You are a helpful assistant." // Optional: Extract system prompt if needed
+
             });
 
-            // Handle different stream events
+
             stream.on('text', (text) => {
                 responseText += text;
                 res.write(`data: ${JSON.stringify({ text })}\n\n`);
             });
 
-            //   stream.on('message', (message) => {
-            //     // console.log('Stop reason:', message.stop_reason);
-            //     // console.log('Usage:', message.usage);
-            //   });
+
 
             stream.on('error', (error) => {
                 console.error('\nError:', error);
                 res.write(`event: error\ndata: ${JSON.stringify({ error: error.message })}\n\n`);
             });
 
-            // Wait for the stream to complete
+
             await stream.finalMessage();
 
         } else if (["gpt-oss-120b", "llama", "qwen", "moonshot", "kimi"].some(keyword => selectedModel.includes(keyword)) || selectedModel.includes("groq")) {
-            // Groq Handling
-            // Map history to OpenAI format
+
             const groqMessages = history
                 .filter(msg => msg.role === 'user' || msg.role === 'model')
                 .map(msg => ({
@@ -358,27 +364,17 @@ app.post("/stream", verifyToken, upload.single("image"), async (req, res) => {
                     content: msg.parts.map(p => p.text).join('\n')
                 }));
 
-            // Add current user message
             groqMessages.push({
                 role: 'user',
                 content: userMessage
             });
 
-            // (Optional) Handle files/web search data if possible with Groq/OpenAI format
-            // The user example didn't use files, just text. We will stick to text for now as per example.
-            // If web search was on, it's already in history/context.
 
-            // If there's file content in geminiParts (image), Groq might support it depending on model (Vision).
-            // gpt-oss-120b is typically text-only or multimodal? "openai/gpt-oss-120b" sounds like a wrapper.
-            // Let's assume text for safety or minimal image support if standard OpenAI compat.
-            // For now, appending text content from parts.
 
             const currentContent = geminiParts.map(p => p.text || "").join("\n");
-            // Update the last message content to include file text/context if it was separate
+
             if (currentContent && currentContent !== userMessage) {
-                // If geminiParts had extra stuff (like file context), append it or replace?
-                // User message was already added. geminiParts is what we send to model.
-                // Let's replace the last message content with full text from parts
+
                 groqMessages[groqMessages.length - 1].content = currentContent;
             }
 

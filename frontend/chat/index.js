@@ -659,7 +659,7 @@ async function regenerateResponse(messageId, originalMessage) {
         const messageElement = document.getElementById(messageId);
         const chatLi = messageElement.closest('.chat.incoming');
 
-        const newIncomingChatli = createList('<span class="material-symbols-outlined"><img src="/public/assests/Star-icon.png" class="chatbot-img" id="Loading_out_Icon"></span>', "incoming");
+        const newIncomingChatli = createList('<span class="material-symbols-outlined"><img src="/assests/Star-icon.png" class="chatbot-img" id="Loading_out_Icon"></span>', "incoming");
 
         chatLi.parentNode.replaceChild(newIncomingChatli, chatLi);
 
@@ -2051,7 +2051,7 @@ function ChatHandle() {
     // webSearch.style.display = 'flex'; // This line was causing issues if webSearch isn't defined or needed
 
     setTimeout(() => {
-        const incomingChatli = createList('<span class="material-symbols-outlined"><img src="../assests/Star-icon.png" class="chatbot-img" id="Loading_out_Icon"></span>', "incoming")
+        const incomingChatli = createList('<span class="material-symbols-outlined"><img src="/assests/Star-icon.png" class="chatbot-img" id="Loading_out_Icon"></span>', "incoming")
         chatbox.appendChild(incomingChatli);
 
         if (isSearchMode) {

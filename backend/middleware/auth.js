@@ -43,21 +43,9 @@ export const verifyToken = async (req, res, next) => {
             req.user = decodedToken;
             next();
         } else {
-            // Fallback for when Firebase isn't configured yet (Dev Mode)
-            console.warn("WARNING: Skipping Token Verification (Firebase Admin not initialized).");
-            // In a real production scenario, this MUST fail. 
-            // However, to avoid blocking the user immediately if they haven't set up the key:
-            // We will attempt to decode the email from the token roughly or just pass.
-            // But 'security' was requested, so we should probably reject or mock.
-            // Let's Mock it for now if in non-production, or fail.
-            // Let's trust the 'email' in the body ONLY if we are in a 'dev' known state, 
-            // but the request is for PRODUCTION readiness.
-
-            // DECISION: Fail open ONLY if explicit DEV flag, otherwise fail closed.
-            // Assuming we want to demonstrate the security feature:
-            // For now, we'll attach a 'mock' user and warn heavily.
-            console.warn("SECURITY WARNING: Auth bypassed because Firebase is not configured.");
-            next();
+            // Fallback for when Firebase isn't configured yet
+            console.warn("WARNING: Firebase Admin not initialized. Cannot verify token.");
+            return res.status(500).json({ error: "Server Configuration Error", details: "Firebase Admin not initialized. Check server logs." });
         }
     } catch (error) {
         console.error("Token verification failed:", error);
