@@ -7,12 +7,15 @@
   <title>Treevit powered Chatbot</title>
   <link rel="icon" href="/assests/Designer.png" type="image/png">
   <link rel="stylesheet" href="index.css">
+  <link rel="stylesheet" href="sarvam-theme.css" id="sarvam-css">
   <link rel="stylesheet" href="../temp_search.css">
   <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
   <link href='https://cdn.boxicons.com/3.0.3/fonts/basic/boxicons.min.css' rel='stylesheet'>
   <link href='https://cdn.boxicons.com/3.0.3/fonts/brands/boxicons-brands.min.css' rel='stylesheet'>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
     integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
     crossorigin="anonymous"></script>
@@ -56,6 +59,12 @@
           <span class="links_name">New Chat</span>
         </a>
       </li>
+      <li>
+        <a href="#" id="gallery-btn">
+          <i class='bx bx-images'></i>
+          <span class="links_name">Gallery</span>
+        </a>
+      </li>
 
       <div class="history-container">
         <ul id="chat-history-list">
@@ -69,12 +78,19 @@
           <span class="links_name">Settings</span>
         </a>
       </li>
-      <li class="profile">
+      <li id="login-li" style="display: none;">
+        <a href="/login/" id="login-btn-sidebar" title="Log In">
+          <i class='bx bx-log-in'></i>
+          <span class="links_name">Log In</span>
+        </a>
+      </li>
+      <li class="profile" id="profile-li">
         <div class="profile-details">
           <img id="_imgField" src="/assests/Designer.png" alt="Profile Image" />
           <div class="name_job">
             <div class="name"><span id="loggedUserFName"></span></div>
-            <div class="job"><span id="loggedUserEmail" style="font-size: 10px; color: #fff;"></span></div>
+            <div class="job"><span id="loggedUserEmail"></span></div>
+
           </div>
           <i class='bx bx-log-out' id="logout" title="Logout"></i>
         </div>
@@ -96,8 +112,9 @@
           <h2>Treevit</h2>
         </div>
         <div class="right-heder-bar">
-
-          <i class='bx bxs-message-bubble-notification'></i>
+          <!-- <div class="Try-Speectra" id="try-spectra-btn"><span>Try Spectra<i
+                class="bx bx-arrow-up-right-stroke"></i></span></div> -->
+          <i class='bx bx-eye-slash' id="temp-chat-icon" title="Temporary Chat"></i>
           <i class='bx bx-dock-right' id="toggle-search-panel-btn" style="display:none; color: white;"
             title="Toggle Search Results"></i>
           <i class='bx  bx-forward-big'></i>
@@ -184,81 +201,132 @@
           </div>
         </div>
 
+        <div class="Spectra-mode" id="spectra-mode-container" style="display: none;">
+          <div class="spectra-image-container">
+            <div class="spectra-image-1-container" id="spectra-upload-1">
+              <i class='bx  bx-arrow-from-bottom-stroke'></i>
+              <span>Upload</span>
+              <input type="file" id="spectra-file-1" accept="image/*" multiple hidden>
+            </div>
+            <i class='bx  bx-thunder' style="font-size: 20px;color:#fff"></i>
+            <div class="spectra-image-2-container" id="spectra-upload-2">
+              <i class='bx  bx-arrow-from-bottom-stroke'></i> <span>Upload</span>
+              <input type="file" id="spectra-file-2" accept="image/*" hidden>
+            </div>
+          </div>
+        </div>
       </div>
+
       <div class="chat-input-container">
         <div class="chat-input" id="chat-input">
-
-          <div class="icon-btn" id="plus-btn" title="More Options">
-            <i class='bx bx-plus'></i>
-          </div>
-
-          <div class="input-actions-menu" id="input-actions-menu">
-            <div class="menu-item">
-              <label for="file-upload" class="menu-icon-btn" title="Upload File">
-                <i class="bx bx-paperclip"></i>
-                <span>Upload File</span>
-              </label>
-              <input type="file" id="file-upload"
-                accept="image/*, audio/*, video/*, .pdf, .txt, .js, .py, .java, .c, .cpp, .html, .css, .json, .md, .csv, .xml, .rtf"
-                hidden />
-            </div>
-
-            <div class="menu-item">
-              <div class="menu-icon-btn" id="web-search" title="Google Web Search">
-                <i class='bx bxl-google'></i>
-                <span>Google Search</span>
-              </div>
-            </div>
-
-            <div class="menu-item">
-              <div class="model-select-wrapper" id="model-wrapper">
-                <div class="model-select-trigger" id="model-trigger">
-                  <span id="model-display">Gemini 2.5 Flash</span>
-                  <i class='bx bx-chevron-down'></i>
-                </div>
-                <div class="model-options" id="model-options">
-                  <div class="model-option" data-value="moonshotai/kimi-k2-instruct-0905"
-                    title="🧠 Claude Sonnet 4. Powerful reasoning and coding capabilities.">Claude Sonnet 4</div>
-                  <div class="model-option" data-value="openai/gpt-oss-120b"
-                    title="🚀 Groq Hosted. Ultra-fast inference.">GPT-OSS 120B</div>
-                  <div class="model-option" data-value="llama-3.3-70b-versatile"
-                    title="🦙 Llama 3.3 70B. Powerful open model by Meta on Groq.">Llama 3.3 70B</div>
-                  <div class="model-option" data-value="qwen/qwen3-32b"
-                    title="🧠 Qwen 3 32B. High performance open model.">Qwen 3 32B</div>
-                  <div class="model-option" data-value="moonshotai/kimi-k2-instruct-0905"
-                    title="🌙 Kimi K2. Advanced instruction following.">Kimi K2 Instruct</div>
-                  <div class="model-option" data-value="gemini-2.5-flash-lite"
-                    title="🧠 Most Powerful. Best for complex reasoning, advanced coding, detailed writing, and multi-step problem solving.">
-                    Gemini 2.5 Mini</div>
-                  <div class="model-option selected" data-value="gemini-2.5-flash"
-                    title="⚡ Fastest and Cost-Effective. Excellent for quick chat, general questions, and low-latency applications.">
-                    Gemini 2.5 Flash</div>
-                </div>
-                <input type="hidden" id="model-select" value="gemini-2.5-flash">
-              </div>
-            </div>
-          </div>
-
           <div class="input-wrapper">
-            <div id="file-preview" class="file-preview hidden">
-              <span id="file-name"></span>
-              <i class="bx bx-x cancel-file" title="Remove file"></i>
+            <div class="previews-container" style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <div id="file-preview" class="file-preview hidden">
+                <img class="preview-thumbnail" style="display: none;" />
+                <div class="file-info-col">
+                  <div class="file-preview-text" id="file-preview-text"></div>
+                  <div class="file-bottom-row">
+                    <span class="file-preview-badge" id="file-preview-badge">FILE</span>
+                    <span id="file-name"></span>
+                  </div>
+                </div>
+                <i class="bx bx-x cancel-file" title="Remove file"></i>
+              </div>
+              <div id="pasted-text-preview" class="file-preview hidden">
+                <div class="file-info-col">
+                  <div class="file-preview-text" id="pasted-preview-text"></div>
+                  <div class="file-bottom-row">
+                    <span class="file-preview-badge" id="pasted-preview-badge">PASTED</span>
+                    <span id="pasted-file-name">Text Snippet</span>
+                  </div>
+                </div>
+                <i class="bx bx-x cancel-file" id="cancel-pasted" title="Remove pasted text"></i>
+              </div>
             </div>
             <textarea placeholder="Ask anything..." required id="inputa"></textarea>
           </div>
 
-          <span>
-            <i class='bx  bxs-arrow-up-circle' id="send-button"></i>
+          <div class="chat-input-toolbar">
+            <div class="toolbar-left">
+              <div class="icon-btn" id="plus-btn" title="More Options">
+                <i class='bx bx-plus'></i>
+              </div>
 
-          </span>
+              <div class="input-actions-menu" id="input-actions-menu">
+                <div class="menu-item">
+                  <label for="file-upload" class="menu-icon-btn" title="Upload File">
+                    <i class="bx bx-paperclip"></i>
+                    <span>Upload File</span>
+                  </label>
+                  <input type="file" id="file-upload"
+                    accept="image/*, audio/*, video/*, .pdf, .txt, .js, .py, .java, .c, .cpp, .html, .css, .json, .md, .csv, .xml, .rtf"
+                    hidden />
+                </div>
 
-          <div class="mic-btn" id="mic-btn" title="Start speaking">
-            <i class='bx  bxs-microphone-big'></i>
+                <div class="menu-item">
+                  <div class="menu-icon-btn" id="web-search" title="Google Web Search">
+                    <i class='bx bxl-google'></i>
+                    <span>Google Search</span>
+                  </div>
+                </div>
+
+                <div class="menu-item">
+                  <div class="menu-icon-btn" id="generate-image-btn" title="Generate Image">
+                    <i class='bx bx-image-add'></i>
+                    <span>Generate Image</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="toolbar-right">
+              <div class="model-select-wrapper" id="model-wrapper">
+                <div class="model-select-trigger" id="model-trigger">
+                  <span id="model-display">Auto</span>
+                  <i class='bx bx-chevron-down'></i>
+                </div>
+                <div class="model-options" id="model-options">
+                  <div class="model-option selected" data-value="auto"
+                    title="🧠 Auto. Balances speed and intelligence.">Auto</div>
+                  <div class="model-option" data-value="fast" title="⚡ Fast. Ultra-fast responses.">Fast and Simple
+                  </div>
+                  <div class="model-option" data-value="deep" title="🔍 Deep. Best for complex reasoning and coding.">
+                    Deep Thinking</div>
+                </div>
+                <input type="hidden" id="model-select" value="auto">
+              </div>
+
+              <div class="mic-btn" id="mic-btn" title="Start speaking">
+                <i class='bx  bxs-microphone-big'></i>
+              </div>
+
+              <span>
+                <i class='bx  bxs-arrow-up-circle' id="send-button"></i>
+              </span>
+            </div>
           </div>
         </div>
 
         <audio id="startSound" src="/assests/start-13691.mp3"></audio>
         <audio id="stopSound" src="/assests/stop-13692.mp3"></audio>
+
+        <!-- Speaking Overlay -->
+        <div id="speaking-overlay" class="speaking-overlay hidden">
+          <div class="speaking-modal">
+            <div class="speaking-waveform">
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+            </div>
+            <p class="speaking-label">Listening<span class="dots"><span>.</span><span>.</span><span>.</span></span></p>
+            <p id="live-transcript" class="live-transcript"></p>
+            <button id="stop-speaking-btn" class="stop-speaking-btn"><i class='bx bx-stop-circle'></i> Stop</button>
+          </div>
+        </div>
       </div>
 
 
@@ -279,11 +347,350 @@
   <script type="module" src="../login/homepage.js"></script>
 
 
+  <!-- ── Theme Picker UI — always present, not inside sarvam-theme.css ── -->
+  <style>
+    /* Theme card grid */
+    .theme-picker {
+      display: flex;
+      gap: 14px;
+      margin-top: 6px;
+    }
+
+    .theme-card {
+      flex: 1;
+      border: 2px solid rgba(128, 128, 128, 0.25);
+      border-radius: 14px;
+      overflow: hidden;
+      cursor: pointer;
+      position: relative;
+      background: rgba(128, 128, 128, 0.08);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .theme-card:hover {
+      border-color: rgba(128, 128, 128, 0.5);
+    }
+
+    .theme-card.selected {
+      border-color: #4ade80;
+      box-shadow: 0 0 0 1px #4ade8060;
+    }
+
+    .theme-card-check {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #4ade80;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+    }
+
+    .theme-card.selected .theme-card-check {
+      display: flex;
+    }
+
+    .theme-card-check i {
+      font-size: 13px !important;
+      color: #fff !important;
+    }
+
+    /* Mini preview */
+    .theme-card-preview {
+      height: 80px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .tp-header {
+      height: 14px;
+      flex-shrink: 0;
+    }
+
+    .tp-body {
+      display: flex;
+      flex: 1;
+    }
+
+    .tp-sidebar {
+      width: 26px;
+      flex-shrink: 0;
+    }
+
+    .tp-content {
+      flex: 1;
+      padding: 6px 6px 0 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .tp-msg {
+      height: 8px;
+      border-radius: 4px;
+      width: 75%;
+    }
+
+    .tp-msg.tp-msg-out {
+      width: 55%;
+      align-self: flex-end;
+    }
+
+    .tp-msg.short {
+      width: 45%;
+    }
+
+    /* Classic (index.css dark) preview */
+    .classic-preview {
+      background: #11101D;
+    }
+
+    .classic-preview .tp-header {
+      background: #1a1838;
+    }
+
+    .classic-preview .tp-sidebar {
+      background: #1a1838;
+    }
+
+    .classic-preview .tp-msg.tp-msg-in {
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .classic-preview .tp-msg.tp-msg-out {
+      background: rgba(103, 58, 183, 0.5);
+    }
+
+    /* Sarvam (sarvam-theme.css dark) preview */
+    .sarvam-preview {
+      background: #1C1C1E;
+    }
+
+    .sarvam-preview .tp-header {
+      background: #28282C;
+    }
+
+    .sarvam-preview .tp-sidebar {
+      background: #28282C;
+    }
+
+    .sarvam-preview .tp-msg.tp-msg-in {
+      background: rgba(255, 255, 255, 0.10);
+    }
+
+    .sarvam-preview .tp-msg.tp-msg-out {
+      background: rgba(110, 231, 183, 0.25);
+    }
+
+    /* Card label */
+    .theme-card-info {
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .theme-name {
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: block;
+    }
+
+    .theme-desc {
+      font-size: 0.72rem;
+      opacity: 0.6;
+      display: block;
+    }
+
+    /* Colour for labels — adapts to light/dark */
+    .theme-name {
+      color: #141414;
+    }
+
+    body:not(.white-mode) .theme-name {
+      color: #F0F0F0;
+    }
+
+    .theme-desc {
+      color: #666;
+    }
+
+    body:not(.white-mode) .theme-desc {
+      color: #A0A0A8;
+    }
+
+    /* Segmented mode control */
+    .mode-segment {
+      display: flex;
+      margin-top: 8px;
+      width: fit-content;
+      background: rgba(128, 128, 128, 0.12);
+      border: 1px solid rgba(128, 128, 128, 0.2);
+      border-radius: 9999px;
+      padding: 4px;
+      gap: 4px;
+    }
+
+    .mode-seg-btn {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 22px;
+      border: none;
+      border-radius: 9999px;
+      background: transparent;
+      font-size: 0.88rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      outline: none;
+      color: #555;
+    }
+
+    body:not(.white-mode) .mode-seg-btn {
+      color: #A0A0A8;
+    }
+
+    .mode-seg-btn i {
+      font-size: 1.1rem;
+    }
+
+    .mode-seg-btn[data-mode="dark"].selected {
+      background: #1C1C2E;
+      color: #C0BEFF;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+    }
+
+    .mode-seg-btn[data-mode="light"].selected {
+      background: #FFFFFF;
+      color: #D97706;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    }
+
+    .mode-seg-btn:hover:not(.selected) {
+      background: rgba(128, 128, 128, 0.15);
+    }
+
+    /* ── Sidebar: history scrolls, profile always pinned ── */
+    .history-container {
+      flex: 1;
+      overflow-y: auto;
+      min-height: 0;
+      margin: 4px 0;
+    }
+
+    .history-container::-webkit-scrollbar {
+      width: 3px;
+    }
+
+    .history-container::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 6px;
+    }
+
+    /* Ensure login-li and profile-li share the bottom region */
+    #login-li {
+      flex-shrink: 0;
+    }
+  </style>
+
+
   <script>
-
     document.addEventListener('contextmenu', event => event.preventDefault());
-
   </script>
+
+
+  <script>
+    // ── Theme & Mode Picker Logic ────────────────────────────────
+    // Theme: 'classic' (index.css only) | 'sarvam' (+ sarvam-theme.css)
+    // Mode:  'dark' (default)          | 'light' (body.white-mode)
+    (function () {
+      const THEME_KEY = 'app-theme-style';
+      const MODE_KEY = 'app-theme-mode';
+
+      // ── Apply theme style ──────────────────────────────────────
+      function applyThemeStyle(theme) {
+        const link = document.getElementById('sarvam-css');
+        if (link) link.disabled = (theme !== 'sarvam');
+      }
+
+      // ── Apply colour mode ─────────────────────────────────────
+      function applyMode(mode) {
+        if (mode === 'light') {
+          document.body.classList.add('white-mode');
+        } else {
+          document.body.classList.remove('white-mode');
+        }
+        // Sync legacy hidden toggle & status
+        const toggle = document.getElementById('theme-toggle');
+        if (toggle) toggle.checked = (mode === 'light');
+        const status = document.getElementById('theme-status');
+        if (status) status.textContent = mode === 'light' ? 'Light Mode' : 'Dark Mode';
+      }
+
+      // ── Update visual card selection (theme cards) ────────────
+      function selectCard(pickerEl, activeValue, dataAttr) {
+        if (!pickerEl) return;
+        pickerEl.querySelectorAll('.theme-card').forEach(c => {
+          c.classList.toggle('selected', c.dataset[dataAttr] === activeValue);
+        });
+      }
+
+      // ── Update segmented button selection (mode) ──────────────
+      function selectSegBtn(pickerEl, activeValue, dataAttr) {
+        if (!pickerEl) return;
+        pickerEl.querySelectorAll('.mode-seg-btn').forEach(b => {
+          b.classList.toggle('selected', b.dataset[dataAttr] === activeValue);
+        });
+      }
+
+      // ── Init ──────────────────────────────────────────────────
+      function init() {
+        const savedTheme = localStorage.getItem(THEME_KEY) || 'sarvam';
+        const savedMode = localStorage.getItem(MODE_KEY) || 'light';
+
+
+        applyThemeStyle(savedTheme);
+        applyMode(savedMode);
+        selectCard(document.getElementById('theme-picker'), savedTheme, 'theme');
+        selectSegBtn(document.getElementById('mode-picker'), savedMode, 'mode');
+
+        // Theme style cards
+        document.querySelectorAll('#theme-picker .theme-card').forEach(card => {
+          card.addEventListener('click', () => {
+            const theme = card.dataset.theme;
+            localStorage.setItem(THEME_KEY, theme);
+            applyThemeStyle(theme);
+            selectCard(document.getElementById('theme-picker'), theme, 'theme');
+          });
+        });
+
+        // Colour mode segment buttons
+        document.querySelectorAll('#mode-picker .mode-seg-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const mode = btn.dataset.mode;
+            localStorage.setItem(MODE_KEY, mode);
+            applyMode(mode);
+            selectSegBtn(document.getElementById('mode-picker'), mode, 'mode');
+          });
+        });
+      }
+
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+      } else {
+        init();
+      }
+    })();
+  </script>
+
+
 
 
 
@@ -303,6 +710,23 @@
     </div>
   </div>
 
+  <div id="login-limit-modal" class="confirm-modal">
+    <div class="confirm-modal-content">
+      <div class="confirm-modal-header">
+        <i class='bx bx-lock-alt'></i>
+        <h3>Login Required</h3>
+      </div>
+      <div class="confirm-modal-body">
+        <p id="login-limit-message">You've reached the guest limit. Please sign in to continue.</p>
+      </div>
+      <div class="confirm-modal-footer">
+        <button class="confirm-btn-cancel" id="login-cancel">Cancel</button>
+        <button class="confirm-btn-delete" id="login-redirect" style="background-color: var(--primary-color);">Sign
+          In</button>
+      </div>
+    </div>
+  </div>
+
   <div class="search-side-panel" id="search-side-panel">
     <div class="panel-header">
       <h3><i class='bx bxl-google'></i> Search Results</h3>
@@ -311,6 +735,28 @@
     <div class="panel-body" id="search-results-container">
       <div class="search-placeholder">
 
+      </div>
+    </div>
+  </div>
+
+  <div id="image-modal" class="image-modal">
+    <span class="close-image-modal">&times;</span>
+    <img class="image-modal-content" id="img-modal-preview">
+    <div id="image-caption"></div>
+    <a id="modal-download-btn" href="#" download><i class='bx  bx-arrow-to-bottom'></i> </a>
+  </div>
+
+  <div id="gallery-modal" class="settings-modal">
+    <div class="settings-modal-content" style="max-width: 900px; height: 85vh;">
+      <div class="settings-header">
+        <h3><i class='bx bx-images'></i> Generated Gallery</h3>
+        <i class='bx bx-x' id="close-gallery"></i>
+      </div>
+      <div class="gallery-body" style="padding: 20px; overflow-y: auto; height: calc(100% - 60px);">
+        <div id="gallery-grid" class="gallery-grid">
+          <!-- Images will be loaded here -->
+          <div class="gallery-loading">Loading...</div>
+        </div>
       </div>
     </div>
   </div>
@@ -325,6 +771,9 @@
         <div class="settings-sidebar">
           <button class="settings-tab-btn active" data-tab="general">
             <i class='bx bx-user'></i> General
+          </button>
+          <button class="settings-tab-btn" data-tab="ai-behavior">
+            <i class='bx bx-brain'></i> AI Behavior
           </button>
           <button class="settings-tab-btn" data-tab="voice">
             <i class='bx bx-volume-full'></i> Voice
@@ -379,21 +828,148 @@
               </div>
 
               <div class="form-group">
-                <label for="theme-toggle">App Theme</label>
-                <div class="theme-switch-wrapper">
-                  <label class="theme-switch" for="theme-toggle">
-                    <input type="checkbox" id="theme-toggle" />
-                    <div class="slider round">
-                      <i class='bx bxs-moon'></i>
-                      <i class='bx bxs-sun'></i>
+                <label>Theme Style</label>
+                <div class="theme-picker" id="theme-picker">
+
+                  <!-- Theme 1: Classic (original index.css) -->
+                  <div class="theme-card" data-theme="classic" id="theme-card-classic">
+                    <div class="theme-card-preview classic-preview">
+                      <div class="tp-header"></div>
+                      <div class="tp-body">
+                        <div class="tp-sidebar"></div>
+                        <div class="tp-content">
+                          <div class="tp-msg tp-msg-in"></div>
+                          <div class="tp-msg tp-msg-out"></div>
+                          <div class="tp-msg tp-msg-in short"></div>
+                        </div>
+                      </div>
                     </div>
-                  </label>
-                  <span id="theme-status">Dark Mode</span>
+                    <div class="theme-card-info">
+                      <span class="theme-name">Cosmos</span>
+                      <span class="theme-desc">Original bold theme</span>
+                    </div>
+                    <div class="theme-card-check"><i class='bx bx-check'></i></div>
+                  </div>
+
+                  <!-- Theme 2: Sarvam (sarvam-theme.css on top) -->
+                  <div class="theme-card" data-theme="sarvam" id="theme-card-sarvam">
+                    <div class="theme-card-preview sarvam-preview">
+                      <div class="tp-header"></div>
+                      <div class="tp-body">
+                        <div class="tp-sidebar"></div>
+                        <div class="tp-content">
+                          <div class="tp-msg tp-msg-in"></div>
+                          <div class="tp-msg tp-msg-out"></div>
+                          <div class="tp-msg tp-msg-in short"></div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="theme-card-info">
+                      <span class="theme-name">Lumina</span>
+                      <span class="theme-desc">Modern Sarvam style</span>
+                    </div>
+                    <div class="theme-card-check"><i class='bx bx-check'></i></div>
+                  </div>
+
                 </div>
               </div>
 
+              <div class="form-group">
+                <label>Colour Mode</label>
+                <div class="mode-segment" id="mode-picker">
+                  <button class="mode-seg-btn" type="button" data-mode="dark" id="mode-card-dark">
+                    <i class='bx bxs-moon'></i>
+                    <span>Dark</span>
+                  </button>
+                  <button class="mode-seg-btn" type="button" data-mode="light" id="mode-card-light">
+                    <i class='bx bxs-sun'></i>
+                    <span>Light</span>
+                  </button>
+                </div>
+                <!-- Legacy toggle kept hidden for compatibility -->
+                <input type="checkbox" id="theme-toggle" style="display:none" />
+                <span id="theme-status" style="display:none">Dark Mode</span>
+              </div>
+
+
+
+
               <div class="settings-actions">
                 <button type="submit" class="save-btn">Save Preferences</button>
+              </div>
+            </form>
+          </div>
+
+          <div id="tab-ai-behavior" class="settings-tab-content">
+            <form id="ai-behavior-form">
+              <div class="form-group custom-select-wrapper-group">
+                <label for="settings-model">Default AI Model Base</label>
+                <div class="custom-select-wrapper" id="settings-model-wrapper">
+                  <div class="custom-select-trigger" id="settings-model-trigger" tabindex="0">
+                    <span id="settings-model-display">Gemini 2.5 Flash</span>
+                    <i class='bx bx-chevron-down'></i>
+                  </div>
+                  <div class="custom-options" id="settings-model-options">
+                    <div class="custom-option selected" data-value="gemini-2.5-flash">Gemini 2.5 Flash (Fast & Default)
+                    </div>
+                    <div class="custom-option" data-value="gemini-2.5-flash-lite">Gemini 2.5 Mini</div>
+                    <div class="custom-option" data-value="moonshotai/kimi-k2-instruct-0905">Claude Sonnet 4 / Kimi K2
+                    </div>
+                    <div class="custom-option" data-value="llama-3.3-70b-versatile">Llama 3.3 70B</div>
+                    <div class="custom-option" data-value="qwen/qwen3-32b">Qwen 3 32B</div>
+                    <div class="custom-option" data-value="openai/gpt-oss-120b">GPT-OSS 120B</div>
+                  </div>
+                  <input type="hidden" id="user-default-model" value="gemini-2.5-flash">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="user-writing-style">AI Writing Style</label>
+                <div class="custom-select-wrapper" id="writing-style-wrapper">
+                  <div class="custom-select-trigger" tabindex="0">
+                    <span id="writing-style-display">Balanced & Natural</span>
+                    <i class='bx bx-chevron-down'></i>
+                  </div>
+                  <div class="custom-options">
+                    <div class="custom-option selected" data-value="">Balanced & Natural</div>
+                    <div class="custom-option" data-value="concise">Direct & Concise (No fluff)</div>
+                    <div class="custom-option" data-value="professional">Professional & Academic</div>
+                    <div class="custom-option" data-value="sarcastic">Witty & Sarcastic</div>
+                    <div class="custom-option" data-value="storyteller">Creative Storyteller</div>
+                  </div>
+                  <input type="hidden" id="user-writing-style" value="">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="user-creativity">Creativity Level</label>
+                <div class="custom-select-wrapper" id="creativity-wrapper">
+                  <div class="custom-select-trigger" tabindex="0">
+                    <span id="creativity-display">Standard</span>
+                    <i class='bx bx-chevron-down'></i>
+                  </div>
+                  <div class="custom-options">
+                    <div class="custom-option selected" data-value="">Standard</div>
+                    <div class="custom-option" data-value="precise">Highly Precise & Logical</div>
+                    <div class="custom-option" data-value="creative">Highly Creative & Brainstorming</div>
+                  </div>
+                  <input type="hidden" id="user-creativity" value="">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="user-interests">Your Core Interests (AI will tailor examples)</label>
+                <input type="text" id="user-interests" placeholder="e.g., Coding, Sci-Fi, Investing, Gaming">
+              </div>
+
+              <div class="form-group">
+                <label for="user-custom-rules">Custom Instructions / Rules</label>
+                <textarea id="user-custom-rules" rows="3"
+                  placeholder="e.g., Always reply in bullet points. Never use emojis. Treat me like a senior developer."></textarea>
+              </div>
+
+              <div class="settings-actions">
+                <button type="submit" class="save-btn">Save AI Behavior</button>
               </div>
             </form>
           </div>
@@ -427,6 +1003,456 @@
     </div>
   </div>
 
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!--  PREMIUM FIRST-VISIT GREETING LOADER                       -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div id="greeting-overlay" aria-modal="true" role="dialog" aria-label="Welcome">
+
+    <!-- Animated canvas-style noise bg (CSS only) -->
+    <div class="go-bg">
+      <div class="go-orb go-orb-1"></div>
+      <div class="go-orb go-orb-2"></div>
+      <div class="go-orb go-orb-3"></div>
+    </div>
+
+    <!-- 3-D card -->
+    <div class="go-card">
+
+      <!-- Orbital ring loader -->
+      <div class="go-ring-wrap">
+        <svg class="go-ring" viewBox="0 0 100 100">
+          <circle class="go-ring-track" cx="50" cy="50" r="42" />
+          <circle class="go-ring-progress" cx="50" cy="50" r="42" />
+        </svg>
+        <!-- Logo mark inside ring -->
+        <div class="go-logo">
+          <svg width="28" height="28" viewBox="0 0 40 40" fill="none">
+            <path
+              d="M20 4C28.837 4 36 11.163 36 20C36 28.837 28.837 36 20 36C11.163 36 4 28.837 4 20C4 11.163 11.163 4 20 4Z"
+              fill="url(#logograd)" />
+            <path d="M13 20L17 24L27 14" stroke="white" stroke-width="2.5" stroke-linecap="round"
+              stroke-linejoin="round" />
+            <defs>
+              <linearGradient id="logograd" x1="4" y1="4" x2="36" y2="36" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#7C6DFA" />
+                <stop offset="100%" stop-color="#38C9A4" />
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Text content -->
+      <div class="go-text">
+        <p class="go-eyebrow">Welcome back</p>
+        <h1 class="go-title" id="go-typewriter"></h1>
+        <p class="go-subtitle">Your intelligent assistant is ready.</p>
+      </div>
+
+      <!-- Progress dots -->
+      <div class="go-dots">
+        <span class="go-dot active"></span>
+        <span class="go-dot"></span>
+        <span class="go-dot"></span>
+      </div>
+
+      <!-- CTA -->
+      <button class="go-btn" id="go-dismiss-btn">
+        <span>Get Started</span>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+      </button>
+
+      <p class="go-hint">Powered by AI · Private · Fast</p>
+    </div>
+  </div>
+
+  <style>
+    /* ── Overlay ─────────────────────────────────────────── */
+    #greeting-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'DM Sans', sans-serif;
+      overflow: hidden;
+      opacity: 1;
+      transition: opacity 0.55s ease, transform 0.55s ease;
+    }
+
+    #greeting-overlay.go-exit {
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(1.04);
+    }
+
+    /* ── Background ──────────────────────────────────────── */
+    .go-bg {
+      position: absolute;
+      inset: 0;
+      background: #0C0E16;
+    }
+
+    /* Noise texture via SVG data uri */
+    .go-bg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      background-size: 180px;
+      pointer-events: none;
+    }
+
+    /* Glowing orbs */
+    .go-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.45;
+      animation: orbFloat 8s ease-in-out infinite alternate;
+    }
+
+    .go-orb-1 {
+      width: 420px;
+      height: 420px;
+      background: radial-gradient(circle, #8B85FA55, transparent 70%);
+      top: -120px;
+      left: -100px;
+    }
+
+    .go-orb-2 {
+      width: 360px;
+      height: 360px;
+      background: radial-gradient(circle, #38C9A440, transparent 70%);
+      bottom: -80px;
+      right: -60px;
+      animation-delay: -3s;
+    }
+
+    .go-orb-3 {
+      width: 260px;
+      height: 260px;
+      background: radial-gradient(circle, #7C3AED30, transparent 70%);
+      top: 50%;
+      left: 55%;
+      animation-delay: -6s;
+      opacity: 0.3;
+    }
+
+    @keyframes orbFloat {
+      from {
+        transform: translate(0, 0) scale(1);
+      }
+
+      to {
+        transform: translate(30px, 20px) scale(1.08);
+      }
+    }
+
+    /* ── Card ────────────────────────────────────────────── */
+    .go-card {
+      position: relative;
+      z-index: 2;
+      width: min(420px, 92vw);
+      background: linear-gradient(160deg, #12141F 0%, #0E1019 100%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 28px;
+      padding: 44px 40px 36px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      /* Multi-layer 3D depth shadow */
+      box-shadow:
+        0 0 0 1px rgba(139, 133, 250, 0.18),
+        0 4px 6px rgba(0, 0, 0, 0.35),
+        0 20px 60px rgba(0, 0, 0, 0.55),
+        0 50px 120px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      text-align: center;
+      transform: translateY(0) perspective(900px) rotateX(0deg);
+      animation: cardRise 0.7s cubic-bezier(0.34, 1.36, 0.64, 1) forwards;
+    }
+
+    @keyframes cardRise {
+      from {
+        opacity: 0;
+        transform: translateY(40px) perspective(900px) rotateX(6deg);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) perspective(900px) rotateX(0deg);
+      }
+    }
+
+    /* Subtle shimmer line at top of card */
+    .go-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 20%;
+      right: 20%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(139, 133, 250, 0.8), rgba(56, 201, 164, 0.6), transparent);
+      border-radius: 1px;
+    }
+
+    /* ── Orbital ring ────────────────────────────────────── */
+    .go-ring-wrap {
+      position: relative;
+      width: 88px;
+      height: 88px;
+      margin-bottom: 28px;
+    }
+
+    .go-ring {
+      width: 88px;
+      height: 88px;
+      transform: rotate(-90deg);
+      animation: spinRing 2.2s linear infinite;
+    }
+
+    @keyframes spinRing {
+      to {
+        transform: rotate(270deg);
+      }
+    }
+
+    .go-ring-track {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.06);
+      stroke-width: 5;
+    }
+
+    .go-ring-progress {
+      fill: none;
+      stroke: url(#ringGrad);
+      stroke-width: 5;
+      stroke-linecap: round;
+      stroke-dasharray: 264;
+      stroke-dashoffset: 180;
+      filter: drop-shadow(0 0 6px #7C6DFA99);
+    }
+
+    /* Inject SVG gradient into the ring */
+    .go-ring-wrap::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: transparent;
+    }
+
+    .go-logo {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ── Text ────────────────────────────────────────────── */
+    .go-eyebrow {
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.35);
+      margin: 0 0 10px;
+      font-weight: 500;
+    }
+
+    .go-title {
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-size: clamp(1.7rem, 4vw, 2.3rem);
+      font-weight: 400;
+      line-height: 1.18;
+      letter-spacing: -0.025em;
+      color: #F0EEF8;
+      margin: 0 0 12px;
+      min-height: 2.8rem;
+    }
+
+    .go-title .go-cursor {
+      display: inline-block;
+      width: 2px;
+      height: 1em;
+      background: #8B85FA;
+      margin-left: 3px;
+      vertical-align: middle;
+      animation: blinkCursor 0.85s step-end infinite;
+    }
+
+    @keyframes blinkCursor {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: 0
+      }
+    }
+
+    .go-subtitle {
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.38);
+      margin: 0 0 28px;
+      line-height: 1.55;
+      font-weight: 400;
+    }
+
+    #temp-chat-icon,
+    #toggle-search-panel-btn {
+      cursor: pointer;
+    }
+
+    /* ── Dot stepper ─────────────────────────────────────── */
+    .go-dots {
+      display: flex;
+      gap: 7px;
+      margin-bottom: 28px;
+    }
+
+    .go-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      transition: all 0.4s ease;
+    }
+
+    .go-dot.active {
+      width: 22px;
+      border-radius: 3px;
+      background: linear-gradient(90deg, #7C6DFA, #38C9A4);
+    }
+
+    /* ── CTA button ──────────────────────────────────────── */
+    .go-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 13px 30px;
+      background: linear-gradient(135deg, #7C6DFA 0%, #38C9A4 100%);
+      color: #fff;
+      border: none;
+      border-radius: 9999px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.92rem;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      cursor: pointer;
+      outline: none;
+      margin-bottom: 16px;
+      box-shadow: 0 8px 30px rgba(124, 109, 250, 0.45);
+      transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+    }
+
+    .go-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(124, 109, 250, 0.55);
+    }
+
+    .go-btn:active {
+      transform: translateY(0);
+      opacity: 0.9;
+    }
+
+    .go-hint {
+      font-size: 0.72rem;
+      color: rgba(255, 255, 255, 0.2);
+      margin: 0;
+      letter-spacing: 0.04em;
+    }
+
+
+    .go-svg-defs {
+      position: absolute;
+      width: 0;
+      height: 0;
+      overflow: hidden;
+    }
+  </style>
+
+
+  <svg class="go-svg-defs" aria-hidden="true">
+    <defs>
+      <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#7C6DFA" />
+        <stop offset="100%" stop-color="#38C9A4" />
+      </linearGradient>
+    </defs>
+  </svg>
+
+  <script>
+    (function () {
+      const SEEN_KEY = 'treevit-greeted';
+      const overlay = document.getElementById('greeting-overlay');
+      const dismissBtn = document.getElementById('go-dismiss-btn');
+      const typeEl = document.getElementById('go-typewriter');
+      const dots = document.querySelectorAll('.go-dot');
+
+
+      if (localStorage.getItem(SEEN_KEY)) {
+        overlay.style.display = 'none';
+        return;
+      }
+
+
+      const words = ['Hello there.', 'Good to see you.', 'Let\'s get started.'];
+      let wordIdx = 0, charIdx = 0, deleting = false, dotStep = 0;
+      let typeTimer, dotTimer;
+
+      function updateDots(step) {
+        dots.forEach((d, i) => d.classList.toggle('active', i === step));
+      }
+
+      function type() {
+        const word = words[wordIdx];
+        const cursor = '<span class="go-cursor"></span>';
+        if (!deleting) {
+          charIdx++;
+          typeEl.innerHTML = word.slice(0, charIdx) + cursor;
+          if (charIdx === word.length) {
+            // Pause then delete
+            setTimeout(() => { deleting = true; type(); }, 1400);
+            return;
+          }
+        } else {
+          charIdx--;
+          typeEl.innerHTML = word.slice(0, charIdx) + cursor;
+          if (charIdx === 0) {
+            deleting = false;
+            wordIdx = (wordIdx + 1) % words.length;
+            dotStep = wordIdx;
+            updateDots(dotStep % dots.length);
+          }
+        }
+        typeTimer = setTimeout(type, deleting ? 55 : 95);
+      }
+      type();
+
+
+      function dismiss() {
+        clearTimeout(typeTimer);
+        overlay.classList.add('go-exit');
+        localStorage.setItem(SEEN_KEY, '1');
+        setTimeout(() => overlay.remove(), 620);
+      }
+
+      dismissBtn.addEventListener('click', dismiss);
+
+      setTimeout(dismiss, 7000);
+    })();
+  </script>
+
 </body>
+
 
 </html>

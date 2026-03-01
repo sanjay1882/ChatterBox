@@ -25,7 +25,7 @@ onAuthStateChanged(auth, (user) => {
 
 
   } else {
-    window.location.href = 'Login/index.html';
+    // Guest user - do nothing (handled by guest limits)
   }
 });
 
@@ -34,6 +34,7 @@ const logoutButton = document.getElementById('logout');
 logoutButton.addEventListener('click', () => {
 
   localStorage.removeItem('loggedInUserId');
+  localStorage.removeItem('loggedInUserEmail');
 
   signOut(auth)
     .then(() => {

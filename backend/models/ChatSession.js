@@ -1,8 +1,16 @@
 import mongoose from "mongoose";
 
+const partSchema = new mongoose.Schema({
+    text: String,
+    inlineData: {
+        mimeType: String,
+        data: String
+    }
+}, { _id: false });
+
 const messageSchema = new mongoose.Schema({
     role: { type: String, required: true },
-    parts: [{ text: String }],
+    parts: [partSchema],
     timestamp: { type: Date, default: Date.now }
 });
 

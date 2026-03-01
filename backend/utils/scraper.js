@@ -6,8 +6,10 @@ function simpleClean(text) {
     if (!text) return "";
     // Collapse whitespace
     let cleaned = text.replace(/\s+/g, " ").trim();
-    // Drop weird non-ASCII chars (preserving punctuation)
-    cleaned = cleaned.replace(/[^A-Za-z0-9\s.,!?:;'"()\-\n]/g, " ");
+
+    // REMOVED: Aggressive non-ASCII stripping
+    // cleaned = cleaned.replace(/[^A-Za-z0-9\s.,!?:;'"()\-\n]/g, " ");
+
     // Remove common boilerplate
     cleaned = cleaned.replace(/\b(cookie|privacy|terms|subscribe|advertis(ement|ing)|copyright)\b/gi, "");
     // Collapse repeated punctuation
@@ -37,7 +39,7 @@ export async function googleSearch(query, maxLinks = 10) {
                 q: query,
                 key: API_KEY_SE,
                 cx: CX,
-                num: Math.min(10, maxLinks) 
+                num: Math.min(10, maxLinks)
             },
             timeout: 10000
         });
@@ -70,7 +72,14 @@ export async function fetchAndExtract(url) {
 
         const $ = cheerio.load(response.data);
 
-        $('script, style, noscript, header, footer, nav, iframe, form, aside').remove();
+        // Remove clutter
+        $('script, style, noscript, header, footer, nav, iframe, form, aside, svg').remove();
+
+        // Preserve structure: Add newlines to block elements
+        $('br').replaceWith('\n');
+        $('p, h1, h2, h3, h4, h5, h6, li, div, tr').each((i, el) => {
+            $(el).append('\n');
+        });
 
         let text = $('body').text();
         text = simpleClean(text);
@@ -79,8 +88,8 @@ export async function fetchAndExtract(url) {
         return text;
 
     } catch (error) {
-        
-        return null; 
+        console.error(`Error fetching ${url}:`, error.message);
+        return null;
     }
 }
 
@@ -96,7 +105,7 @@ export async function scrapeQuery(query, maxLinks = 5) {
             results.push({
                 title: item.title,
                 link: item.link,
-                snippet: item.snippet, 
+                snippet: item.snippet,
                 text: text
             });
         }

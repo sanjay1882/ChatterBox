@@ -39,8 +39,7 @@ try {
     console.log("\n1. Building and Submitting Image...");
     execSync(`gcloud builds submit . --tag "gcr.io/${PROJECT_ID}/${SERVICE_NAME}" --project "${PROJECT_ID}"`, { stdio: 'inherit' });
 
-    // 2. Deploy with Env Vars
-    // Construct env var string carefully
+  
     let envVars = `NODE_ENV=production`;
     if (API_KEY) envVars += `,API_KEY_SE=${API_KEY}`;
     if (CX_ID) envVars += `,CX_ID=${CX_ID}`;

@@ -1,4 +1,7 @@
-import { API_BASE_URL } from '../config.js';
+// Set API_BASE_URL directly to bypass import issues in some environments
+const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:' || window.location.hostname === ''
+    ? "http://localhost:3000"
+    : "https://chatterbox-backend-3tlejwqmcq-uc.a.run.app";
 
 let chatInput = document.querySelector(".chat-input textarea");
 const chatbox = document.querySelector(".chatbox");
@@ -40,7 +43,28 @@ let allSessions = [];
 // let allSessions = []; // Removed duplicate
 
 let isTemporaryMode = false;
+let isImageGenMode = false;
 let abortController = null; // Controller for stopping generation
+let stopDisplayFlag = false; // Stops visual streaming display without killing network
+
+// Gallery State
+let currentGalleryPage = 1;
+let galleryImagesCache = [];
+let galleryHasNextPage = false;
+let isGalleryLoading = false;
+
+// Session State
+let currentSessionPage = 1;
+let sessionsCache = [];
+let sessionsHasNextPage = false;
+let isSessionsLoading = false;
+
+function getCurrentUserEmail() {
+    if (window.auth && window.auth.currentUser && window.auth.currentUser.email) {
+        return window.auth.currentUser.email;
+    }
+    return localStorage.getItem('loggedInUserEmail');
+}
 
 let sidebar = document.querySelector(".sidebar");
 let closeBtn = document.querySelector("#btn");
@@ -105,10 +129,19 @@ function init() {
     };
 
     waitForAuth().then((user) => {
+        const profileLi = document.getElementById('profile-li');
+        const loginLi = document.getElementById('login-li');
+
         if (!user) {
-            window.location.href = '/login/';
+            // Guest mode logic
+            if (profileLi) profileLi.style.display = 'none';
+            if (loginLi) loginLi.style.display = 'block';
             return;
         }
+
+        // Logged in mode
+        if (profileLi) profileLi.style.display = 'flex'; // Use flex as per css usually
+        if (loginLi) loginLi.style.display = 'none';
 
         // Ensure email in localStorage matches the authenticated user
         const storedEmail = localStorage.getItem('loggedInUserEmail');
@@ -118,9 +151,10 @@ function init() {
 
         const emailToUse = user.email || storedEmail;
 
+
         if (emailToUse) {
             loadUserPreferences(emailToUse);
-            loadSessions();
+            loadSessions(true);
         }
         initSettings();
     });
@@ -166,9 +200,292 @@ if (shareChatBtn) {
     shareChatBtn.addEventListener('click', shareChatSession);
 }
 
+const galleryBtn = document.getElementById('gallery-btn');
+if (galleryBtn) {
+    galleryBtn.addEventListener('click', (e) => {
+        e.preventDefault(); // Always prevent default anchor behavior
+        if (!checkGuestAccess('gallery')) {
+            return;
+        }
+        const galleryModal = document.getElementById('gallery-modal');
+        if (galleryModal) {
+            galleryModal.classList.add('show');
+            // If cache is empty, load first page. If not, it will show cached images instantly
+            if (galleryImagesCache.length === 0) {
+                loadGalleryImages(true);
+            } else {
+                renderGalleryImages(galleryImagesCache);
+                // Optionally refresh cache in background or keep as is for "production level" speed
+            }
+        }
+    });
+
+    const closeGallery = document.getElementById('close-gallery');
+    if (closeGallery) {
+        closeGallery.addEventListener('click', () => {
+            document.getElementById('gallery-modal').classList.remove('show');
+        });
+    }
+}
+
+async function loadGalleryImages(isFirstPage = false) {
+    if (isGalleryLoading) return;
+
+    const grid = document.getElementById('gallery-grid');
+    if (!grid) return;
+
+    if (isFirstPage) {
+        currentGalleryPage = 1;
+        galleryImagesCache = [];
+        grid.innerHTML = Array(12).fill('<div class="gallery-skeleton-item"></div>').join('');
+    }
+
+    const userEmail = localStorage.getItem('loggedInUserEmail');
+    if (!userEmail) return;
+
+    isGalleryLoading = true;
+
+    try {
+        const token = await getAuthToken();
+        const headers = {};
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        } else {
+            console.warn("Gallery fetch: No auth token available. Request may fail 401.");
+        }
+
+        const limit = 12;
+        console.log(`Fetching gallery: Page ${currentGalleryPage}, Limit ${limit}`);
+        const res = await fetch(`${API_BASE_URL}/user/gallery/${userEmail}?page=${currentGalleryPage}&limit=${limit}`, { headers });
+
+        if (res.ok) {
+            const data = await res.json();
+            const images = data.images || [];
+            galleryHasNextPage = data.hasNextPage;
+
+            console.log(`Gallery fetch success: Received ${images.length} images`);
+
+            if (isFirstPage && images.length === 0) {
+                grid.innerHTML = '<div class="gallery-empty">no photos found</div>';
+                isGalleryLoading = false;
+                return;
+            }
+
+            // Update cache
+            galleryImagesCache = [...galleryImagesCache, ...images];
+
+            renderGalleryImages(galleryImagesCache);
+            updateLoadMoreButton();
+
+            if (galleryHasNextPage) {
+                currentGalleryPage++;
+            }
+        } else {
+            console.error(`Gallery fetch failed: Status ${res.status}`);
+            if (res.status === 401) {
+                showToast("Authentication failed. Please try logging in again.");
+            }
+            if (isFirstPage) grid.innerHTML = '<div class="gallery-error">Failed to load images.</div>';
+        }
+    } catch (e) {
+        console.error("Gallery load error", e);
+        if (isFirstPage) grid.innerHTML = '<div class="gallery-error">Error loading images.</div>';
+    } finally {
+        isGalleryLoading = false;
+    }
+}
+
+function renderGalleryImages(images) {
+    const grid = document.getElementById('gallery-grid');
+    if (!grid) return;
+
+    grid.innerHTML = '';
+    images.forEach(imgData => {
+        const div = document.createElement('div');
+        div.className = 'gallery-item';
+        div.innerHTML = `<img src="data:${imgData.mimeType || 'image/png'};base64,${imgData.imageBase64}" alt="Generated Image" loading="lazy">`;
+        div.onclick = () => openImageModal(`data:${imgData.mimeType || 'image/png'};base64,${imgData.imageBase64}`, imgData.prompt || "Gallery Image");
+        grid.appendChild(div);
+    });
+}
+
+function updateLoadMoreButton() {
+    let loadMoreBtn = document.getElementById('gallery-load-more');
+    const galleryBody = document.querySelector('.gallery-body');
+
+    if (galleryHasNextPage) {
+        if (!loadMoreBtn) {
+            loadMoreBtn = document.createElement('button');
+            loadMoreBtn.id = 'gallery-load-more';
+            loadMoreBtn.className = 'load-more-btn';
+            loadMoreBtn.innerHTML = '<span>Load More</span> <i class="bx bx-chevron-down"></i>';
+            loadMoreBtn.onclick = () => loadGalleryImages();
+            galleryBody.appendChild(loadMoreBtn);
+        }
+        loadMoreBtn.style.display = 'flex';
+    } else if (loadMoreBtn) {
+        loadMoreBtn.style.display = 'none';
+    }
+}
 
 
+const generateImageBtn = document.getElementById('generate-image-btn');
+if (generateImageBtn) {
+    generateImageBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (!checkGuestAccess('image')) return;
+        isImageGenMode = !isImageGenMode;
+        if (isImageGenMode) {
+            generateImageBtn.classList.add('active');
+            chatInput.placeholder = "Describe image to generate...";
+            actionsMenu.classList.remove('show');
+            chatInput.focus();
+        } else {
+            generateImageBtn.classList.remove('active');
+            chatInput.placeholder = "Ask anything...";
+        }
+    });
+}
 
+const trySpectraBtn = document.getElementById('try-spectra-btn');
+const spectraModeContainer = document.getElementById('spectra-mode-container');
+
+if (trySpectraBtn && spectraModeContainer && hometagContent) {
+    trySpectraBtn.addEventListener('click', () => {
+        const plusBtn = document.getElementById('plus-btn');
+        const micBtn = document.getElementById('mic-btn');
+        const inputActionsMenu = document.getElementById('input-actions-menu');
+
+        // Toggle visibility
+        if (spectraModeContainer.style.display === 'none') {
+            hometagContent.style.display = 'none';
+            spectraModeContainer.style.display = 'block';
+            document.body.classList.add('spectra-mode-active');
+
+            // Backup hiding in case CSS fails to load immediately or specificity issues
+            if (plusBtn) plusBtn.style.display = 'none';
+            if (micBtn) micBtn.style.display = 'none';
+            if (inputActionsMenu) {
+                inputActionsMenu.style.display = 'none';
+                inputActionsMenu.classList.remove('show');
+            }
+            if (chatInput) chatInput.placeholder = "Enter the additional thoughts";
+
+        } else {
+            hometagContent.style.display = 'block';
+            spectraModeContainer.style.display = 'none';
+            document.body.classList.remove('spectra-mode-active');
+
+            if (plusBtn) plusBtn.style.display = '';
+            if (micBtn) micBtn.style.display = '';
+            if (inputActionsMenu) {
+                inputActionsMenu.style.display = '';
+            }
+            if (chatInput) chatInput.placeholder = "Ask anything...";
+        }
+    });
+}
+function initSpectraUploads() {
+    ['1', '2'].forEach(id => {
+        const container = document.getElementById(`spectra-upload-${id}`);
+        const fileInput = document.getElementById(`spectra-file-${id}`);
+
+        if (container && fileInput) {
+            container.addEventListener('click', (e) => {
+                // Prevent triggering if clicking on delete button (if added later dynamically) or image
+                if (e.target.closest('.delete-spectra-img')) return;
+                fileInput.click();
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                const files = e.target.files;
+                if (files && files.length > 0) {
+
+                    // Multi-upload handling for Input 1
+                    if (id === '1' && files.length >= 2) {
+                        const file1 = files[0];
+                        const file2 = files[1];
+
+                        // Process File 1 for Container 1
+                        displaySpectraPreview(container, fileInput, file1);
+
+                        // Process File 2 for Container 2
+                        const container2 = document.getElementById('spectra-upload-2');
+                        const fileInput2 = document.getElementById('spectra-file-2');
+                        if (container2 && fileInput2) {
+                            // Manually set the file for input 2 using DataTransfer
+                            const dt = new DataTransfer();
+                            dt.items.add(file2);
+                            fileInput2.files = dt.files;
+
+                            // Trigger preview for Container 2
+                            displaySpectraPreview(container2, fileInput2, file2);
+                        }
+                    } else {
+                        // Standard single file handling
+                        const file = files[0];
+                        displaySpectraPreview(container, fileInput, file);
+                    }
+                }
+            });
+        }
+    });
+}
+
+// Helper to show preview (refactored from inline to share logic)
+function displaySpectraPreview(container, fileInput, file) {
+    if (!file.type.startsWith('image/')) {
+        showToast('Please upload an image file.');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+        // Create preview HTML
+        container.classList.add('has-image');
+
+        // Store original content if not already stored
+        if (!container.dataset.originalContent) {
+            container.dataset.originalContent = Array.from(container.children)
+                .filter(c => c !== fileInput)
+                .map(c => c.outerHTML).join('');
+        }
+
+        container.innerHTML = `
+            <img src="${event.target.result}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;">
+            <div class="delete-spectra-img" style="position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.5); border-radius: 50%; padding: 5px; cursor: pointer; color: white;">
+                <i class='bx bx-x'></i>
+            </div>
+        `;
+        container.appendChild(fileInput);
+
+        // Add delete handler
+        container.querySelector('.delete-spectra-img').addEventListener('click', (ev) => {
+            ev.stopPropagation();
+            resetSpectraContainer(container, fileInput);
+        });
+    };
+    reader.readAsDataURL(file);
+}
+
+function resetSpectraContainer(container, fileInput) {
+    fileInput.value = ''; // Clear input
+    container.classList.remove('has-image');
+    if (container.dataset.originalContent) {
+        container.innerHTML = container.dataset.originalContent;
+        container.appendChild(fileInput);
+    } else {
+        // Fallback if something went wrong
+        container.innerHTML = `
+            <i class='bx bx-arrow-from-bottom-stroke'></i>
+            <span>Upload</span>
+        `;
+        container.appendChild(fileInput);
+    }
+}
+
+// Initialize uploads
+initSpectraUploads();
 
 function createActionButtons(messageId, messageText, isComplete = false) {
     const actionsDiv = document.createElement('div');
@@ -217,6 +534,109 @@ function createActionButtons(messageId, messageText, isComplete = false) {
     actionsDiv.appendChild(regenerateBtn);
 
     return actionsDiv;
+}
+
+function createUserActionButtons(messageId, messageText) {
+    const actionsDiv = document.createElement('div');
+    actionsDiv.className = 'user-chat-actions';
+
+    const copyBtn = document.createElement('button');
+    copyBtn.className = 'action-btn copy-btn';
+    copyBtn.innerHTML = '<i class="bx bx-copy" title="Copy"></i>';
+    copyBtn.onclick = () => copyToClipboard(messageText, messageId);
+
+    const editBtn = document.createElement('button');
+    editBtn.className = 'action-btn edit-btn';
+    editBtn.innerHTML = '<i class="bx bx-edit-alt" title="Edit"></i>';
+    editBtn.onclick = () => editMessage(messageId, messageText);
+
+    actionsDiv.appendChild(copyBtn);
+    actionsDiv.appendChild(editBtn);
+
+    return actionsDiv;
+}
+
+function editMessage(messageId, oldText) {
+    const messageP = document.getElementById(messageId);
+    if (!messageP) return;
+
+    const originalContent = messageP.innerHTML;
+    const parentLi = messageP.closest('li');
+
+    // Create inline editor
+    const editContainer = document.createElement('div');
+    editContainer.className = 'inline-edit-container';
+
+    const editWrapper = document.createElement('div');
+    editWrapper.className = 'edit-wrapper';
+
+    const textarea = document.createElement('textarea');
+    textarea.className = 'edit-textarea';
+    textarea.value = oldText;
+
+    const btnGroup = document.createElement('div');
+    btnGroup.className = 'edit-btn-group';
+
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'edit-save-btn';
+    saveBtn.textContent = 'Save & Submit';
+
+    const cancelBtn = document.createElement('button');
+    cancelBtn.className = 'edit-cancel-btn';
+    cancelBtn.textContent = 'Cancel';
+
+    btnGroup.appendChild(saveBtn);
+    btnGroup.appendChild(cancelBtn);
+    editWrapper.appendChild(textarea);
+    editWrapper.appendChild(btnGroup);
+    editContainer.appendChild(editWrapper);
+
+    // Hide original text and show editor
+    messageP.style.display = 'none';
+    const actions = parentLi.querySelector('.user-chat-actions');
+    if (actions) actions.style.display = 'none';
+    parentLi.appendChild(editContainer);
+
+    textarea.focus();
+
+    cancelBtn.onclick = () => {
+        editContainer.remove();
+        messageP.style.display = 'block';
+        if (actions) actions.style.display = 'flex';
+    };
+
+    saveBtn.onclick = () => {
+        const newText = textarea.value.trim();
+        if (!newText) return;
+
+        // Forking Logic: Remove all subsequent messages from UI
+        let current = parentLi.nextElementSibling;
+        while (current) {
+            let next = current.nextElementSibling;
+            current.remove();
+            current = next;
+        }
+
+        // Update current message UI
+        messageP.textContent = newText;
+        messageP.style.display = 'block';
+        editContainer.remove();
+        if (actions) actions.style.display = 'flex';
+
+        // Trigger regeneration
+        userMessage = newText;
+        editingMessageId = messageId;
+
+        // Hide home tag if it was visible (unlikely here but safe)
+        if (hometagContent) hometagContent.style.display = "none";
+
+        // Add loading state
+        const incomingChatli = createList('<span class="material-symbols-outlined"><img src="/assests/Star-icon.png" class="chatbot-img" id="Loading_out_Icon"></span>', "incoming");
+        chatbox.appendChild(incomingChatli);
+        chatbox.scrollTo(0, chatbox.scrollHeight);
+
+        generateResponse(incomingChatli, null);
+    };
 }
 
 function copyToClipboard(text, messageId) {
@@ -549,11 +969,33 @@ function showTranslationResult(translatedText, langName, messageId) {
         let html = '';
         let inList = false;
         let inTable = false;
+        let inCodeBlock = false;
         let tableLines = [];
 
         for (let line of lines) {
             const trimmed = line.trim();
             const pipeCount = (line.match(/\|/g) || []).length;
+
+            // Detect start of a pre block
+            if (line.match(/^<pre><code/)) {
+                inCodeBlock = true;
+                html += `${line}\n`;
+                // If it also closes on the same line
+                if (line.match(/<\/code><\/pre>/)) {
+                    inCodeBlock = false;
+                }
+                continue;
+            }
+
+            // Inside a code block — emit raw
+            if (inCodeBlock) {
+                if (line.match(/<\/code><\/pre>/)) {
+                    inCodeBlock = false;
+                }
+                html += `${line}\n`;
+                continue;
+            }
+
             const looksLikeTableRow =
                 pipeCount >= 2 &&
                 !/^<pre><code>/.test(line) &&
@@ -587,11 +1029,6 @@ function showTranslationResult(translatedText, langName, messageId) {
 
             if (line.match(/<h[1-6]>/)) {
                 html += `${line}<br>`;
-                continue;
-            }
-
-            if (line.match(/^<pre><code>/)) {
-                html += `${line}\n`;
                 continue;
             }
 
@@ -659,13 +1096,34 @@ async function regenerateResponse(messageId, originalMessage) {
         const messageElement = document.getElementById(messageId);
         const chatLi = messageElement.closest('.chat.incoming');
 
+        let actualUserPrompt = userMessage; // fallback
+        const previousOutgoing = chatLi.previousElementSibling;
+        if (previousOutgoing && previousOutgoing.classList.contains('outgoing')) {
+            const raw = previousOutgoing.getAttribute('data-raw-text');
+            if (raw) {
+                actualUserPrompt = raw;
+            } else {
+                const userP = previousOutgoing.querySelector('p');
+                if (userP) {
+                    actualUserPrompt = userP.innerText || userP.textContent;
+                    actualUserPrompt = actualUserPrompt.replace('Pasted text snippet', '').trim();
+                }
+            }
+
+            // Set editing message ID so backend truncates history and replaces the previous user message exactly where it was
+            const userP = previousOutgoing.querySelector('p');
+            if (userP && userP.id) {
+                editingMessageId = userP.id;
+            }
+        }
+
         const newIncomingChatli = createList('<span class="material-symbols-outlined"><img src="/assests/Star-icon.png" class="chatbot-img" id="Loading_out_Icon"></span>', "incoming");
 
         chatLi.parentNode.replaceChild(newIncomingChatli, chatLi);
 
         chatbox.scrollTo(0, chatbox.scrollHeight);
 
-        userMessage = originalMessage;
+        userMessage = actualUserPrompt;
         await generateResponse(newIncomingChatli);
 
     } catch (error) {
@@ -727,6 +1185,18 @@ function initSettings() {
     const voiceOptions = document.getElementById('voice-options');
 
     if (voiceWrapper && voiceTrigger) {
+        document.getElementById('settings-btn').addEventListener('click', (e) => {
+            if (!checkGuestAccess('settings')) {
+                e.preventDefault();
+                return;
+            }
+            document.getElementById('settings-modal').classList.add('show');
+        });
+
+        document.getElementById('close-settings').addEventListener('click', () => {
+            document.getElementById('settings-modal').classList.remove('show');
+        });
+
         voiceTrigger.addEventListener('click', () => {
             voiceWrapper.classList.toggle('open');
         });
@@ -839,6 +1309,7 @@ function initModelDropdown() {
 
     if (modelWrapper && modelTrigger && modelOptions) {
         modelTrigger.addEventListener('click', () => {
+            if (!checkGuestAccess('model')) return;
             modelWrapper.classList.toggle('open');
         });
 
@@ -877,7 +1348,76 @@ if (document.readyState === 'complete') {
 }
 
 
+
 initModelDropdown();
+
+// --- Guest Access Control ---
+function checkGuestAccess(feature) {
+    const userEmail = localStorage.getItem('loggedInUserEmail');
+    if (userEmail) return true; // Logged in users have full access
+
+    if (feature === 'chat') {
+        // Bypass limit on localhost for easier development/testing
+        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+        let guestCount = parseInt(localStorage.getItem('guest_chat_count') || '0');
+        const GUEST_LIMIT = isLocalhost ? 10000 : 1000; // Much higher limit
+
+        if (guestCount < GUEST_LIMIT) {
+            localStorage.setItem('guest_chat_count', (guestCount + 1).toString());
+            return true;
+        } else {
+            showLoginAlert("You've reached the guest limit. Please sign in to continue.");
+            return false;
+        }
+    } else {
+        // All other features (model, image, settings, gallery, search) require login
+        const featureNames = {
+            'model': 'changing AI models',
+            'image': 'image generation',
+            'settings': 'accessing settings',
+            'gallery': 'viewing the gallery',
+            'search': 'web search'
+        };
+        const action = featureNames[feature] || 'this feature';
+        showLoginAlert(`Please sign in to access ${action}.`);
+        return false;
+    }
+}
+
+function showLoginAlert(message) {
+    const modal = document.getElementById('login-limit-modal');
+    const msgElement = document.getElementById('login-limit-message');
+    const cancelBtn = document.getElementById('login-cancel');
+    const loginBtn = document.getElementById('login-redirect');
+
+    if (modal && msgElement) {
+        msgElement.textContent = message;
+        modal.classList.add('show');
+        console.log("Login Alert Shown:", message);
+
+        const close = () => {
+            modal.classList.remove('show');
+        };
+
+        // Professional event handling with addEventListener
+        cancelBtn.onclick = null; // Clear any old handlers
+        loginBtn.onclick = null;
+
+        cancelBtn.addEventListener('click', close, { once: true });
+        loginBtn.addEventListener('click', () => {
+            console.log("Sign In Button Clicked");
+            close();
+            window.location.href = '/login/';
+        }, { once: true });
+
+        // Close on outside click
+        modal.onclick = (e) => {
+            if (e.target === modal) close();
+        };
+    }
+}
+
 
 
 async function loadUserPreferences(email) {
@@ -893,7 +1433,11 @@ async function loadUserPreferences(email) {
             applyUserPreferences(prefs);
         }
     } catch (e) {
-        console.error("Failed to load prefs", e);
+        if (e.name === 'TypeError' && e.message.includes('fetch')) {
+            console.warn("Backend appears to be offline. Preferences not loaded.");
+        } else {
+            console.error("Failed to load prefs", e);
+        }
     }
 }
 
@@ -1114,23 +1658,29 @@ function showToast(message) {
     }, 3000);
 }
 
-const createList = (message, className, isComplete = false) => {
+const createList = (message, className, isComplete = false, dbId = null) => {
     const chatLi = document.createElement("li");
     chatLi.classList.add("chat", className);
-    const messageID = "msg_" + Math.random().toString(36).substr(2, 9);
+    // Use dbId if provided (prefixed with msg_), otherwise generate random
+    const messageID = dbId ? ("msg_" + dbId) : ("msg_" + Math.random().toString(36).substr(2, 9));
 
     let chatContent = '';
 
     if (className === "outgoing") {
         chatContent = `<p id="${messageID}" class="user-message">${message} </p>`;
     } else {
-        chatContent = `<p id="${messageID}" class="chat-content">${message}</p>`;
+        const isImageGen = message.includes('generated-image-container');
+        const tag = isImageGen ? 'div' : 'p';
+        chatContent = `<${tag} id="${messageID}" class="chat-content">${message}</${tag}>`;
     }
 
     chatLi.innerHTML = chatContent;
 
     if (className === "incoming") {
         const actionButtons = createActionButtons(messageID, message, isComplete);
+        chatLi.appendChild(actionButtons);
+    } else if (className === "outgoing") {
+        const actionButtons = createUserActionButtons(messageID, message);
         chatLi.appendChild(actionButtons);
     }
 
@@ -1151,6 +1701,22 @@ function formatStreamedText(text) {
         thinkBlocks.push(content);
         processedText = processedText.replace(/<think>([\s\S]*)$/, `__THINK_BLOCK_${thinkBlocks.length - 1}__`);
     }
+
+    // Code block extraction — BEFORE escapeHTML to prevent corruption
+    // This also handles streaming (incomplete) code blocks
+    const codeBlocks = [];
+
+    // 1. Extract complete code blocks (``` ... ```)
+    processedText = processedText.replace(/```(\w*)[ \t]*\n?([\s\S]*?)```/gim, (match, lang, code) => {
+        codeBlocks.push({ lang: (lang || '').trim(), code });
+        return `__CODE_BLOCK_${codeBlocks.length - 1}__`;
+    });
+
+    // 2. Extract incomplete code blocks (streaming: ``` opened but not yet closed)
+    processedText = processedText.replace(/```(\w*)[ \t]*\n?([\s\S]*)$/, (match, lang, code) => {
+        codeBlocks.push({ lang: (lang || '').trim(), code });
+        return `__CODE_BLOCK_${codeBlocks.length - 1}__`;
+    });
 
     // Math block extraction
     const mathBlocks = [];
@@ -1189,6 +1755,7 @@ function formatStreamedText(text) {
                     if (left) return 'left';
                     return null;
                 });
+                rows.splice(1, 1); // Remove the divider row so it doesn't render as a body row
             }
         }
 
@@ -1228,23 +1795,47 @@ function formatStreamedText(text) {
         .replace(/\*(.*?)\*/gim, '<i>$1</i>')
         .replace(/\[([^\]]+)\]\(([^)]+)\)/gim, '<a href="$2" target="_blank" class="styled-link"><i class="bx bx-link"></i> $1</a>')
         .replace(/`([^`]+)`/gim, '<code>$1</code>')
-        .replace(/```(\w+)?\n?([\s\S]*?)```/gim, (match, lang, code) => {
-            const language = lang ? ` class="language-${lang}"` : '';
-            return `<pre><code${language}>${code}</code></pre>`;
-        })
+        // NOTE: triple-backtick blocks are now pre-extracted; no regex needed here
         .replace(/^\s*[-*]\s+(.*)/gim, '<li>$1</li>');
 
     const lines = processedText.split('\n');
     let html = '';
     let inList = false;
     let inTable = false;
+    let inCodeBlock = false;
     let tableLines = [];
 
     for (let line of lines) {
         const trimmed = line.trim();
 
         const pipeCount = (line.match(/\|/g) || []).length;
-        const looksLikeTableRow = pipeCount >= 2 && !/^<pre><code>/.test(line) && !/<\/code><\/pre>/.test(line);
+
+        // Detect start of a pre/code block
+        if (line.match(/^<pre><code/)) {
+            inCodeBlock = true;
+            html += `${line}\n`;
+            if (line.match(/<\/code><\/pre>/)) {
+                inCodeBlock = false;
+            }
+            continue;
+        }
+
+        // Inside a code block — emit raw, don't wrap in <p>
+        if (inCodeBlock) {
+            if (line.match(/<\/code><\/pre>/)) {
+                inCodeBlock = false;
+            }
+            html += `${line}\n`;
+            continue;
+        }
+
+        // Pass code-block placeholders through raw (restored later)
+        if (trimmed.match(/^__CODE_BLOCK_\d+__$/)) {
+            html += trimmed;
+            continue;
+        }
+
+        const looksLikeTableRow = pipeCount >= 2 && !/<pre><code>/.test(line) && !/<\/code><\/pre>/.test(line);
 
         if (looksLikeTableRow) {
             inTable = true;
@@ -1265,7 +1856,7 @@ function formatStreamedText(text) {
             }
             html += line;
             continue;
-        } else if (line.trim() !== '') { // Only close list if line is NOT empty
+        } else if (line.trim() !== '') {
             if (inList) {
                 html += '</ul>';
                 inList = false;
@@ -1274,11 +1865,6 @@ function formatStreamedText(text) {
 
         if (line.match(/<h[1-6]/)) {
             html += `${line}`;
-            continue;
-        }
-
-        if (line.match(/^<pre><code>/)) {
-            html += `${line}\n`;
             continue;
         }
 
@@ -1294,6 +1880,30 @@ function formatStreamedText(text) {
     }
 
     if (inList) html += '</ul>';
+
+    // Restore code blocks with premium ChatGPT/Claude-style HTML and highlight.js
+    html = html.replace(/__CODE_BLOCK_(\d+)__/g, (match, index) => {
+        const block = codeBlocks[parseInt(index)];
+        if (!block) return match;
+        const langLabel = block.lang || 'plaintext';
+        let langClass = block.lang ? `language-${block.lang}` : 'language-plaintext';
+        let formattedCode = escapeHTML(block.code);
+
+        try {
+            if (window.hljs) {
+                if (block.lang && hljs.getLanguage(block.lang)) {
+                    formattedCode = hljs.highlight(block.code, { language: block.lang, ignoreIllegals: true }).value;
+                } else {
+                    formattedCode = hljs.highlightAuto(block.code).value;
+                }
+                langClass += ' hljs';
+            }
+        } catch (e) {
+            console.error("Syntax Highlighting Error:", e);
+        }
+
+        return `<div class="code-block-wrapper" data-lang="${block.lang || 'txt'}"><div class="code-header"><span class="code-lang-label">${langLabel}</span><div class="code-header-actions"><button class="copy-code-btn" onclick="copyCodeBlock(this)"><i class='bx bx-copy'></i> Copy</button><button class="download-code-btn" onclick="downloadCodeBlock(this)"><i class='bx bx-download'></i> Download</button></div></div><pre class="code-pre"><code class="${langClass}">${formattedCode}</code></pre></div>`;
+    });
 
     // Restore think blocks
     html = html.replace(/__THINK_BLOCK_(\d+)__/g, (match, index) => {
@@ -1340,6 +1950,8 @@ function formatStreamedText(text) {
 
 let response;
 let file = null;
+let pastedLongText = null;
+let editingMessageId = null; // Track if we are editing an existing message
 
 async function generateResponse(incomingChatli, fileToUpload) {
     const messageElement = incomingChatli.querySelector('p');
@@ -1354,17 +1966,57 @@ async function generateResponse(incomingChatli, fileToUpload) {
     try {
         const selectedModel = document.getElementById("model-select").value;
 
+        // Resolve precise API model value from the selector presets or custom settings
+        let actualModelToUse = selectedModel;
+
+        if (selectedModel === "auto") {
+            actualModelToUse = "gemini-2.5-flash"; // Auto balances cost & speed
+        } else if (selectedModel === "fast") {
+            actualModelToUse = "gemini-2.5-flash-lite"; // Faster responses
+        } else if (selectedModel === "deep") {
+            actualModelToUse = "moonshotai/kimi-k2-instruct-0905"; // Powerful reasoning
+        }
+
+        // Override with custom default model from settings if configured by the user, and if they selected "auto" or just let it fall back
+        const savedSettingsCheck = localStorage.getItem("chatSettings");
+        if (savedSettingsCheck) {
+            const settingsObj = JSON.parse(savedSettingsCheck);
+            if (settingsObj.defaultModel) {
+                actualModelToUse = settingsObj.defaultModel;
+                // Set UI to match if user selected from settings explicitly
+                const display = document.getElementById('settings-model-display');
+                if (display) {
+                    const overrideText = display.textContent;
+                    // Optional UI sync logic here if needed
+                }
+            }
+        }
+
         const formData = new FormData();
         formData.append("message", userMessage);
-        formData.append("model", selectedModel);
+        formData.append("model", actualModelToUse);
+        if (editingMessageId) {
+            formData.append("editMessageId", editingMessageId.replace('msg_', ''));
+            // Reset after sending
+            editingMessageId = null;
+        }
 
-        const userEmail = localStorage.getItem('loggedInUserEmail');
-        if (!userEmail) {
-            showToast("Please login to send messages.");
+        const userEmail = getCurrentUserEmail();
+        // Fetch token FIRST to determine if we are truly logged in vs guest
+        const token = userEmail ? await getAuthToken() : null;
+
+        // Guest Access Check
+        if (!checkGuestAccess('chat')) {
             incomingChatli.remove();
             return;
         }
-        formData.append("email", userEmail);
+
+        if (token && userEmail) {
+            formData.append("email", userEmail);
+        } else {
+            formData.append("email", "guest");
+            formData.append("isGuest", "true");
+        }
 
         if (currentSessionId) {
             formData.append("sessionId", currentSessionId);
@@ -1398,10 +2050,7 @@ async function generateResponse(incomingChatli, fileToUpload) {
             setTimeout(() => {
                 rotateMessage();
             }, 2000);
-
-
-        }
-        else {
+        } else {
             formData.append("webSearch", "false");
         }
 
@@ -1417,11 +2066,19 @@ async function generateResponse(incomingChatli, fileToUpload) {
             if (settings.ageGroup) formData.append('ageGroup', settings.ageGroup);
             if (settings.language) formData.append('language', settings.language);
             if (settings.culture) formData.append('culture', settings.culture);
+            // New AI behavior options
+            if (settings.writingStyle) formData.append('writingStyle', settings.writingStyle);
+            if (settings.creativity) formData.append('creativityLevel', settings.creativity);
+            if (settings.interests) formData.append('interests', settings.interests);
+            if (settings.customRules) formData.append('customRules', settings.customRules);
         }
 
-        const token = await getAuthToken();
         const headers = {};
-        if (token) headers['Authorization'] = `Bearer ${token}`;
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        } else {
+            headers['x-guest-mode'] = 'true';
+        }
 
         // Update UI to Stop Button
         const micBtn = document.getElementById('mic-btn');
@@ -1462,7 +2119,7 @@ async function generateResponse(incomingChatli, fileToUpload) {
 
         let displayedText = "";
         let isStreaming = true;
-        const animationSpeed = 50; // ms per character
+        const typingDelay = 25; // ms between characters
 
         const animateText = () => {
             // Capture state of all think blocks in this message
@@ -1474,7 +2131,14 @@ async function generateResponse(incomingChatli, fileToUpload) {
             if (displayedText.length < fullText.length) {
                 // Calculate dynamic chunk size to catch up if buffer is large
                 const bufferSize = fullText.length - displayedText.length;
-                const chunkSize = Math.max(1, Math.min(bufferSize, Math.ceil(bufferSize / STREAMING_SPEED_MODIFIER) + 1)); // Adaptive speed
+
+                // Tiered Catch-up Logic to prevent "fast start" jolt
+                let chunkSize = 1;
+                if (bufferSize > 500) {
+                    chunkSize = 4; // Capped speed for large buffers
+                } else if (bufferSize > 200) {
+                    chunkSize = 2; // Moderate speed-up
+                }
 
                 displayedText += fullText.slice(displayedText.length, displayedText.length + chunkSize);
 
@@ -1489,7 +2153,7 @@ async function generateResponse(incomingChatli, fileToUpload) {
 
                 messageElement.innerHTML = html;
                 chatbox.scrollTo(0, chatbox.scrollHeight);
-                requestAnimationFrame(animateText); // No setTimeout delay, run at max frame rate
+                setTimeout(animateText, typingDelay);
             } else if (!isStreaming) {
                 let html = formatStreamedText(fullText);
 
@@ -1509,7 +2173,7 @@ async function generateResponse(incomingChatli, fileToUpload) {
                     newActionButtons.style.display = 'flex';
                 }
             } else {
-                requestAnimationFrame(animateText);
+                setTimeout(animateText, typingDelay);
             }
         };
         animateText();
@@ -1527,7 +2191,26 @@ async function generateResponse(incomingChatli, fileToUpload) {
             for (const line of lines) {
                 if (line.startsWith("event: session_id")) {
                     currentSessionId = line.split("\n")[1].replace("data: ", "").trim();
-                    loadSessions();
+                    loadSessions(true);
+                } else if (line.startsWith("event: message_ids")) {
+                    try {
+                        const dataStr = line.split("\n")[1].replace("data: ", "").trim();
+                        const { userMsgId, modelMsgId } = JSON.parse(dataStr);
+                        // Sync IDs in domestic UI
+                        // User message is the one BEFORE incomingChatli
+                        const userChatli = incomingChatli.previousElementSibling;
+                        if (userChatli && userChatli.classList.contains('outgoing')) {
+                            const userP = userChatli.querySelector('p');
+                            if (userP) userP.id = "msg_" + userMsgId;
+                        }
+                        // Model message is incomingChatli
+                        const modelP = incomingChatli.querySelector('p');
+                        if (modelP) modelP.id = "msg_" + modelMsgId;
+
+                        console.log("[Sync] Updated message IDs from server:", userMsgId, modelMsgId);
+                    } catch (e) {
+                        console.error("Error syncing message IDs", e);
+                    }
                 } else if (line.startsWith("event: sources")) {
                     const dataStr = line.split("\n")[1].replace("data: ", "").trim();
                     try {
@@ -1661,6 +2344,7 @@ function closeSearchPanel() {
 
 if (webSearchBtn) {
     webSearchBtn.addEventListener("click", () => {
+        if (!checkGuestAccess('search')) return;
         isSearchMode = !isSearchMode;
         const chatInputContainer = document.querySelector(".chat-input"); // Use class selector for safety if ID varies
         if (isSearchMode) {
@@ -1763,16 +2447,12 @@ async function handleSearchFlow(prompt, incomingChatli) {
 
         searchResultsContainer.innerHTML = ""; // Clear loader
 
-        // --- AI Overview Button ---
         const overviewBtn = document.createElement("button");
         overviewBtn.className = "ai-overview-btn";
         overviewBtn.innerHTML = "<i class='bx bx-brain'></i> Generate AI Overview";
         overviewBtn.onclick = () => handleOverviewClick(prompt);
         searchResultsContainer.appendChild(overviewBtn);
-        // --------------------------
 
-        // 2. Fetch Results for each query (or just first 2 for speed)
-        // Let's do parallel fetch
         const searchPromises = queries.slice(0, 2).map(q =>
             fetch(`${API_BASE_URL}/search-results?query=${encodeURIComponent(q)}`, { headers })
                 .then(r => r.json())
@@ -1784,7 +2464,7 @@ async function handleSearchFlow(prompt, incomingChatli) {
             if (data.results) allResults.push(...data.results);
         });
 
-        // Deduplicate by link
+
         const uniqueResults = [];
         const seenLinks = new Set();
         for (const r of allResults) {
@@ -1800,7 +2480,7 @@ async function handleSearchFlow(prompt, incomingChatli) {
             return;
         }
 
-        // Render Results
+
         uniqueResults.forEach(result => {
             const card = document.createElement("div");
             card.className = "search-result-card";
@@ -1813,7 +2493,7 @@ async function handleSearchFlow(prompt, incomingChatli) {
             searchResultsContainer.appendChild(card);
         });
 
-        // Generate Dynamic AI Response
+
         const contextPrompt = `
             User Prompt: "${prompt}"
             Search Results Found: ${uniqueResults.length}
@@ -1830,10 +2510,10 @@ async function handleSearchFlow(prompt, incomingChatli) {
 
         if (completionRes.ok) {
             const completionData = await completionRes.json();
-            // Simulate typing effect or just set text
+
             incomingChatli.querySelector("p").innerText = completionData.text;
         } else {
-            // Fallback
+
             incomingChatli.querySelector("p").textContent = "All set! Your search results are ready in the side panel. Click any link to explore!";
         }
 
@@ -1861,7 +2541,7 @@ async function handleResultClick(url, originalPrompt) {
         chatbox.scrollTo(0, chatbox.scrollHeight);
 
         const messageElement = incomingChatli.querySelector('p');
-        // Hide paragraph to fix alignment issues
+
         messageElement.style.display = "none";
 
         const cardDiv = document.createElement("div");
@@ -1873,7 +2553,7 @@ async function handleResultClick(url, originalPrompt) {
             <div class="analyzing-info">
                 <span class="analyzing-label">Analyzing Source</span>
                 <a href="${url}" target="_blank" class="analyzing-url">
-                    <i class='bx bx-link-external'></i> ${url}
+                    <i class='bx bx-link-external'></i> Link
                 </a>
             </div>
         </div>`;
@@ -1947,6 +2627,7 @@ async function streamResponseToChat(response, incomingChatli) {
     let fullText = "";
     let displayedText = "";
     let isStreaming = true;
+    stopDisplayFlag = false; // Reset on each new stream
 
 
     const animateText = () => {
@@ -1955,6 +2636,25 @@ async function streamResponseToChat(response, incomingChatli) {
         messageElement.querySelectorAll('details.think-block-details').forEach((el, index) => {
             if (el.hasAttribute('open')) openIndices.add(index);
         });
+
+        if (stopDisplayFlag) {
+            // User clicked stop — immediately render whatever has been displayed so far as final
+            let html = formatStreamedText(displayedText);
+            let count = 0;
+            html = html.replace(/<details class="think-block-details">/g, (match) => {
+                const isOpen = openIndices.has(count++);
+                return isOpen ? '<details class="think-block-details" open>' : match;
+            });
+            messageElement.innerHTML = html;
+            chatbox.scrollTo(0, chatbox.scrollHeight);
+            const actionButtons = incomingChatli.querySelector('.chat-actions');
+            if (actionButtons) {
+                const newActionButtons = createActionButtons(messageElement.id, displayedText, true);
+                actionButtons.parentNode.replaceChild(newActionButtons, actionButtons);
+                newActionButtons.style.display = 'flex';
+            }
+            return; // Stop the animation loop entirely
+        }
 
         if (displayedText.length < fullText.length) {
             const bufferSize = fullText.length - displayedText.length;
@@ -2009,7 +2709,7 @@ async function streamResponseToChat(response, incomingChatli) {
         for (const line of lines) {
             if (line.startsWith("event: session_id")) {
                 currentSessionId = line.split("\n")[1].replace("data: ", "").trim();
-                loadSessions();
+                loadSessions(true);
             } else if (line.startsWith("data: ")) {
                 const dataStr = line.replace("data: ", "").trim();
                 if (dataStr === "done") break;
@@ -2029,26 +2729,80 @@ async function streamResponseToChat(response, incomingChatli) {
 function ChatHandle() {
 
     userMessage = chatInput.value.trim();
-    if (!userMessage) {
+    if (!userMessage && !file && !pastedLongText) {
         const randomIndex = Math.floor(Math.random() * alertMessages.length);
         showToast(alertMessages[randomIndex]);
+        return;
+    }
+
+    if (isImageGenMode) {
+        handleImageGeneration();
+        return;
+    }
+
+    if (spectraModeContainer && spectraModeContainer.style.display !== 'none') {
+        sendToBananaModel();
         return;
     }
 
     sendButton.style.display = "none";
     hometagContent.style.display = "none";
     document.getElementById("chat-input").classList.add("hide-before");
-    chatbox.appendChild(createList(userMessage, "outgoing"));
+
+    let displayMessage = userMessage;
+    const currentFile = file;
+
+    // Attach pasted text to actual backend payload
+    if (pastedLongText) {
+        if (userMessage) {
+            userMessage += "\n\n[PASTED TEXT]:\n" + pastedLongText;
+        } else {
+            userMessage = pastedLongText;
+        }
+
+        if (displayMessage && displayMessage.trim() !== "") {
+            displayMessage += `<br>`;
+        }
+        displayMessage += `<span class="chat-outgoing-file"><i class='bx bx-text'></i> <span class="file-name">Pasted text snippet</span></span>`;
+    }
+
+    if (currentFile) {
+        if (displayMessage && displayMessage.trim() !== "") {
+            displayMessage += `<br>`;
+        }
+        if (currentFile.type && currentFile.type.startsWith('image/')) {
+            const fileUrl = URL.createObjectURL(currentFile);
+            displayMessage += `<img src="${fileUrl}" class="chat-outgoing-image">`;
+        } else {
+            displayMessage += `<span class="chat-outgoing-file"><i class='bx bxs-file'></i> <span class="file-name">${currentFile.name}</span></span>`;
+        }
+    }
+
+    const li = createList(displayMessage, "outgoing");
+    li.setAttribute("data-raw-text", userMessage);
+
+    const actionButtons = li.querySelector('.user-chat-actions');
+    if (actionButtons) {
+        const rawEditText = chatInput.value.trim();
+        const newActionButtons = createUserActionButtons(li.querySelector("p").id, rawEditText);
+        actionButtons.parentNode.replaceChild(newActionButtons, actionButtons);
+    }
+
+    chatbox.appendChild(li);
 
     chatInput.value = "";
     chatbox.scrollTo(0, chatbox.scrollHeight);
-    const currentFile = file;
 
-    // Clear styles and file
     file = null;
+    pastedLongText = null;
     fileUpload.value = '';
-    filePreview.classList.add('hidden');
-    // webSearch.style.display = 'flex'; // This line was causing issues if webSearch isn't defined or needed
+
+    document.getElementById('file-preview').classList.add('hidden');
+    const pastedPreview = document.getElementById('pasted-text-preview');
+    if (pastedPreview) pastedPreview.classList.add('hidden');
+
+    const img = document.querySelector('#file-preview .preview-thumbnail');
+    if (img) img.style.display = 'none';
 
     setTimeout(() => {
         const incomingChatli = createList('<span class="material-symbols-outlined"><img src="/assests/Star-icon.png" class="chatbot-img" id="Loading_out_Icon"></span>', "incoming")
@@ -2061,6 +2815,118 @@ function ChatHandle() {
         }
     }, 600);
 
+
+}
+
+async function sendToBananaModel() {
+    const prompt = chatInput.value.trim();
+    if (!prompt) {
+        showToast("Please enter a prompt for the Banana Model!");
+        return;
+    }
+
+    const fileInput1 = document.getElementById('spectra-file-1');
+    const fileInput2 = document.getElementById('spectra-file-2');
+
+    // Retrieve files
+    const photo1 = fileInput1 && fileInput1.files.length > 0 ? fileInput1.files[0] : null;
+    const photo2 = fileInput2 && fileInput2.files.length > 0 ? fileInput2.files[0] : null;
+
+    if (!photo1 || !photo2) {
+        showToast("Both images are required for Spectra Mode.");
+        return;
+    }
+
+    try {
+        // UI Feedback
+        chatInput.value = "";
+
+        // Show user message immediately (optional, or wait for server)
+        chatbox.appendChild(createList(prompt, "outgoing"));
+        chatbox.scrollTo(0, chatbox.scrollHeight);
+
+        // Loader
+        const incomingChatli = createList('<span class="material-symbols-outlined"><img src="/assests/Star-icon.png" class="chatbot-img" id="Loading_out_Icon"></span>', "incoming");
+        chatbox.appendChild(incomingChatli);
+        const messageElement = incomingChatli.querySelector('p');
+        messageElement.innerHTML = `Generating Spectra Image... <i class='bx bx-loader-alt bx-spin'></i>`;
+        chatbox.scrollTo(0, chatbox.scrollHeight);
+
+        const formData = new FormData();
+        formData.append('prompt', prompt);
+        formData.append('email', localStorage.getItem("loggedInUserEmail") || "guest"); // Or handle auth better
+        formData.append('photo1', photo1);
+        formData.append('photo2', photo2);
+        if (currentSessionId) formData.append('sessionId', currentSessionId);
+
+        const token = await getAuthToken();
+        const headers = {};
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+
+        const response = await fetch(`${API_BASE_URL}/spectra-generate`, {
+            method: 'POST',
+            headers: headers,
+            body: formData
+        });
+
+        if (!response.ok) {
+            const errData = await response.json();
+            throw new Error(errData.error || "Generation failed");
+        }
+
+        const data = await response.json();
+
+        // Update Session ID if new
+        if (data.sessionId) currentSessionId = data.sessionId;
+
+        // Render Response
+        // Text
+        if (data.text) {
+            messageElement.innerHTML = formatStreamedText(data.text);
+        }
+
+        // Image
+        if (data.image && data.image.data) {
+            const container = document.createElement('div');
+            container.className = 'generated-image-container';
+
+            const img = document.createElement('img');
+            img.src = `data:${data.image.mimeType};base64,${data.image.data}`;
+            img.alt = "Spectra Generated Image";
+            img.className = 'generated-image';
+            img.onclick = () => openImageModal(img.src, "Spectra Generated Image");
+
+            const actions = document.createElement('div');
+            actions.className = 'image-actions';
+            const downloadBtn = document.createElement('button');
+            downloadBtn.className = 'action-btn download-btn';
+            downloadBtn.innerHTML = "<i class='bx bx-download'></i>";
+            downloadBtn.onclick = () => downloadImage(img.src, "spectra-image");
+
+            actions.appendChild(downloadBtn);
+            container.appendChild(img);
+            container.appendChild(actions);
+
+            // Append to the list item's content area
+            const contentDiv = incomingChatli.querySelector('.chat-content') || incomingChatli; // fallback if structure varies
+            // Actually createList structure is li -> span(icon) + p + chat-actions. 
+            // We can append image AFTER p within the same li? Or replace P if it was just loading text.
+
+            // Let's append it after the text (p)
+            messageElement.parentNode.insertBefore(container, messageElement.nextSibling);
+        }
+
+        chatbox.scrollTo(0, chatbox.scrollHeight);
+
+
+    } catch (error) {
+        console.error("Spectra Error:", error);
+        showToast("Spectra generation failed: " + error.message);
+        const incomingChatli = chatbox.lastElementChild;
+        if (incomingChatli && incomingChatli.classList.contains("incoming")) {
+            incomingChatli.querySelector('p').innerHTML = `<span style="color:red">Error: ${error.message}</span>`;
+        }
+    }
 }
 
 chatInput.addEventListener("keydown", function (event) {
@@ -2074,28 +2940,102 @@ sendButton.addEventListener("click", ChatHandle);
 
 
 
-async function loadSessions() {
+
+function loadSessionsFinalRobust() {
+    // This is just a helper to store the code I want to inject
+}
+
+// ... existing code ...
+async function loadSessions(isFirstPage = false) {
+    if (isSessionsLoading) return;
+
     const userEmail = localStorage.getItem('loggedInUserEmail');
     if (!userEmail) return;
+
+    if (isFirstPage) {
+        currentSessionPage = 1;
+        sessionsCache = [];
+        const historyList = document.getElementById('chat-history-list');
+        if (historyList) {
+            historyList.innerHTML = `
+                <div class="history-skeleton-container">
+                    ${Array(5).fill('<div class="history-skeleton-item"></div>').join('')}
+                </div>
+            `;
+        }
+    }
+
+    isSessionsLoading = true;
 
     try {
         const token = await getAuthToken();
         const headers = {};
         if (token) headers['Authorization'] = `Bearer ${token}`;
 
-        const res = await fetch(`${API_BASE_URL}/sessions/${userEmail}`, { headers });
-        const sessions = await res.json();
+        const limit = 20;
+        const res = await fetch(`${API_BASE_URL}/sessions/${userEmail}?page=${currentSessionPage}&limit=${limit}`, { headers });
+        const data = await res.json();
 
-        if (!Array.isArray(sessions)) {
-            console.error("Expected array of sessions but got:", sessions);
-            return;
+        let sessionsToAdd = [];
+        if (data && data.sessions && Array.isArray(data.sessions)) {
+            sessionsToAdd = data.sessions;
+            sessionsHasNextPage = data.hasNextPage;
+        } else if (Array.isArray(data)) {
+            sessionsToAdd = data;
+            sessionsHasNextPage = false;
         }
 
-        allSessions = sessions;
-        renderSessions(allSessions);
+        if (sessionsToAdd.length > 0) {
+            sessionsCache = [...sessionsCache, ...sessionsToAdd];
+            allSessions = sessionsCache;
+            renderSessions(allSessions);
+            updateSessionLoadMoreButton();
+
+            if (sessionsHasNextPage) {
+                currentSessionPage++;
+            }
+        } else {
+            if (isFirstPage) {
+                const historyList = document.getElementById('chat-history-list');
+                if (historyList) historyList.innerHTML = '<div class="gallery-empty">No chats found</div>';
+            }
+            updateSessionLoadMoreButton();
+        }
 
     } catch (error) {
-        console.error("Failed to load sessions", error);
+        if (error.name === 'TypeError' && error.message.includes('fetch')) {
+            console.warn("Backend appears to be offline. Sessions not loaded.");
+            if (isFirstPage) {
+                const historyList = document.getElementById('chat-history-list');
+                if (historyList) historyList.innerHTML = '<div class="gallery-empty">Offline: Connect to server to view history</div>';
+            }
+        } else {
+            console.error("Failed to load sessions", error);
+        }
+    } finally {
+        isSessionsLoading = false;
+    }
+}
+
+
+function updateSessionLoadMoreButton() {
+    let loadMoreContainer = document.getElementById('session-load-more-container');
+    const historyList = document.getElementById('chat-history-list');
+
+    if (!historyList) return;
+
+    if (!loadMoreContainer) {
+        loadMoreContainer = document.createElement('div');
+        loadMoreContainer.id = 'session-load-more-container';
+        loadMoreContainer.className = 'history-load-more';
+        historyList.parentNode.insertBefore(loadMoreContainer, historyList.nextSibling);
+    }
+
+    if (sessionsHasNextPage) {
+        loadMoreContainer.innerHTML = `<button class="session-load-more-btn" onclick="loadSessions()">Load More Chats</button>`;
+        loadMoreContainer.style.display = 'block';
+    } else {
+        loadMoreContainer.style.display = 'none';
     }
 }
 
@@ -2220,7 +3160,7 @@ async function deleteSession(sessionId) {
             if (currentSessionId === sessionId) {
                 startNewChat();
             } else {
-                loadSessions();
+                loadSessions(true);
             }
         } else {
             showToast("Failed to delete chat");
@@ -2314,7 +3254,6 @@ async function loadSession(sessionId) {
         }
 
         document.querySelectorAll(".history-item").forEach(el => el.classList.remove("active"));
-        loadSessions();
 
         chatbox.innerHTML = "";
         hometagContent.style.display = "none";
@@ -2326,24 +3265,54 @@ async function loadSession(sessionId) {
 
                 if (msg.role === "user") {
                     const webScrapedPart = msg.parts.find(p => p.text && p.text.startsWith("Web-Scraped-Data"));
-                    if (webScrapedPart) {
-                        try {
-                            const data = JSON.parse(webScrapedPart.text.replace("Web-Scraped-Data: ", ""));
-                            const sources = (data.results || []).map(r => ({ title: r.title, link: r.link }));
-                            // Render sources container if needed, logic preserved from original but safer
-                        } catch (e) {
-                            console.error("Error parsing stored web data", e);
-                        }
-                    }
-
                     const textPart = msg.parts.find(p => p.text && !p.text.startsWith("System-Time") && !p.text.startsWith("Web-Scraped-Data")) || msg.parts[0];
                     const text = textPart ? textPart.text : "";
 
+                    const escapeTextForHTML = (str) =>
+                        String(str).replace(/[&<>"']/g, (tag) => (
+                            { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[tag]
+                        ));
+
                     if (text && !text.startsWith("Web-Scraped-Data")) {
-                        const li = createList(text, "outgoing");
+                        let displayMessage = text;
+                        let rawEditText = text;
+
+                        const pastedIndex = text.indexOf("\n\n[PASTED TEXT]:\n");
+                        if (pastedIndex !== -1) {
+                            const originalMessage = text.substring(0, pastedIndex);
+                            displayMessage = escapeTextForHTML(originalMessage);
+                            if (displayMessage && displayMessage.trim() !== "") {
+                                displayMessage += `<br>`;
+                            }
+                            displayMessage += `<span class="chat-outgoing-file"><i class='bx bx-text'></i> <span class="file-name">Pasted text snippet</span></span>`;
+                            rawEditText = originalMessage; // When editing, edit the text before pasting
+                        } else if (text.startsWith("[PASTED TEXT]:\n")) {
+                            displayMessage = `<span class="chat-outgoing-file"><i class='bx bx-text'></i> <span class="file-name">Pasted text snippet</span></span>`;
+                            rawEditText = "";
+                        } else {
+                            displayMessage = escapeTextForHTML(text);
+                        }
+
+                        const imageParts = msg.parts.filter(p => p.inlineData);
+                        if (imageParts && imageParts.length > 0) {
+                            imageParts.forEach(imgPart => {
+                                if (displayMessage && displayMessage.trim() !== "") {
+                                    displayMessage += `<br>`;
+                                }
+                                displayMessage += `<img src="data:${imgPart.inlineData.mimeType};base64,${imgPart.inlineData.data}" class="chat-outgoing-image">`;
+                            });
+                        }
+
+                        const li = createList(displayMessage, "outgoing", false, msg._id);
+
+                        const actionButtons = li.querySelector('.user-chat-actions');
+                        if (actionButtons) {
+                            const newActionButtons = createUserActionButtons(li.querySelector("p").id, rawEditText);
+                            actionButtons.parentNode.replaceChild(newActionButtons, actionButtons);
+                        }
+
                         chatbox.appendChild(li);
 
-                        // Re-render sources if they exist (rendering logic could be improved but keeping minimal changes to fix crash)
                         if (webScrapedPart) {
                             try {
                                 const data = JSON.parse(webScrapedPart.text.replace("Web-Scraped-Data: ", ""));
@@ -2355,13 +3324,70 @@ async function loadSession(sessionId) {
                             } catch (e) { }
                         }
                     }
-
                 } else {
-                    const textPart = msg.parts.find(p => p.text && !p.text.startsWith("System-Time")) || msg.parts[0];
-                    const text = textPart ? textPart.text : "";
-                    if (text) {
-                        const li = createList(text, "incoming", true);
+                    const textPart = msg.parts.find(p => p.text && !p.text.startsWith("System-Time"));
+                    const imagePart = msg.parts.find(p => p.inlineData);
+
+                    if (imagePart) {
+                        const li = createList('<span class="material-symbols-outlined"><img src="/assests/Star-icon.png" class="chatbot-img"></span>', "incoming", true, msg._id);
+                        const container = document.createElement('div');
+                        container.className = 'generated-image-container';
+
+                        const img = document.createElement('img');
+                        img.src = `data:${imagePart.inlineData.mimeType};base64,${imagePart.inlineData.data}`;
+                        img.alt = "Generated Image";
+                        img.className = 'generated-image';
+                        img.onclick = () => openImageModal(img.src, "Generated Image");
+
+                        const actions = document.createElement('div');
+                        actions.className = 'image-actions';
+                        const downloadBtn = document.createElement('button');
+                        downloadBtn.className = 'action-btn download-btn';
+                        downloadBtn.innerHTML = "<i class='bx bx-download'></i>";
+                        downloadBtn.onclick = () => downloadImage(img.src, "generated-image");
+
+                        actions.appendChild(downloadBtn);
+                        container.appendChild(img);
+                        container.appendChild(actions);
+
+                        li.querySelector('.chat-content').innerHTML = '';
+                        li.querySelector('.chat-content').appendChild(container);
+
+                        // If it has both image AND text, we should probably render the text too
+                        if (textPart && textPart.text) {
+                            // Convert the <p> so it is below the image
+                            const textC = document.createElement('p');
+                            textC.innerHTML = formatStreamedText(textPart.text);
+                            li.querySelector('.chat-content').appendChild(textC);
+                            const actionButtons = li.querySelector('.chat-actions');
+                            if (actionButtons) {
+                                const newActionButtons = createActionButtons(li.querySelector(".chat-content").id, textPart.text, true);
+                                actionButtons.parentNode.replaceChild(newActionButtons, actionButtons);
+                            }
+                        }
+
+                        chatbox.appendChild(li);
+                    } else if (textPart) {
+                        const text = textPart.text;
+                        if (text) {
+                            const li = createList("", "incoming", true, msg._id);
+                            li.querySelector("p").innerHTML = formatStreamedText(text);
+                            const actionButtons = li.querySelector('.chat-actions');
+                            if (actionButtons) {
+                                const newActionButtons = createActionButtons(li.querySelector("p").id, text, true);
+                                actionButtons.parentNode.replaceChild(newActionButtons, actionButtons);
+                            }
+                            chatbox.appendChild(li);
+                        }
+                    } else if (msg.parts[0] && msg.parts[0].text) {
+                        const text = msg.parts[0].text;
+                        const li = createList("", "incoming", true, msg._id);
                         li.querySelector("p").innerHTML = formatStreamedText(text);
+                        const actionButtons = li.querySelector('.chat-actions');
+                        if (actionButtons) {
+                            const newActionButtons = createActionButtons(li.querySelector("p").id, text, true);
+                            actionButtons.parentNode.replaceChild(newActionButtons, actionButtons);
+                        }
                         chatbox.appendChild(li);
                     }
                 }
@@ -2394,6 +3420,90 @@ const greetings = [
     "What do you need today?"
 ];
 
+window.copyCodeBlock = function (btn) {
+    const wrapper = btn.closest('.code-block-wrapper');
+    const code = wrapper ? wrapper.querySelector('.code-pre code') : null;
+    const text = code ? (code.textContent || '') : '';
+    if (!text) return;
+
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => {
+            btn.innerHTML = "<i class='bx bx-check'></i> Copied!";
+            btn.classList.add('copied');
+            setTimeout(() => {
+                btn.innerHTML = "<i class='bx bx-copy'></i> Copy";
+                btn.classList.remove('copied');
+            }, 2000);
+        }).catch(() => {
+            fallbackCopyCode(text, btn);
+        });
+    } else {
+        fallbackCopyCode(text, btn);
+    }
+};
+
+function fallbackCopyCode(text, btn) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try {
+        document.execCommand('copy');
+        btn.innerHTML = "<i class='bx bx-check'></i> Copied!";
+        btn.classList.add('copied');
+        setTimeout(() => {
+            btn.innerHTML = "<i class='bx bx-copy'></i> Copy";
+            btn.classList.remove('copied');
+        }, 2000);
+    } catch (e) {
+        showToast('Copy failed. Please select and copy manually.');
+    } finally {
+        document.body.removeChild(ta);
+    }
+}
+
+window.downloadCodeBlock = function (btn) {
+    const wrapper = btn.closest('.code-block-wrapper');
+    const code = wrapper ? wrapper.querySelector('.code-pre code') : null;
+    const text = code ? (code.textContent || '') : '';
+    if (!text) return;
+
+    // Determine file extension from language
+    const lang = (wrapper.dataset.lang || 'txt').toLowerCase();
+    const extMap = {
+        javascript: 'js', js: 'js', typescript: 'ts', ts: 'ts',
+        python: 'py', py: 'py', java: 'java', c: 'c', cpp: 'cpp',
+        'c++': 'cpp', csharp: 'cs', cs: 'cs', go: 'go', rust: 'rs',
+        ruby: 'rb', php: 'php', swift: 'swift', kotlin: 'kt',
+        html: 'html', css: 'css', scss: 'scss', sql: 'sql',
+        bash: 'sh', shell: 'sh', sh: 'sh', json: 'json',
+        xml: 'xml', yaml: 'yaml', yml: 'yml', markdown: 'md', md: 'md',
+        r: 'r', dart: 'dart', lua: 'lua', perl: 'pl'
+    };
+    const ext = extMap[lang] || 'txt';
+    const filename = `code-snippet.${ext}`;
+
+    const blob = new Blob([text], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    // Visual feedback
+    btn.innerHTML = "<i class='bx bx-check'></i> Saved!";
+    btn.classList.add('downloaded');
+    setTimeout(() => {
+        btn.innerHTML = "<i class='bx bx-download'></i> Download";
+        btn.classList.remove('downloaded');
+    }, 2000);
+};
+
 function setRandomGreeting() {
     const greetTag = document.getElementById("Greet-tag");
     if (greetTag) {
@@ -2408,7 +3518,7 @@ function startNewChat() {
     hometagContent.style.display = "block";
     document.getElementById("chat-input").classList.remove("hide-before");
     setRandomGreeting();
-    loadSessions();
+    loadSessions(true);
     if (sidebar.classList.contains("open")) {
         sidebar.classList.remove("open");
         if (typeof closeBtn !== 'undefined') {
@@ -2438,20 +3548,152 @@ const webSearch = document.getElementById('web-search');
 const textarea = document.getElementById('inputa');
 
 
-micBtn.addEventListener('click', () => {
-    if (micBtn.classList.contains('stop-generating')) {
-        if (abortController) {
-            abortController.abort();
-            return;
+// ── Mic Button / Speech Recognition (Groq Whisper) ───────────────────────────
+// Uses MediaRecorder to capture audio then sends it to the backend for
+// transcription via Groq's whisper-large-v3-turbo model.
+// Falls back gracefully if MediaDevices API is unavailable.
+(function () {
+    const overlay = document.getElementById('speaking-overlay');
+    const liveText = document.getElementById('live-transcript');
+    const stopBtn = document.getElementById('stop-speaking-btn');
+    const inputarea = document.getElementById('inputa');
+
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let isRecording = false;
+
+    function showOverlay() {
+        overlay.classList.remove('hidden');
+        micBtn.classList.add('recording');
+        if (liveText) liveText.textContent = 'Listening…';
+    }
+
+    function hideOverlay() {
+        overlay.classList.add('hidden');
+        micBtn.classList.remove('recording');
+        if (liveText) liveText.textContent = '';
+    }
+
+    function setTranscribingState() {
+        if (liveText) liveText.textContent = 'Transcribing…';
+    }
+
+    async function sendAudioForTranscription(blob) {
+        setTranscribingState();
+        try {
+            const ext = blob.type.includes('ogg') ? 'ogg' : blob.type.includes('mp4') ? 'mp4' : 'webm';
+            const formData = new FormData();
+            formData.append('audio', blob, `recording.${ext}`);
+
+            const response = await fetch(`${API_BASE_URL}/api/transcribe`, {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!response.ok) {
+                const err = await response.json().catch(() => ({}));
+                throw new Error(err.details || err.error || `HTTP ${response.status}`);
+            }
+
+            const data = await response.json();
+            const transcript = (data.text || '').trim();
+
+            if (transcript) {
+                const current = inputarea.value.trim();
+                inputarea.value = current ? current + ' ' + transcript : transcript;
+                inputarea.dispatchEvent(new Event('input'));
+                inputarea.focus();
+                showToast('✓ Transcribed!');
+            } else {
+                showToast('No speech detected. Please try again.');
+            }
+        } catch (err) {
+            console.error('Transcription error:', err);
+            showToast('Transcription failed: ' + err.message);
+        } finally {
+            hideOverlay();
+            try { stopSound.play(); } catch (_) { }
         }
     }
 
-    micBtn.classList.toggle('recording');
-    const isRecording = micBtn.classList.contains('recording');
-    micBtn.innerHTML = `<i class='bx ${isRecording ? 'bx-pause' : 'bx-microphone'}'></i>`;
-    micBtn.title = isRecording ? 'Stop recording' : 'Start speaking';
-    (isRecording ? startSound : stopSound).play();
-});
+    function stopRecording() {
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+            mediaRecorder.stop(); // triggers ondataavailable then onstop
+        }
+        isRecording = false;
+    }
+
+    if (stopBtn) {
+        stopBtn.addEventListener('click', () => {
+            if (isRecording) stopRecording();
+            else hideOverlay();
+        });
+    }
+
+    micBtn.addEventListener('click', async () => {
+        // Acting as stop-generating button
+        if (micBtn.classList.contains('stop-generating')) {
+            stopDisplayFlag = true;
+            return;
+        }
+
+        // Already recording — stop
+        if (isRecording) {
+            stopRecording();
+            return;
+        }
+
+        // Check for MediaDevices support
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            showToast('Microphone not supported in this browser. Please use Chrome, Firefox, or Edge.');
+            return;
+        }
+
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            try { startSound.play(); } catch (_) { }
+
+            // Pick best supported format
+            const mimeType = ['audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus', 'audio/mp4']
+                .find(t => MediaRecorder.isTypeSupported(t)) || '';
+
+            const options = mimeType ? { mimeType } : {};
+            mediaRecorder = new MediaRecorder(stream, options);
+            audioChunks = [];
+
+            mediaRecorder.ondataavailable = (e) => {
+                if (e.data && e.data.size > 0) audioChunks.push(e.data);
+            };
+
+            mediaRecorder.onstop = async () => {
+                // Stop all microphone tracks so the browser mic indicator goes away
+                stream.getTracks().forEach(track => track.stop());
+
+                if (audioChunks.length === 0) {
+                    hideOverlay();
+                    showToast('No audio recorded.');
+                    return;
+                }
+
+                const blob = new Blob(audioChunks, { type: mimeType || 'audio/webm' });
+                await sendAudioForTranscription(blob);
+            };
+
+            mediaRecorder.start(250); // collect chunks every 250ms for reliable data
+            isRecording = true;
+            showOverlay();
+
+        } catch (err) {
+            console.error('Mic access error:', err);
+            if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+                showToast('Microphone permission denied. Please allow mic access in your browser settings.');
+            } else {
+                showToast('Cannot access microphone: ' + err.message);
+            }
+        }
+    });
+})();
+
 
 
 fileUpload.addEventListener("change", (event) => {
@@ -2460,16 +3702,120 @@ fileUpload.addEventListener("change", (event) => {
     webSearch.style.display = 'none';
     fileName.textContent = file.name;
     filePreview.classList.remove("hidden");
+    showFilePreview(file);
 });
 
+textarea.addEventListener("paste", (event) => {
+    const clipboardData = event.clipboardData || event.originalEvent?.clipboardData;
+    const pastedText = clipboardData ? clipboardData.getData('text') : null;
 
+    if (pastedText && pastedText.trim().length > 300) {
+        event.preventDefault();
+        pastedLongText = pastedText;
+        webSearch.style.display = 'none';
+
+        const previewEl = document.getElementById("pasted-text-preview");
+        if (previewEl) {
+            previewEl.classList.remove("hidden");
+            const textSpan = document.getElementById("pasted-preview-text");
+            if (textSpan) textSpan.textContent = pastedLongText;
+            textSpan.style.display = '-webkit-box';
+        }
+        return;
+    }
+
+    const items = clipboardData?.items;
+    if (!items) return;
+
+    for (const item of items) {
+        if (item.kind === 'file') {
+            const blob = item.getAsFile();
+            if (blob) {
+                let pastedFile = blob;
+                if (!pastedFile.name || pastedFile.name === "image.png") {
+                    const ext = blob.type.split('/')[1] || 'png';
+                    pastedFile = new File([blob], `pasted-image-${Date.now()}.${ext}`, { type: blob.type });
+                }
+
+                file = pastedFile;
+                webSearch.style.display = 'none';
+                fileName.textContent = file.name;
+                filePreview.classList.remove("hidden");
+                showFilePreview(file);
+
+                event.preventDefault();
+                break;
+            }
+        }
+    }
+});
+
+function showFilePreview(file) {
+    const textPreviewSpan = document.getElementById('file-preview-text');
+    const badge = document.getElementById('file-preview-badge');
+    const img = filePreview.querySelector('.preview-thumbnail');
+
+    if (file && file.type.startsWith('image/')) {
+        fileName.textContent = file.name;
+        fileName.style.display = 'block';
+        if (textPreviewSpan) textPreviewSpan.style.display = 'none';
+        if (badge) badge.style.display = 'none';
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            if (img) {
+                img.src = e.target.result;
+                img.style.display = 'block';
+            }
+        };
+        reader.readAsDataURL(file);
+    } else {
+        if (img) img.style.display = 'none';
+        fileName.style.display = 'none';
+
+        if (textPreviewSpan) {
+            textPreviewSpan.style.display = '-webkit-box';
+            if (badge) badge.style.display = 'inline-block';
+
+            if (file && file.name === "Pasted content") {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    textPreviewSpan.textContent = e.target.result;
+                    if (badge) badge.textContent = 'PASTED';
+                };
+                reader.readAsText(file);
+            } else if (file && file.type === "text/plain") {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    textPreviewSpan.textContent = e.target.result;
+                    if (badge) badge.textContent = 'DOCUMENT';
+                };
+                reader.readAsText(file);
+            } else {
+                textPreviewSpan.textContent = file ? file.name : "Document";
+                if (badge) badge.textContent = 'FILE';
+            }
+        }
+    }
+}
 
 cancelFile.addEventListener('click', () => {
     file = null;
-    webSearch.style.display = 'flex';
+    if (!pastedLongText) webSearch.style.display = 'flex';
     fileUpload.value = '';
-    filePreview.classList.add('hidden');
+    document.getElementById('file-preview').classList.add('hidden');
+    const img = document.querySelector('#file-preview .preview-thumbnail');
+    if (img) img.style.display = 'none';
 });
+
+const cancelPasted = document.getElementById('cancel-pasted');
+if (cancelPasted) {
+    cancelPasted.addEventListener('click', () => {
+        pastedLongText = null;
+        if (!file) webSearch.style.display = 'flex';
+        document.getElementById('pasted-text-preview').classList.add('hidden');
+    });
+}
 
 
 
@@ -2542,12 +3888,24 @@ function saveSettings(e) {
     const ageGroup = document.getElementById("user-age").value;
     const language = document.getElementById("user-language").value;
     const culture = document.getElementById("user-culture").value;
+    const defaultModel = document.getElementById("user-default-model").value;
+
+    // AI Behavior Settings
+    const writingStyle = document.getElementById("user-writing-style")?.value || "";
+    const creativity = document.getElementById("user-creativity")?.value || "";
+    const interests = document.getElementById("user-interests")?.value || "";
+    const customRules = document.getElementById("user-custom-rules")?.value || "";
 
     const settings = {
         gender,
         ageGroup,
         language,
-        culture
+        culture,
+        defaultModel,
+        writingStyle,
+        creativity,
+        interests,
+        customRules
     };
 
     localStorage.setItem("chatSettings", JSON.stringify(settings));
@@ -2610,6 +3968,70 @@ function loadSettings() {
             const cultureInput = document.getElementById("user-culture");
             if (cultureInput) cultureInput.value = settings.culture;
         }
+
+        if (settings.defaultModel !== undefined) {
+            const modelWrapper = document.getElementById('settings-model-wrapper');
+            const input = document.getElementById('user-default-model');
+            const display = document.getElementById('settings-model-display');
+
+            if (modelWrapper && input && display) {
+                input.value = settings.defaultModel;
+                const options = modelWrapper.querySelectorAll('.custom-option');
+                options.forEach(opt => {
+                    if (opt.getAttribute('data-value') === settings.defaultModel) {
+                        display.textContent = opt.textContent;
+                        opt.classList.add('selected');
+                    } else {
+                        opt.classList.remove('selected');
+                    }
+                });
+            }
+        }
+
+        // Load AI Behavior settings
+        if (settings.writingStyle !== undefined) {
+            const wrapper = document.getElementById('writing-style-wrapper');
+            const input = document.getElementById('user-writing-style');
+            const display = document.getElementById('writing-style-display');
+            if (wrapper && input && display) {
+                input.value = settings.writingStyle;
+                wrapper.querySelectorAll('.custom-option').forEach(opt => {
+                    if (opt.getAttribute('data-value') === settings.writingStyle) {
+                        display.textContent = opt.textContent;
+                        opt.classList.add('selected');
+                    } else {
+                        opt.classList.remove('selected');
+                    }
+                });
+            }
+        }
+
+        if (settings.creativity !== undefined) {
+            const wrapper = document.getElementById('creativity-wrapper');
+            const input = document.getElementById('user-creativity');
+            const display = document.getElementById('creativity-display');
+            if (wrapper && input && display) {
+                input.value = settings.creativity;
+                wrapper.querySelectorAll('.custom-option').forEach(opt => {
+                    if (opt.getAttribute('data-value') === settings.creativity) {
+                        display.textContent = opt.textContent;
+                        opt.classList.add('selected');
+                    } else {
+                        opt.classList.remove('selected');
+                    }
+                });
+            }
+        }
+
+        if (settings.interests) {
+            const input = document.getElementById("user-interests");
+            if (input) input.value = settings.interests;
+        }
+
+        if (settings.customRules) {
+            const input = document.getElementById("user-custom-rules");
+            if (input) input.value = settings.customRules;
+        }
     }
 }
 window.loadSession = loadSession;
@@ -2644,6 +4066,29 @@ document.addEventListener("DOMContentLoaded", () => {
     if (settingsForm) {
         settingsForm.addEventListener("submit", saveSettings);
     }
+
+    const aiBehaviorForm = document.getElementById("ai-behavior-form");
+    if (aiBehaviorForm) {
+        aiBehaviorForm.addEventListener("submit", saveSettings);
+    }
+
+    // Tab switching logic for settings modal
+    const tabBtns = document.querySelectorAll('.settings-tab-btn');
+    const tabContents = document.querySelectorAll('.settings-tab-content');
+
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            // Remove active from all tabs and contents
+            tabBtns.forEach(b => b.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+            // Add active to clicked tab
+            btn.classList.add('active');
+            // Show corresponding content
+            const targetTab = btn.getAttribute('data-tab');
+            const contentPane = document.getElementById(`tab-${targetTab}`);
+            if (contentPane) contentPane.classList.add('active');
+        });
+    });
 
     if (closeSettingsBtn && settingsModal) {
         closeSettingsBtn.addEventListener("click", () => {
@@ -2711,7 +4156,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     const shareBtn = document.querySelector(".right-heder-bar .bx-share");
-    const tempChatBtn = document.querySelector(".right-heder-bar .bxs-message-bubble-notification");
+    const tempChatBtn = document.getElementById("temp-chat-icon") || document.querySelector(".right-heder-bar .bx-eye-slash");
 
     if (tempChatBtn) {
         tempChatBtn.addEventListener("click", () => {
@@ -2824,6 +4269,137 @@ async function shareChatSession() {
 }
 
 
+
+async function handleImageGeneration() {
+    const prompt = chatInput.value.trim();
+    if (!prompt) {
+        showToast("Please enter a description for the image first.");
+        return;
+    }
+
+    // Close the menu if open
+    actionsMenu.classList.remove('show');
+
+    // UI Updates similar to ChatHandle
+    sendButton.style.display = "none";
+    hometagContent.style.display = "none";
+    document.getElementById("chat-input").classList.add("hide-before");
+
+    // Create user message in chat
+    const userChatLi = createList(prompt, "outgoing");
+    chatbox.appendChild(userChatLi);
+    chatbox.scrollTo(0, chatbox.scrollHeight);
+
+    // Clear input
+    chatInput.value = "";
+    chatInput.style.height = 'auto'; // Reset height
+
+    if (isImageGenMode) {
+        isImageGenMode = false;
+        if (generateImageBtn) generateImageBtn.classList.remove('active');
+        chatInput.placeholder = "Ask anything...";
+    }
+
+
+    const loadingLi = createList(`
+   <div class="generated-image-container">
+      <div class="premium-image-loader">
+        <i class='bx bx-brush'></i>
+        <div class="loader-text">Summoning your pixels...</div>
+        <div class="loader-bar-container"><div class="loader-bar-fill"></div></div>
+      </div>
+   </div>
+`, "incoming");
+
+    chatbox.appendChild(loadingLi);
+    chatbox.scrollTo(0, chatbox.scrollHeight);
+
+    try {
+        const token = await getAuthToken();
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+
+        const response = await fetch(`${API_BASE_URL}/generate-image`, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify({
+                prompt,
+                email: getCurrentUserEmail(),
+                sessionId: currentSessionId
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Image generation failed');
+        }
+
+        const data = await response.json();
+        if (data.imageBase64) {
+            if (data.imageBase64) {
+                // Find the container we created initially
+                const container = loadingLi.querySelector('.generated-image-container');
+                container.innerHTML = ''; // Clear loading animation
+
+                const img = document.createElement('img');
+                img.src = `data:image/png;base64,${data.imageBase64}`;
+                img.alt = prompt;
+                img.className = 'generated-image';
+                img.onclick = () => openImageModal(img.src, prompt);
+
+                const actions = document.createElement('div');
+                actions.className = 'image-actions';
+
+                const downloadBtn = document.createElement('button');
+                downloadBtn.className = 'action-btn download-btn';
+                downloadBtn.innerHTML = "<i class='bx  bx-arrow-to-bottom'></i> ";
+                downloadBtn.onclick = () => downloadImage(img.src, prompt);
+
+                const refreshBtn = document.createElement('button');
+                refreshBtn.className = 'action-btn refresh-btn';
+                refreshBtn.innerHTML = "<i class='bx bx-refresh'></i>";
+                refreshBtn.onclick = () => regenerateImage(prompt);
+
+                actions.appendChild(downloadBtn);
+                actions.appendChild(refreshBtn);
+                container.appendChild(img);
+                container.appendChild(actions);
+
+                loadingLi.classList.add('close');
+            }
+
+
+        }
+
+    } catch (error) {
+        console.error(error);
+        loadingLi.classList.add('error');
+        loadingLi.querySelector('.chat-content').textContent = "Failed to generate image. Please try again.";
+    }
+}
+
+function openImageModal(src, prompt) {
+    const modal = document.getElementById('image-modal');
+    const modalImg = document.getElementById("img-modal-preview");
+    const captionText = document.getElementById("image-caption");
+    const downloadLink = document.getElementById("modal-download-btn");
+
+    modal.style.display = "block";
+    modalImg.src = src;
+    captionText.innerHTML = prompt;
+    downloadLink.href = src;
+    downloadLink.download = `generated-${prompt.substring(0, 20)}.png`;
+
+    const span = document.getElementsByClassName("close-image-modal")[0];
+    span.onclick = function () {
+        modal.style.display = "none";
+    }
+    modal.onclick = function (event) {
+        if (event.target === modal) {
+            modal.style.display = "none";
+        }
+    }
+}
+
 if (document.readyState === 'complete') {
     init();
     resetSearchMode();
@@ -2833,3 +4409,4 @@ if (document.readyState === 'complete') {
         resetSearchMode();
     });
 }
+

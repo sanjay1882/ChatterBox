@@ -1,8 +1,23 @@
 @echo off
 SETLOCAL
 
-REM Deployment Script for Chatterbox on Google Cloud Platform (Windows)
-REM Usage: deploy.bat [PROJECT_ID] [REGION]
+REM ======================================================
+REM  Chatterbox Deployment Script -- Windows (GCP)
+REM  Usage: deploy.bat <PROJECT_ID> [REGION]
+REM
+REM  BEFORE RUNNING: Set these environment variables:
+REM    set GEMINI_API_KEY=your_key
+REM    set ANTHROPIC_API_KEY=your_key
+REM    set GROQ_API_KEY=your_key
+REM    set TAVILY_API_KEY=your_key
+REM    set API_KEY_SE=your_key
+REM    set CX_ID=your_cx_id
+REM    set MONGO_URI=your_mongo_uri
+REM    set FRONTEND_URL=https://treevit.web.app
+REM
+REM  NEVER hardcode secrets in this file.
+REM  Store them in backend/.env (gitignored) for local use.
+REM ======================================================
 
 SET PROJECT_ID=%1
 SET REGION=%2
@@ -12,6 +27,12 @@ IF "%PROJECT_ID%"=="" (
     ECHO Usage: deploy.bat ^<PROJECT_ID^> [REGION]
     EXIT /B 1
 )
+
+REM Validate required secrets are set
+IF "%GEMINI_API_KEY%"=="" (ECHO ERROR: GEMINI_API_KEY env var not set & EXIT /B 1)
+IF "%ANTHROPIC_API_KEY%"=="" (ECHO ERROR: ANTHROPIC_API_KEY env var not set & EXIT /B 1)
+IF "%GROQ_API_KEY%"=="" (ECHO ERROR: GROQ_API_KEY env var not set & EXIT /B 1)
+IF "%MONGO_URI%"=="" (ECHO ERROR: MONGO_URI env var not set & EXIT /B 1)
 
 IF "%REGION%"=="" SET REGION=us-central1
 
@@ -23,7 +44,7 @@ REM 1. Enable Services
 ECHO Ensuring necessary services are enabled...
 call gcloud services enable cloudbuild.googleapis.com run.googleapis.com containerregistry.googleapis.com --project "%PROJECT_ID%"
 
-REM 2. Deploy Backend
+REM 2. Deploy Backend (Build Docker image and push to Cloud Run)
 ECHO --------------------------------------------------
 ECHO Deploying Backend...
 cd backend
@@ -34,47 +55,20 @@ call gcloud run deploy chatterbox-backend ^
   --region "%REGION%" ^
   --allow-unauthenticated ^
   --project "%PROJECT_ID%" ^
-  --set-env-vars="NODE_ENV=production"
+  --set-env-vars="NODE_ENV=production,GEMINI_API_KEY=%GEMINI_API_KEY%,MONGO_URI=%MONGO_URI%,ANTHROPIC_API_KEY=%ANTHROPIC_API_KEY%,GROQ_API_KEY=%GROQ_API_KEY%,TAVILY_API_KEY=%TAVILY_API_KEY%,API_KEY_SE=%API_KEY_SE%,CX_ID=%CX_ID%,FRONTEND_URL=%FRONTEND_URL%"
 
 REM Capture Backend URL
 FOR /F "tokens=*" %%i IN ('call gcloud run services describe chatterbox-backend --platform managed --region "%REGION%" --project "%PROJECT_ID%" --format "value(status.url)"') DO SET BACKEND_URL=%%i
 ECHO Backend Deployed at: %BACKEND_URL%
 cd ..
 
-REM 3. Deploy Scraper
-ECHO --------------------------------------------------
-ECHO Deploying Scraper...
-cd backend/Python-scripts
-call gcloud builds submit --tag "gcr.io/%PROJECT_ID%/chatterbox-scraper" --project "%PROJECT_ID%"
-call gcloud run deploy chatterbox-scraper ^
-  --image "gcr.io/%PROJECT_ID%/chatterbox-scraper" ^
-  --platform managed ^
-  --region "%REGION%" ^
-  --allow-unauthenticated ^
-  --project "%PROJECT_ID%"
-
-REM Capture Scraper URL
-FOR /F "tokens=*" %%i IN ('call gcloud run services describe chatterbox-scraper --platform managed --region "%REGION%" --project "%PROJECT_ID%" --format "value(status.url)"') DO SET SCRAPER_URL=%%i
-ECHO Scraper Deployed at: %SCRAPER_URL%
-cd ../..
-
-ECHO --------------------------------------------------
-ECHO Updating Backend with Scraper URL...
-call gcloud run services update chatterbox-backend ^
-  --platform managed ^
-  --region "%REGION%" ^
-  --project "%PROJECT_ID%" ^
-  --set-env-vars="SCRAPER_URL=%SCRAPER_URL%"
-
 ECHO ==================================================
 ECHO Deployment Complete!
 ECHO Backend URL: %BACKEND_URL%
-ECHO Scraper URL: %SCRAPER_URL%
 ECHO --------------------------------------------------
 ECHO NEXT STEPS:
-ECHO 1. Update 'frontend/config.js' to use Backend URL: %BACKEND_URL%
-ECHO 2. Deploy Frontend to Firebase: firebase deploy --only hosting
-ECHO 3. Update Backend with Frontend URL:
-ECHO    gcloud run services update chatterbox-backend --set-env-vars="FRONTEND_URL=YOUR_FIREBASE_URL"
+ECHO 1. Frontend live at: https://treevit.web.app
+ECHO 2. If backend URL changed, update frontend/config.js
+ECHO 3. Run: firebase deploy --only hosting
 ECHO ==================================================
 ENDLOCAL

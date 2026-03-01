@@ -11,10 +11,12 @@ import rateLimit from "express-rate-limit";
 import ChatSession from "./models/ChatSession.js";
 import SharedSession from "./models/SharedSession.js";
 import UserPreferences from "./models/UserPreferences.js";
+import GeneratedContent from "./models/GeneratedContent.js";
 import getInitialPrompt from "./history.js";
 import { findRelevantContext, saveContextChunk } from "./utils/vectorUtils.js";
 import { verifyToken } from "./middleware/auth.js";
 import * as scraper from "./utils/scraper.js";
+import fetch from "node-fetch";
 
 dotenv.config();
 
@@ -32,12 +34,13 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // CORS Configuration
-const allowedOrigins = [process.env.FRONTEND_URL, "https://treevit.web.app", "http://localhost:5173", "http://localhost:3000"];
+const allowedOrigins = [process.env.FRONTEND_URL, "https://treevit.web.app", "http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:5174", "http://127.0.0.1:5174", "http://localhost:3000", "null"];
 app.use(cors({
     origin: function (origin, callback) {
-        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+        if (!origin || allowedOrigins.indexOf(origin) !== -1 || origin === 'null') {
             callback(null, true);
         } else {
+            console.log("Blocked by CORS origin:", origin);
             callback(new Error('Not allowed by CORS'));
         }
     }
@@ -111,12 +114,33 @@ app.get("/sessions/:email", verifyToken, async (req, res) => {
     try {
         if (req.user.email !== req.params.email) return res.status(403).json({ error: "Unauthorized access" });
 
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 20;
+        const skip = (page - 1) * limit;
+
+        const totalSessions = await ChatSession.countDocuments({
+            email: req.params.email,
+            isDeleted: false,
+            isTemporary: { $ne: true }
+        });
+
         const sessions = await ChatSession.find({
             email: req.params.email,
             isDeleted: false,
             isTemporary: { $ne: true }
-        }).select("title updatedAt isWebSearchEnabled").sort({ updatedAt: -1 });
-        res.json(sessions);
+        })
+            .select("title updatedAt isWebSearchEnabled")
+            .sort({ updatedAt: -1 })
+            .skip(skip)
+            .limit(limit);
+
+        res.json({
+            sessions,
+            currentPage: page,
+            totalPages: Math.ceil(totalSessions / limit),
+            totalSessions,
+            hasNextPage: page * limit < totalSessions
+        });
     } catch (error) {
         console.error("Error fetching sessions:", error);
         res.status(500).json({ error: "Failed to fetch sessions", details: error.message });
@@ -158,19 +182,36 @@ app.patch("/sessions/:email/:id/soft-delete", verifyToken, async (req, res) => {
 
 
 app.post("/stream", verifyToken, upload.single("image"), async (req, res) => {
-    const userMessage = req.body.message;
-    const userEmail = req.body.email;
-    const selectedModel = req.body.model || "gemini-2.5-flash";
-    const webSearch = req.body.webSearch;
-    const isTemporary = req.body.isTemporary === 'true';
-    let sessionId = req.body.sessionId;
+    const {
+        message: userMessage,
+        email: userEmail,
+        sessionId: incomingSessionId,
+        model: selectedModel = "gemini-2.5-flash",
+        isTemporary: incomingIsTemporary,
+        webSearch,
+        editMessageId,
+        gender,
+        ageGroup,
+        language,
+        culture,
+        writingStyle,
+        creativityLevel,
+        interests,
+        customRules
+    } = req.body;
 
+    const isTemporary = incomingIsTemporary === 'true' || incomingIsTemporary === true;
+    let sessionId = incomingSessionId;
 
     const settings = {
-        gender: req.body.gender,
-        ageGroup: req.body.ageGroup,
-        language: req.body.language,
-        culture: req.body.culture
+        gender,
+        ageGroup,
+        language,
+        culture,
+        writingStyle,
+        creativityLevel,
+        interests,
+        customRules
     };
 
     if (!userMessage || !userEmail) {
@@ -191,8 +232,15 @@ app.post("/stream", verifyToken, upload.single("image"), async (req, res) => {
 
         if (sessionId) {
             sessionDoc = await ChatSession.findById(sessionId);
-            // Update existing session's search mode if it changed (optional, but good for persistence)
             if (sessionDoc) {
+                // [Edit Mode] Truncate history if editMessageId is provided
+                if (editMessageId) {
+                    const editIndex = sessionDoc.messages.findIndex(m => m._id.toString() === editMessageId);
+                    if (editIndex !== -1) {
+                        sessionDoc.messages = sessionDoc.messages.slice(0, editIndex);
+                        console.log(`[Edit] Truncated session ${sessionId} history from index ${editIndex}`);
+                    }
+                }
                 sessionDoc.isWebSearchEnabled = (webSearch === "true");
                 await sessionDoc.save();
             }
@@ -219,7 +267,7 @@ app.post("/stream", verifyToken, upload.single("image"), async (req, res) => {
         // Prepare history for Gemini
         const dbHistory = sessionDoc.messages.map(h => ({
             role: h.role,
-            parts: h.parts.map(p => ({ text: p.text }))
+            parts: h.parts.map(p => ({ text: p.text || "[Image/File]" }))
         }));
 
         const initialPrompt = getInitialPrompt(settings);
@@ -454,6 +502,13 @@ app.post("/stream", verifyToken, upload.single("image"), async (req, res) => {
         await sessionDoc.save();
         console.log(`Chat saved to session ${sessionId}`);
 
+        // Send newly created message IDs to client for ID syncing (Edit support)
+        const userMsgId = sessionDoc.messages[sessionDoc.messages.length - 2]?._id;
+        const modelMsgId = sessionDoc.messages[sessionDoc.messages.length - 1]?._id;
+        if (userMsgId && modelMsgId) {
+            res.write(`event: message_ids\ndata: ${JSON.stringify({ userMsgId, modelMsgId })}\n\n`);
+        }
+
         res.write(`event: end\ndata: done\n\n`);
         res.end();
 
@@ -603,6 +658,163 @@ app.post("/scrape-and-vectorize", verifyToken, async (req, res) => {
     }
 });
 
+
+
+
+// 4. Spectra Mode Generation (Banana Model Stub)
+app.post("/spectra-generate", verifyToken, upload.fields([{ name: 'photo1', maxCount: 1 }, { name: 'photo2', maxCount: 1 }]), async (req, res) => {
+    try {
+        const { prompt, email, sessionId } = req.body;
+
+        if (!prompt || !email) {
+            return res.status(400).json({ error: "Prompt and Email are required" });
+        }
+        if (req.user.email !== email) return res.status(403).json({ error: "Unauthorized: Email mismatch" });
+
+        const photo1 = req.files['photo1'] ? req.files['photo1'][0] : null;
+        const photo2 = req.files['photo2'] ? req.files['photo2'][0] : null;
+
+        const systemPrompt = `
+
+Take this pic "photo1"as reference — don't spoil the originality.
+In photo2; you need to replace the person.
+Keep 100% originality of this image:
+- Same background
+- Same colors, textures, composition
+- Same graphic-novel/poster style
+- Only the person will be replaced
+- No remix
+- No style change
+- No extra creativity
+
+Workflow:
+1. This image photo1= base reference (locked)
+2. then in photo2
+3. I replace only the person, everything else stays untouched
+
+
+`;
+
+        const finalPrompt = systemPrompt + prompt;
+
+        console.log(`[Spectra] Request received.`);
+        console.log(`[Spectra] User Input: "${prompt}"`);
+        console.log(`[Spectra] Photo1: ${photo1 ? photo1.originalname : 'None'}, Photo2: ${photo2 ? photo2.originalname : 'None'}`);
+
+        // --- Banana Model Integration (STUB) ---
+        // Workflow Requirement: 
+        // 1. Upload Photo 1 -> Wait for response
+        // 2. Upload Photo 2 -> Wait for response
+        // 3. Receive Acknowledgement
+        // 4. Send System Prompt + User Prompt -> Generate
+
+        console.log("[Spectra] Starting Strict Sequential Workflow...");
+
+        // Mock Function to simulate API call latency
+        const uploadToBanana = async (file, label) => {
+            if (!file) {
+                console.log(`[Spectra] ${label} missing, skipping upload.`);
+                return null;
+            }
+            console.log(`[Spectra] Step 1: Uploading ${label}...`);
+            // await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API wait
+            console.log(`[Spectra] ${label} Uploaded. Waiting for response comment...`);
+            const responseId = `banana_${label}_${Math.random().toString(36).substr(2, 5)}`;
+            console.log(`[Spectra] Response Received for ${label}: ID=${responseId}`);
+            return responseId;
+        };
+
+        // --- Step 1: Photo 1 ---
+        const image1Id = await uploadToBanana(photo1, "Photo 1");
+
+        // --- Step 2: Photo 2 ---
+        const image2Id = await uploadToBanana(photo2, "Photo 2");
+
+        // --- Step 3: Acknowledgement ---
+        if (image1Id && image2Id) {
+            console.log("[Spectra] Acknowledgement: Both images successfully uploaded.");
+        } else {
+            console.log("[Spectra] Acknowledgement: Partial or failed uploads (proceeding with avail data).");
+        }
+
+        // --- Step 4: Prompt & Generation ---
+        console.log("[Spectra] Step 4: Preparing Final Prompt...");
+
+
+
+        console.log(`[Spectra] System Prompt + User Prompt combined: "${finalPrompt}"`);
+        console.log(`[Spectra] Sending to Banana Generation Endpoint...`);
+
+        // Mocking a generated image
+        let generatedImageData;
+        let generatedMimeType = "image/png";
+
+        if (photo1) {
+            generatedImageData = photo1.buffer.toString('base64');
+            generatedMimeType = photo1.mimetype;
+        } else {
+            generatedImageData = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
+        }
+
+        const responseText = "Here is the generated image based on your inputs.";
+        console.log("[Spectra] Generation Response Received.");
+
+        // --- Persistence ---
+        let sessionDoc;
+        let isNewSession = false;
+
+        if (sessionId) {
+            sessionDoc = await ChatSession.findById(sessionId);
+        }
+
+        if (!sessionDoc) {
+            isNewSession = true;
+            // Create title from first few words of message
+            const title = prompt.split(" ").slice(0, 5).join(" ") + "...";
+            sessionDoc = new ChatSession({
+                email: email,
+                title: title,
+                messages: [],
+                isTemporary: false
+            });
+            await sessionDoc.save();
+        }
+
+        // Add User Message (with uploaded images stored as inline data for history)
+        const userParts = [{ text: prompt }];
+        if (photo1) userParts.push({ inlineData: { data: photo1.buffer.toString('base64'), mimeType: photo1.mimetype } });
+        if (photo2) userParts.push({ inlineData: { data: photo2.buffer.toString('base64'), mimeType: photo2.mimetype } });
+
+        sessionDoc.messages.push({
+            role: "user",
+            parts: userParts
+        });
+
+        // Add Model Response
+        sessionDoc.messages.push({
+            role: "model",
+            parts: [
+                { text: responseText },
+                { inlineData: { data: generatedImageData, mimeType: generatedMimeType } }
+            ]
+        });
+
+        await sessionDoc.save();
+
+        res.json({
+            text: responseText,
+            image: {
+                data: generatedImageData,
+                mimeType: generatedMimeType
+            },
+            sessionId: sessionDoc._id
+        });
+
+    } catch (error) {
+        console.error("Spectra Generation Error:", error);
+        res.status(500).json({ error: "Failed to generate image" });
+    }
+});
 
 
 app.post("/analyze-url-stream", verifyToken, async (req, res) => {
@@ -837,8 +1049,37 @@ app.post("/user/preferences", verifyToken, async (req, res) => {
         );
         res.json(prefs);
     } catch (error) {
-        console.error("Error saving preferences:", error);
         res.status(500).json({ error: "Failed to save preferences" });
+    }
+});
+
+app.get("/user/gallery/:email", verifyToken, async (req, res) => {
+    try {
+        const email = req.params.email;
+        if (!email) return res.status(400).json({ error: "Email required" });
+        if (req.user.email !== email) return res.status(403).json({ error: "Unauthorized" });
+
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 12; // Default 12 images per page
+        const skip = (page - 1) * limit;
+
+        const totalImages = await GeneratedContent.countDocuments({ email });
+        const images = await GeneratedContent.find({ email })
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit)
+            .select('prompt imageBase64 createdAt sessionId');
+
+        res.json({
+            images,
+            currentPage: page,
+            totalPages: Math.ceil(totalImages / limit),
+            totalImages,
+            hasNextPage: page * limit < totalImages
+        });
+    } catch (error) {
+        console.error("Error fetching gallery:", error);
+        res.status(500).json({ error: "Failed to fetch gallery" });
     }
 });
 
@@ -859,7 +1100,143 @@ app.post("/chat-completion", verifyToken, async (req, res) => {
     }
 });
 
+app.post("/generate-image", verifyToken, async (req, res) => {
+    try {
+        if (!process.env.GEMINI_API_KEY) {
+            return res.status(500).json({ error: "GEMINI_API_KEY missing" });
+        }
+        const { prompt, email, sessionId } = req.body; // Added email, sessionId
+        if (!prompt) {
+            return res.status(400).json({ error: "Prompt is required" });
+        }
+        // Basic auth check already done by verifyToken, but ensure email matches token
+        if (req.user.email !== email && email) return res.status(403).json({ error: "Unauthorized" });
+
+
+        // Construct the URL for Imagen
+        // Using 'models/imagen-4.0-generate-001' as confirmed by available models list
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${process.env.GEMINI_API_KEY}`;
+
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                instances: [
+                    { prompt: prompt + "Create an image with a watermark that says Treevit AI placed at the bottom in small text." }
+                ],
+                parameters: {
+                    sampleCount: 1,
+                    // You can add more parameters here like aspectRatio, etc. if needed
+                }
+            })
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error("Imagen API Error:", errorText);
+            throw new Error(`Imagen API failed: ${response.status} ${response.statusText}`);
+        }
+
+        const data = await response.json();
+
+        if (data.predictions && data.predictions.length > 0 && data.predictions[0].bytesBase64Encoded) {
+            const base64Image = data.predictions[0].bytesBase64Encoded;
+
+            // 1. Save to GeneratedContent
+            if (email) {
+                try {
+                    const savedImage = new GeneratedContent({
+                        email,
+                        prompt,
+                        imageBase64: base64Image,
+                        sessionId: sessionId || null
+                    });
+                    await savedImage.save();
+                } catch (dbError) {
+                    console.error("Error saving GeneratedContent:", dbError);
+                    // Don't fail the request if saving fails, but log it
+                }
+            }
+
+            // 2. Save to ChatSession if sessionId exists
+            if (sessionId) {
+                try {
+                    const session = await ChatSession.findById(sessionId);
+                    if (session) {
+                        // User message
+                        session.messages.push({
+                            role: "user",
+                            parts: [{ text: `Generate image: ${prompt}` }]
+                        });
+                        // Model message (Image)
+                        session.messages.push({
+                            role: "model",
+                            parts: [{
+                                inlineData: {
+                                    mimeType: "image/png",
+                                    data: base64Image
+                                }
+                            }]
+                        });
+                        await session.save();
+                    }
+                } catch (sessionError) {
+                    console.error("Error saving to ChatSession:", sessionError);
+                }
+            }
+
+            res.json({ imageBase64: base64Image });
+        } else {
+            throw new Error("No image data received from API");
+        }
+
+    } catch (error) {
+        console.error("Image Generation error:", error);
+        res.status(500).json({
+            error: "Failed to generate image.",
+            details: error.message,
+            stack: error.stack,
+            apiError: error.toString()
+        });
+    }
+});
+
+// ── Voice Transcription via Groq Whisper ─────────────────────────────────────
+// Accepts raw audio blob (webm, ogg, wav, mp4) and returns a transcript.
+// No auth required so guests can also use voice input.
+const uploadAudio = multer({
+    limits: { fileSize: 25 * 1024 * 1024 }, // 25 MB max (Groq limit)
+});
+
+app.post("/api/transcribe", uploadAudio.single("audio"), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ error: "No audio file provided" });
+        }
+
+        const { buffer, mimetype, originalname } = req.file;
+
+        // Groq Whisper requires a File-like object. We build one from the buffer.
+        const audioFile = new File([buffer], originalname || "audio.webm", { type: mimetype || "audio/webm" });
+
+        const transcription = await groq.audio.transcriptions.create({
+            file: audioFile,
+            model: "whisper-large-v3-turbo",
+            response_format: "json",
+            temperature: 0,
+        });
+
+        return res.json({ text: transcription.text || "" });
+    } catch (error) {
+        console.error("Transcription error:", error);
+        return res.status(500).json({ error: "Transcription failed", details: error.message });
+    }
+});
+
 const PORT = process.env.PORT || 3000;
+
 app.listen(PORT, () => {
     console.log("Backend running on http://localhost:3000");
 });

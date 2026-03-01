@@ -65,6 +65,181 @@
             margin: auto;
         }
 
+
+.chatbox .incoming p h1,
+.chatbox .incoming p h2,
+.chatbox .incoming p h3,
+.chatbox .incoming p h4,
+.chatbox .incoming p h5,
+.chatbox .incoming p h6 {
+  color: #fff;
+  font-weight: 600;
+  margin: 16px 0 12px 0;
+  line-height: 1.3;
+}
+
+.chatbox .incoming p h1 {
+  font-size: 1rem;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 8px;
+}
+
+.chatbox .incoming p h2 {
+  font-size: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 6px;
+}
+
+.chatbox .incoming p h3 {
+  font-size: 1rem;
+}
+
+.chatbox .incoming p h4 {
+  font-size: 0.9rem;
+}
+
+.chatbox .incoming p h5 {
+  font-size: 0.8rem;
+}
+
+.chatbox .incoming p h6 {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+
+.chatbox .incoming p pre {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 16px;
+  margin: 12px 0;
+  overflow-x: auto;
+  position: relative;
+}
+
+.chatbox .incoming p pre code {
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: #e0e0e0;
+  display: block;
+  white-space: pre;
+}
+
+
+.chatbox .incoming p code {
+  background: rgba(103, 58, 183, 0.2);
+  color: #bb86fc;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 0.85rem;
+  border: 1px solid rgba(103, 58, 183, 0.3);
+}
+
+.chatbox .incoming p pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  color: #e0e0e0;
+}
+
+
+.chatbox .incoming p ul {
+  margin: 12px 0;
+  padding-left: 24px;
+  list-style: none;
+}
+
+.chatbox .incoming p ul li {
+  position: relative;
+  margin: 8px 0;
+  padding-left: 8px;
+  line-height: 1.6;
+  color: #eae7e7;
+}
+
+.chatbox .incoming p ul li::before {
+  content: "•";
+  color: #673ab7;
+  font-weight: bold;
+  position: absolute;
+  left: -16px;
+}
+
+
+
+
+.chatbox .incoming p .md-table tr:hover {
+  background: rgba(255, 255, 255, 0.05);
+  /* Subtle hover */
+}
+
+
+.chatbox .incoming p b,
+.chatbox .incoming p strong {
+  font-weight: 600;
+  color: #fff;
+}
+
+.chatbox .incoming p i,
+.chatbox .incoming p em {
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+
+
+
+.translation-content pre {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 16px;
+  margin: 12px 0;
+  overflow-x: auto;
+}
+
+.translation-content code {
+  background: rgba(103, 58, 183, 0.2);
+  color: #bb86fc;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 0.85rem;
+  border: 1px solid rgba(103, 58, 183, 0.3);
+}
+
+.translation-content pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  color: #e0e0e0;
+  font-size: 0.9rem;
+}
+
+.translation-content ul {
+  margin: 12px 0;
+  padding-left: 24px;
+  list-style: none;
+}
+
+.translation-content ul li {
+  position: relative;
+  margin: 8px 0;
+  padding-left: 8px;
+  line-height: 1.6;
+}
+
+.translation-content ul li::before {
+  content: "•";
+  color: #673ab7;
+  font-weight: bold;
+  position: absolute;
+  left: -16px;
+}
+
         .shared-footer::before {
             content: "";
             position: absolute;
@@ -110,17 +285,52 @@
         body.white-mode .shared-info {
             color: #333;
         }
+.chatbox .incoming p h1,
+.chatbox .incoming p h2,
+.chatbox .incoming p h3,
+.chatbox .incoming p h4,
+.chatbox .incoming p h5,
+.chatbox .incoming p h6 {
+  color: #ececf1;
+  /* ChatGPT Dark Mode Text */
+  font-weight: 600;
+  margin: 16px 0 8px 0;
+  line-height: 1.3;
+  background: none;
+  -webkit-background-clip: border-box;
+  -webkit-text-fill-color: initial;
+  background-clip: border-box;
+}
 
-        .chatbox .incoming p h1,
-        .chatbox .incoming p h2,
-        .chatbox .incoming p h3,
-        .chatbox .incoming p h4,
-        .chatbox .incoming p h5,
-        .chatbox .incoming p h6 {
-            margin: 16px 0 12px 0;
-            line-height: 1.3;
-            font-weight: 600;
-        }
+.chatbox .incoming p h1 {
+  font-size: 1.6rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 0.3em;
+}
+
+.chatbox .incoming p h2 {
+  font-size: 1.4rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 0.3em;
+}
+
+.chatbox .incoming p h3 {
+  font-size: 1.25rem;
+}
+
+.chatbox .incoming p h4 {
+  font-size: 1.1rem;
+}
+
+.chatbox .incoming p h5 {
+  font-size: 1rem;
+}
+
+.chatbox .incoming p h6 {
+  font-size: 0.9rem;
+  color: #d1d5db;
+  text-transform: uppercase;
+}
     </style>
 </head>
 
@@ -131,14 +341,14 @@
                 <div class="left-header" style="display: flex; align-items: center; padding-left: 15px;">
                     <i class='bx bx-doughnut-chart' style="color:white; font-size: 24px; margin-right: 10px;"></i>
 
-                    <h2 id="chat-title" style="font-family: 'Poppins', sans-serif; font-size: 1.6rem;">Treevit</h2>
+                    <h2 id="chat-title" style="font-family: 'Poppins', sans-serif; font-size: 1.6rem;"></h2>
                 </div>
                 <div class="center-header">
 
                     <h2>Treevit</h2>
                 </div>
                 <div class="right-heder-bar">
-                    <i class='bx bxs-sun' id="darkmodebtn"></i>
+                    <i class='bx bxs-sn' id="darkmodebtn"></i>
                 </div>
             </header>
 
@@ -165,203 +375,205 @@
 
         function formatStreamedText(text) {
 
-            // Think block extraction
-            const thinkBlocks = [];
-            let processedText = text.replace(/<think>([\s\S]*?)<\/think>/g, (match, content) => {
-                thinkBlocks.push(content);
-                return `__THINK_BLOCK_${thinkBlocks.length - 1}__`;
-            });
+    // Think block extraction
+    const thinkBlocks = [];
+    let processedText = text.replace(/<think>([\s\S]*?)<\/think>/g, (match, content) => {
+        thinkBlocks.push(content);
+        return `__THINK_BLOCK_${thinkBlocks.length - 1}__`;
+    });
 
-            const openThinkMatch = processedText.match(/<think>([\s\S]*)$/);
-            if (openThinkMatch) {
-                const content = openThinkMatch[1];
-                thinkBlocks.push(content);
-                processedText = processedText.replace(/<think>([\s\S]*)$/, `__THINK_BLOCK_${thinkBlocks.length - 1}__`);
+    const openThinkMatch = processedText.match(/<think>([\s\S]*)$/);
+    if (openThinkMatch) {
+        const content = openThinkMatch[1];
+        thinkBlocks.push(content);
+        processedText = processedText.replace(/<think>([\s\S]*)$/, `__THINK_BLOCK_${thinkBlocks.length - 1}__`);
+    }
+
+    // Math block extraction
+    const mathBlocks = [];
+    processedText = processedText.replace(/\$\$([\s\S]*?)\$\$/g, (match, content) => {
+        mathBlocks.push({ content: content, display: true });
+        return `__MATH_BLOCK_${mathBlocks.length - 1}__`;
+    });
+
+    processedText = processedText.replace(/\$([^$\n]+?)\$/g, (match, content) => {
+        mathBlocks.push({ content: content, display: false });
+        return `__MATH_INLINE_${mathBlocks.length - 1}__`;
+    });
+
+    const escapeHTML = (str) =>
+        String(str).replace(/[&<>"']/g, (tag) => (
+            { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[tag]
+        ));
+
+    function createTableHTMLFromLines(rows) {
+        if (!rows || !rows.length) return '';
+
+        const parse = (r) => r.replace(/^\|/, '').replace(/\|$/, '').split('|').map(c => c.trim());
+
+        const header = parse(rows[0]);
+        let alignments = new Array(header.length).fill(null);
+
+        if (rows.length > 1) {
+            const divider = rows[1].replace(/\s+/g, '');
+            if (/^[:\-|]+$/.test(divider)) {
+                const divCells = parse(rows[1]);
+                alignments = divCells.map(cell => {
+                    const left = cell.startsWith(':');
+                    const right = cell.endsWith(':');
+                    if (left && right) return 'center';
+                    if (right) return 'right';
+                    if (left) return 'left';
+                    return null;
+                });
             }
-
-            // Math block extraction
-            const mathBlocks = [];
-            processedText = processedText.replace(/\$\$([\s\S]*?)\$\$/g, (match, content) => {
-                mathBlocks.push({ content: content, display: true });
-                return `__MATH_BLOCK_${mathBlocks.length - 1}__`;
-            });
-
-            processedText = processedText.replace(/\$([^$\n]+?)\$/g, (match, content) => {
-                mathBlocks.push({ content: content, display: false });
-                return `__MATH_INLINE_${mathBlocks.length - 1}__`;
-            });
-
-            const escapeHTML = (str) =>
-                String(str).replace(/[&<>"']/g, (tag) => (
-                    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[tag]
-                ));
-
-            function createTableHTMLFromLines(rows) {
-                if (!rows || !rows.length) return '';
-
-                const parse = (r) => r.replace(/^\|/, '').replace(/\|$/, '').split('|').map(c => c.trim());
-
-                const header = parse(rows[0]);
-                let alignments = new Array(header.length).fill(null);
-
-                if (rows.length > 1) {
-                    const divider = rows[1].replace(/\s+/g, '');
-                    if (/^[:\-|]+$/.test(divider)) {
-                        const divCells = parse(rows[1]);
-                        alignments = divCells.map(cell => {
-                            const left = cell.startsWith(':');
-                            const right = cell.endsWith(':');
-                            if (left && right) return 'center';
-                            if (right) return 'right';
-                            if (left) return 'left';
-                            return null;
-                        });
-                    }
-                }
-
-                let html = '<br><table class="md-table"><thead><tr>';
-                for (let i = 0; i < header.length; i++) {
-                    const align = alignments[i] ? ` style="text-align:${alignments[i]}"` : '';
-                    html += `<th${align}>${header[i] || ''}</th>`;
-                }
-                html += '</tr></thead><tbody>';
-
-                for (let r = 1; r < rows.length; r++) {
-                    const cells = parse(rows[r]);
-                    html += '<tr>';
-                    for (let i = 0; i < header.length; i++) {
-                        const cell = (cells[i] !== undefined) ? cells[i] : '';
-                        const align = alignments[i] ? ` style="text-align:${alignments[i]}"` : '';
-                        html += `<td${align}>${cell}</td>`;
-                    }
-                    html += '</tr>';
-                }
-
-                html += '</tbody></table><br>';
-                return html;
-            }
-
-            processedText = escapeHTML(processedText)
-                .replace(/(\p{Emoji_Presentation}|\p{Extended_Pictographic})/gu, '<span class="emoji-reset">$1</span>')
-                .replace(/^[-*_]{3,}\s*$/gm, '') // Remove horizontal rules
-                .replace(/^###### (.*$)/gim, '<h6>$1</h6>\n')
-                .replace(/^##### (.*$)/gim, '<h5>$1</h5>\n')
-                .replace(/^#### (.*$)/gim, '<h4>$1</h4>\n')
-                .replace(/^### (.*$)/gim, '<h3>$1</h3>\n')
-                .replace(/^## (.*$)/gim, '<h2>$1</h2>\n')
-                .replace(/^# (.*$)/gim, '<h1>$1</h1>\n')
-                .replace(/\*\*\*(.*?)\*\*\*/gim, '<b><i>$1</i></b>')
-                .replace(/\*\*(.*?)\*\*/gim, '<b>$1</b>')
-                .replace(/\*(.*?)\*/gim, '<i>$1</i>')
-                .replace(/\[([^\]]+)\]\(([^)]+)\)/gim, '<a href="$2" target="_blank" class="styled-link"><i class="bx bx-link"></i> $1</a>')
-                .replace(/`([^`]+)`/gim, '<code>$1</code>')
-                .replace(/```(\w+)?\n?([\s\S]*?)```/gim, (match, lang, code) => {
-                    const language = lang ? ` class="language-${lang}"` : '';
-                    return `<pre><code${language}>${code}</code></pre>`;
-                })
-                .replace(/^\s*[-*]\s+(.*)/gim, '<li>$1</li>');
-
-            const lines = processedText.split('\n');
-            let html = '';
-            let inList = false;
-            let inTable = false;
-            let tableLines = [];
-
-            for (let line of lines) {
-                const trimmed = line.trim();
-
-                const pipeCount = (line.match(/\|/g) || []).length;
-                const looksLikeTableRow = pipeCount >= 2 && !/^<pre><code>/.test(line) && !/<\/code><\/pre>/.test(line);
-
-                if (looksLikeTableRow) {
-                    inTable = true;
-                    tableLines.push(line);
-                    continue;
-                }
-
-                if (inTable && tableLines.length) {
-                    html += createTableHTMLFromLines(tableLines);
-                    tableLines = [];
-                    inTable = false;
-                }
-
-                if (line.match(/<li>/)) {
-                    if (!inList) {
-                        html += '<ul id="list-unstyled">';
-                        inList = true;
-                    }
-                    html += line;
-                    continue;
-                } else {
-                    if (inList) {
-                        html += '</ul>';
-                        inList = false;
-                    }
-                }
-
-                if (line.match(/<h[1-6]>/)) {
-                    html += `${line}<br>`;
-                    continue;
-                }
-
-                if (line.match(/^<pre><code>/)) {
-                    html += `${line}\n`;
-                    continue;
-                }
-
-                if (trimmed) {
-                    html += `<p style="background:rgba(255,255,255,0);">${line}</p>`;
-                } else {
-                    html += `<br>`;
-                }
-            }
-
-            if (inTable && tableLines.length) {
-                html += createTableHTMLFromLines(tableLines);
-            }
-
-            if (inList) html += '</ul>';
-
-            // Restore Think Blocks
-            html = html.replace(/__THINK_BLOCK_(\d+)__/g, (match, index) => {
-                const content = thinkBlocks[index];
-                return `<div class="think-block-wrapper">
-                    <details class="think-block-details">
-                        <summary>Thought Process</summary>
-                        <div class="think-block-content">${content}</div>
-                    </details>
-                </div>`;
-            });
-
-            // Restore Math Blocks
-            html = html.replace(/__MATH_BLOCK_(\d+)__/g, (match, index) => {
-                const block = mathBlocks[index];
-                if (!block) return match;
-                try {
-                    return katex.renderToString(block.content, {
-                        displayMode: true,
-                        throwOnError: false
-                    });
-                } catch (e) {
-                    return match;
-                }
-            });
-
-            html = html.replace(/__MATH_INLINE_(\d+)__/g, (match, index) => {
-                const block = mathBlocks[index];
-                if (!block) return match;
-                try {
-                    return katex.renderToString(block.content, {
-                        displayMode: false,
-                        throwOnError: false
-                    });
-                } catch (e) {
-                    return match;
-                }
-            });
-
-            return html;
         }
+
+        let html = '<br><table class="md-table"><thead><tr>';
+        for (let i = 0; i < header.length; i++) {
+            const align = alignments[i] ? ` style="text-align:${alignments[i]}"` : '';
+            html += `<th${align}>${header[i] || ''}</th>`;
+        }
+        html += '</tr></thead><tbody>';
+
+        for (let r = 1; r < rows.length; r++) {
+            const cells = parse(rows[r]);
+            html += '<tr>';
+            for (let i = 0; i < header.length; i++) {
+                const cell = (cells[i] !== undefined) ? cells[i] : '';
+                const align = alignments[i] ? ` style="text-align:${alignments[i]}"` : '';
+                html += `<td${align}>${cell}</td>`;
+            }
+            html += '</tr>';
+        }
+
+        html += '</tbody></table><br>';
+        return html;
+    }
+
+    processedText = escapeHTML(processedText)
+        .replace(/(\p{Emoji_Presentation}|\p{Extended_Pictographic})/gu, '<span class="emoji-reset">$1</span>')
+        .replace(/^[-*_]{3,}\s*$/gm, '') // Remove horizontal rules
+        .replace(/^###### (.*$)/gim, '<h6>$1</h6>\n')
+        .replace(/^##### (.*$)/gim, '<h5>$1</h5>\n')
+        .replace(/^#### (.*$)/gim, '<h4>$1</h4>\n')
+        .replace(/^### (.*$)/gim, '<h3>$1</h3>\n')
+        .replace(/^## (.*$)/gim, '<h2>$1</h2>\n')
+        .replace(/^# (.*$)/gim, '<h1>$1</h1>\n')
+        .replace(/\*\*\*(.*?)\*\*\*/gim, '<b><i>$1</i></b>')
+        .replace(/\*\*(.*?)\*\*/gim, '<b>$1</b>')
+        .replace(/\*(.*?)\*/gim, '<i>$1</i>')
+        .replace(/\[([^\]]+)\]\(([^)]+)\)/gim, '<a href="$2" target="_blank" class="styled-link"><i class="bx bx-link"></i> $1</a>')
+        .replace(/`([^`]+)`/gim, '<code>$1</code>')
+        .replace(/```(\w+)?\n?([\s\S]*?)```/gim, (match, lang, code) => {
+            const language = lang ? ` class="language-${lang}"` : '';
+            return `<pre><code${language}>${code}</code></pre>`;
+        })
+        .replace(/^\s*[-*]\s+(.*)/gim, '<li>$1</li>');
+
+    const lines = processedText.split('\n');
+    let html = '';
+    let inList = false;
+    let inTable = false;
+    let tableLines = [];
+
+    for (let line of lines) {
+        const trimmed = line.trim();
+
+        const pipeCount = (line.match(/\|/g) || []).length;
+        const looksLikeTableRow = pipeCount >= 2 && !/^<pre><code>/.test(line) && !/<\/code><\/pre>/.test(line);
+
+        if (looksLikeTableRow) {
+            inTable = true;
+            tableLines.push(line);
+            continue;
+        }
+
+        if (inTable && tableLines.length) {
+            html += createTableHTMLFromLines(tableLines);
+            tableLines = [];
+            inTable = false;
+        }
+
+        if (line.match(/<li>/)) {
+            if (!inList) {
+                html += '<ul id="list-unstyled">';
+                inList = true;
+            }
+            html += line;
+            continue;
+        } else if (line.trim() !== '') { // Only close list if line is NOT empty
+            if (inList) {
+                html += '</ul>';
+                inList = false;
+            }
+        }
+
+        if (line.match(/<h[1-6]/)) {
+            html += `${line}`;
+            continue;
+        }
+
+        if (line.match(/^<pre><code>/)) {
+            html += `${line}\n`;
+            continue;
+        }
+
+        if (trimmed) {
+            html += `<p>${line}</p>`;
+        } else {
+            html += ``;
+        }
+    }
+
+    if (inTable && tableLines.length) {
+        html += createTableHTMLFromLines(tableLines);
+    }
+
+    if (inList) html += '</ul>';
+
+    // Restore think blocks
+    html = html.replace(/__THINK_BLOCK_(\d+)__/g, (match, index) => {
+        const content = thinkBlocks[index] || "";
+        return `
+            <div class="think-block-wrapper">
+                <details class="think-block-details">
+                    <summary>Thinking Process</summary>
+                    <div class="think-block-content">${escapeHTML(content)}</div>
+                </details>
+            </div>
+        `;
+    });
+
+    // Restore Math blocks
+    html = html.replace(/__MATH_BLOCK_(\d+)__/g, (match, index) => {
+        const block = mathBlocks[index];
+        if (!block) return match;
+        try {
+            return katex.renderToString(block.content, {
+                displayMode: true,
+                throwOnError: false
+            });
+        } catch (e) {
+            return match;
+        }
+    });
+
+    html = html.replace(/__MATH_INLINE_(\d+)__/g, (match, index) => {
+        const block = mathBlocks[index];
+        if (!block) return match;
+        try {
+            return katex.renderToString(block.content, {
+                displayMode: false,
+                throwOnError: false
+            });
+        } catch (e) {
+            return match;
+        }
+    });
+
+    return html;
+}
 
         async function loadSharedSession() {
 

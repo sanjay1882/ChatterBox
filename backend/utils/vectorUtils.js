@@ -17,7 +17,7 @@ export async function getEmbedding(text) {
         const result = await embeddingModel.embedContent(text);
         return result.embedding.values;
     } catch (error) {
-        console.error("Error generating embedding:", error);
+        // console.warn("Embedding failed (likely model access issue), proceeding without context.");
         return [];
     }
 }
