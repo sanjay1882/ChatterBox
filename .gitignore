@@ -127,3 +127,6 @@ venv/
 __pycache__/
 *.pyc
 update_secrets.bat
+service.yaml
+service_debug.yaml
+service.txt

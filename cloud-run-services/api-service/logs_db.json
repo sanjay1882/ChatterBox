@@ -1,0 +1,102 @@
+﻿[
+  {
+    "insertId": "69afbca100020e4c94cc79e1",
+    "labels": {
+      "instanceId": "00da6cd2c4108a4a6d2bc8d5ef16f4680e8a5aec9f592b6ef3ca8c6b956d56928f94b7030a9a985bf595fbdde891009229ac37fcc2ec618a1dd242307116a6fea2d84738d7e408592413875d"
+    },
+    "logName": "projects/trevit/logs/run.googleapis.com%2Fstdout",
+    "receiveTimestamp": "2026-03-10T06:39:29.142027333Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "chatterbox-backend",
+        "location": "us-central1",
+        "project_id": "trevit",
+        "revision_name": "chatterbox-backend-00020-9kt",
+        "service_name": "chatterbox-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "MongoDB Connected",
+    "timestamp": "2026-03-10T06:39:29.134732Z"
+  },
+  {
+    "insertId": "69afba950002e7ddbfcfe5eb",
+    "labels": {
+      "instanceId": "00da6cd2c4ca6895c0d4c3f2501d9a17f2367e2f5e95e39f1d20b2da6dad24a89800891988888d0fa2e198ab06be43d950aa8033ff34a39bd2325ed5a5f55bae1538adee28b9ec5cd2ce0f397cc3"
+    },
+    "logName": "projects/trevit/logs/run.googleapis.com%2Fstdout",
+    "receiveTimestamp": "2026-03-10T06:30:45.460576675Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "chatterbox-backend",
+        "location": "us-central1",
+        "project_id": "trevit",
+        "revision_name": "chatterbox-backend-00019-w2z",
+        "service_name": "chatterbox-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "MongoDB Connected",
+    "timestamp": "2026-03-10T06:30:45.190429Z"
+  },
+  {
+    "insertId": "69af9dc6000b86d3c73d6f0e",
+    "labels": {
+      "instanceId": "00da6cd2c4cc4aa2f305288a8faa19a457d3939091e858110d3cfb7420672de6609107055f90fa6bbd41148265e3e681a3fbdce7c9cec30a3d04da5fec1b3cdd8dd9e42fcaaeb7a4ed9f068e398680"
+    },
+    "logName": "projects/trevit/logs/run.googleapis.com%2Fstdout",
+    "receiveTimestamp": "2026-03-10T04:27:50.762523783Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "chatterbox-backend",
+        "location": "us-central1",
+        "project_id": "trevit",
+        "revision_name": "chatterbox-backend-00016-mkl",
+        "service_name": "chatterbox-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "MongoDB Connected",
+    "timestamp": "2026-03-10T04:27:50.755411Z"
+  },
+  {
+    "insertId": "69af9da00007c1be9df66753",
+    "labels": {
+      "instanceId": "00da6cd2c4fc1560eb85d8b288f1737bb1b82b205a16ab836a8e41e20dd26320bd8ee3983321af99ec993bf2a7d17c470a83d02e4004cd9180ff5de59574755efe430da383e8b8b25c1427c9f48644"
+    },
+    "logName": "projects/trevit/logs/run.googleapis.com%2Fstdout",
+    "receiveTimestamp": "2026-03-10T04:27:12.557920416Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "chatterbox-backend",
+        "location": "us-central1",
+        "project_id": "trevit",
+        "revision_name": "chatterbox-backend-00016-mkl",
+        "service_name": "chatterbox-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "MongoDB Connected",
+    "timestamp": "2026-03-10T04:27:12.508350Z"
+  },
+  {
+    "insertId": "69af96c30002fb1d2fd12cfd",
+    "labels": {
+      "instanceId": "00da6cd2c4fe45d20ef57e026cbc70b235202684429785d626089c546967529bc1f009eb1576ddd5db12eee5e67ab9fbf67504f4817b71e7bda2aebfe65266054be5bbb4139d142f55d1e201921050"
+    },
+    "logName": "projects/trevit/logs/run.googleapis.com%2Fstdout",
+    "receiveTimestamp": "2026-03-10T03:57:55.201459576Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "chatterbox-backend",
+        "location": "us-central1",
+        "project_id": "trevit",
+        "revision_name": "chatterbox-backend-00016-mkl",
+        "service_name": "chatterbox-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "MongoDB Connected",
+    "timestamp": "2026-03-10T03:57:55.195357Z"
+  }
+]

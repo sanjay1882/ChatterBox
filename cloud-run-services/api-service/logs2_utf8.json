@@ -1,0 +1,444 @@
+﻿[
+  {
+    "insertId": "69afada8000c59a5403e1779",
+    "labels": {
+      "instanceId": "00da6cd2c40b11165580a7a200adcc7cb58d336ae04f02dc3d6d9b21884d2a6041aba46d45965b862b948a8ab42813222aabb0fab189b47f11f7ebccbaea49745a8b98803e6c47948f7a077be6e4ac"
+    },
+    "logName": "projects/trevit/logs/run.googleapis.com%2Fstderr",
+    "receiveTimestamp": "2026-03-10T05:35:36.814874811Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "chatterbox-backend",
+        "location": "us-central1",
+        "project_id": "trevit",
+        "revision_name": "chatterbox-backend-00018-krv",
+        "service_name": "chatterbox-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "Error fetching sessions: MongooseError: Operation `chatsessions.countDocuments()` buffering timed out after 10000ms",
+    "timestamp": "2026-03-10T05:35:36.809381Z"
+  },
+  {
+    "errorGroups": [
+      {
+        "id": "CIL3xuOZvJvk6wE"
+      }
+    ],
+    "insertId": "69afabba000467e127e65dd8",
+    "labels": {
+      "instanceId": "00da6cd2c40b11165580a7a200adcc7cb58d336ae04f02dc3d6d9b21884d2a6041aba46d45965b862b948a8ab42813222aabb0fab189b47f11f7ebccbaea49745a8b98803e6c47948f7a077be6e4ac"
+    },
+    "logName": "projects/trevit/logs/run.googleapis.com%2Fstderr",
+    "receiveTimestamp": "2026-03-10T05:27:22.628236645Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "chatterbox-backend",
+        "location": "us-central1",
+        "project_id": "trevit",
+        "revision_name": "chatterbox-backend-00018-krv",
+        "service_name": "chatterbox-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "severity": "ERROR",
+    "textPayload": "ValidationError: The 'Forwarded' header (standardized X-Forwarded-For) is set but currently being ignored. Add a custom keyGenerator to use a value from this header. See https://express-rate-limit.github.io/ERR_ERL_FORWARDED_HEADER/ for more information.\n    at Object.forwardedHeader (file:///app/node_modules/express-rate-limit/dist/index.mjs:352:13)\n    at wrappedValidations.<computed> [as forwardedHeader] (file:///app/node_modules/express-rate-limit/dist/index.mjs:651:22)\n    at Object.keyGenerator (file:///app/node_modules/express-rate-limit/dist/index.mjs:755:20)\n    at file:///app/node_modules/express-rate-limit/dist/index.mjs:815:32\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async file:///app/node_modules/express-rate-limit/dist/index.mjs:796:5 {",
+    "timestamp": "2026-03-10T05:27:22.288737Z"
+  },
+  {
+    "errorGroups": [
+      {
+        "id": "CIL3xuOZvJvk6wE"
+      }
+    ],
+    "insertId": "69afabba000466c525aacf99",
+    "labels": {
+      "instanceId": "00da6cd2c40b11165580a7a200adcc7cb58d336ae04f02dc3d6d9b21884d2a6041aba46d45965b862b948a8ab42813222aabb0fab189b47f11f7ebccbaea49745a8b98803e6c47948f7a077be6e4ac"
+    },
+    "logName": "projects/trevit/logs/run.googleapis.com%2Fstderr",
+    "receiveTimestamp": "2026-03-10T05:27:22.294494444Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "chatterbox-backend",
+        "location": "us-central1",
+        "project_id": "trevit",
+        "revision_name": "chatterbox-backend-00018-krv",
+        "service_name": "chatterbox-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "severity": "ERROR",
+    "textPayload": "ValidationError: The 'X-Forwarded-For' header is set but the Express 'trust proxy' setting is false (default). This could indicate a misconfiguration which would prevent express-rate-limit from accurately identifying users. See https://express-rate-limit.github.io/ERR_ERL_UNEXPECTED_X_FORWARDED_FOR/ for more information.\n    at Object.xForwardedForHeader (file:///app/node_modules/express-rate-limit/dist/index.mjs:337:13)\n    at wrappedValidations.<computed> [as xForwardedForHeader] (file:///app/node_modules/express-rate-limit/dist/index.mjs:651:22)\n    at Object.keyGenerator (file:///app/node_modules/express-rate-limit/dist/index.mjs:754:20)\n    at file:///app/node_modules/express-rate-limit/dist/index.mjs:815:32\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async file:///app/node_modules/express-rate-limit/dist/index.mjs:796:5 {",
+    "timestamp": "2026-03-10T05:27:22.288453Z"
+  },
+  {
+    "insertId": "69afab18000e693904346abb",
+    "labels": {
+      "instanceId": "00da6cd2c40b11165580a7a200adcc7cb58d336ae04f02dc3d6d9b21884d2a6041aba46d45965b862b948a8ab42813222aabb0fab189b47f11f7ebccbaea49745a8b98803e6c47948f7a077be6e4ac"
+    },
+    "logName": "projects/trevit/logs/run.googleapis.com%2Fstderr",
+    "receiveTimestamp": "2026-03-10T05:24:41.212762772Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "chatterbox-backend",
+        "location": "us-central1",
+        "project_id": "trevit",
+        "revision_name": "chatterbox-backend-00018-krv",
+        "service_name": "chatterbox-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "MongoDB Connection Error: Could not connect to any servers in your MongoDB Atlas cluster. One common reason is that you're trying to access the database from an IP that isn't whitelisted. Make sure your current IP address is on your Atlas cluster's IP whitelist: https://www.mongodb.com/docs/atlas/security-whitelist/",
+    "timestamp": "2026-03-10T05:24:40.944441Z"
+  },
+  {
+    "insertId": "69afa8130001c8ffcc4d645d",
+    "labels": {
+      "instanceId": "00da6cd2c41f343f4ea4e94a33e563e9815679a8d0b4060d49bcde840b810a64ae7e6651ebdff3e5fccdec7a79fc8593737ddd7a3d6c2e13e8706a7f0fa6ec32f6711e8d79e2f970f4f1d6c6feba"
+    },
+    "logName": "projects/trevit/logs/run.googleapis.com%2Fstderr",
+    "receiveTimestamp": "2026-03-10T05:11:47.121745094Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "chatterbox-backend",
+        "location": "us-central1",
+        "project_id": "trevit",
+        "revision_name": "chatterbox-backend-00017-b84",
+        "service_name": "chatterbox-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "Error fetching sessions: MongooseError: Operation `chatsessions.countDocuments()` buffering timed out after 10000ms",
+    "timestamp": "2026-03-10T05:11:47.116991Z"
+  },
+  {
+    "insertId": "69afa4da0001569d4357355c",
+    "labels": {
+      "instanceId": "00da6cd2c41f343f4ea4e94a33e563e9815679a8d0b4060d49bcde840b810a64ae7e6651ebdff3e5fccdec7a79fc8593737ddd7a3d6c2e13e8706a7f0fa6ec32f6711e8d79e2f970f4f1d6c6feba"
+    },
+    "logName": "projects/trevit/logs/run.googleapis.com%2Fstderr",
+    "receiveTimestamp": "2026-03-10T04:58:02.095522218Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "chatterbox-backend",
+        "location": "us-central1",
+        "project_id": "trevit",
+        "revision_name": "chatterbox-backend-00017-b84",
+        "service_name": "chatterbox-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "Error fetching sessions: MongooseError: Operation `chatsessions.countDocuments()` buffering timed out after 10000ms",
+    "timestamp": "2026-03-10T04:58:02.087709Z"
+  },
+  {
+    "insertId": "69afa458000a36f65c4f337d",
+    "labels": {
+      "instanceId": "00da6cd2c41f343f4ea4e94a33e563e9815679a8d0b4060d49bcde840b810a64ae7e6651ebdff3e5fccdec7a79fc8593737ddd7a3d6c2e13e8706a7f0fa6ec32f6711e8d79e2f970f4f1d6c6feba"
+    },
+    "logName": "projects/trevit/logs/run.googleapis.com%2Fstderr",
+    "receiveTimestamp": "2026-03-10T04:55:52.674331929Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "chatterbox-backend",
+        "location": "us-central1",
+        "project_id": "trevit",
+        "revision_name": "chatterbox-backend-00017-b84",
+        "service_name": "chatterbox-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "Error fetching sessions: MongooseError: Operation `chatsessions.countDocuments()` buffering timed out after 10000ms",
+    "timestamp": "2026-03-10T04:55:52.669430Z"
+  },
+  {
+    "errorGroups": [
+      {
+        "id": "CLqtlLGmx9CnYA"
+      }
+    ],
+    "insertId": "69afa1fc0005898d71c58c09",
+    "labels": {
+      "instanceId": "00da6cd2c41f343f4ea4e94a33e563e9815679a8d0b4060d49bcde840b810a64ae7e6651ebdff3e5fccdec7a79fc8593737ddd7a3d6c2e13e8706a7f0fa6ec32f6711e8d79e2f970f4f1d6c6feba"
+    },
+    "logName": "projects/trevit/logs/run.googleapis.com%2Fstderr",
+    "receiveTimestamp": "2026-03-10T04:45:48.615795136Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "chatterbox-backend",
+        "location": "us-central1",
+        "project_id": "trevit",
+        "revision_name": "chatterbox-backend-00017-b84",
+        "service_name": "chatterbox-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "severity": "ERROR",
+    "textPayload": "MongooseError: Operation `chatsessions.insertOne()` buffering timed out after 10000ms\n    at Timeout.<anonymous> (/app/node_modules/mongoose/lib/drivers/node-mongodb-native/collection.js:187:23)\n    at listOnTimeout (node:internal/timers:581:17)\n    at process.processTimers (node:internal/timers:519:7)",
+    "timestamp": "2026-03-10T04:45:48.362893Z"
+  },
+  {
+    "insertId": "69afa1f700095fb5633773f2",
+    "labels": {
+      "instanceId": "00da6cd2c41f343f4ea4e94a33e563e9815679a8d0b4060d49bcde840b810a64ae7e6651ebdff3e5fccdec7a79fc8593737ddd7a3d6c2e13e8706a7f0fa6ec32f6711e8d79e2f970f4f1d6c6feba"
+    },
+    "logName": "projects/trevit/logs/run.googleapis.com%2Fstderr",
+    "receiveTimestamp": "2026-03-10T04:45:43.621792613Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "chatterbox-backend",
+        "location": "us-central1",
+        "project_id": "trevit",
+        "revision_name": "chatterbox-backend-00017-b84",
+        "service_name": "chatterbox-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "Error fetching sessions: MongooseError: Operation `chatsessions.countDocuments()` buffering timed out after 10000ms",
+    "timestamp": "2026-03-10T04:45:43.614325Z"
+  },
+  {
+    "errorGroups": [
+      {
+        "id": "CLqtlLGmx9CnYA"
+      }
+    ],
+    "insertId": "69afa1790009b1842df096ff",
+    "labels": {
+      "instanceId": "00da6cd2c41f343f4ea4e94a33e563e9815679a8d0b4060d49bcde840b810a64ae7e6651ebdff3e5fccdec7a79fc8593737ddd7a3d6c2e13e8706a7f0fa6ec32f6711e8d79e2f970f4f1d6c6feba"
+    },
+    "logName": "projects/trevit/logs/run.googleapis.com%2Fstderr",
+    "receiveTimestamp": "2026-03-10T04:43:37.790213341Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "chatterbox-backend",
+        "location": "us-central1",
+        "project_id": "trevit",
+        "revision_name": "chatterbox-backend-00017-b84",
+        "service_name": "chatterbox-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "severity": "ERROR",
+    "textPayload": "MongooseError: Operation `chatsessions.insertOne()` buffering timed out after 10000ms\n    at Timeout.<anonymous> (/app/node_modules/mongoose/lib/drivers/node-mongodb-native/collection.js:187:23)\n    at listOnTimeout (node:internal/timers:581:17)\n    at process.processTimers (node:internal/timers:519:7)",
+    "timestamp": "2026-03-10T04:43:37.635268Z"
+  },
+  {
+    "insertId": "69afa1750006f43b2d39ff84",
+    "labels": {
+      "instanceId": "00da6cd2c41f343f4ea4e94a33e563e9815679a8d0b4060d49bcde840b810a64ae7e6651ebdff3e5fccdec7a79fc8593737ddd7a3d6c2e13e8706a7f0fa6ec32f6711e8d79e2f970f4f1d6c6feba"
+    },
+    "logName": "projects/trevit/logs/run.googleapis.com%2Fstderr",
+    "receiveTimestamp": "2026-03-10T04:43:33.462654981Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "chatterbox-backend",
+        "location": "us-central1",
+        "project_id": "trevit",
+        "revision_name": "chatterbox-backend-00017-b84",
+        "service_name": "chatterbox-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "Error fetching sessions: MongooseError: Operation `chatsessions.countDocuments()` buffering timed out after 10000ms",
+    "timestamp": "2026-03-10T04:43:33.455739Z"
+  },
+  {
+    "errorGroups": [
+      {
+        "id": "CLqtlLGmx9CnYA"
+      }
+    ],
+    "insertId": "69afa160000e5348da1cbed9",
+    "labels": {
+      "instanceId": "00da6cd2c41f343f4ea4e94a33e563e9815679a8d0b4060d49bcde840b810a64ae7e6651ebdff3e5fccdec7a79fc8593737ddd7a3d6c2e13e8706a7f0fa6ec32f6711e8d79e2f970f4f1d6c6feba"
+    },
+    "logName": "projects/trevit/logs/run.googleapis.com%2Fstderr",
+    "receiveTimestamp": "2026-03-10T04:43:12.945823846Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "chatterbox-backend",
+        "location": "us-central1",
+        "project_id": "trevit",
+        "revision_name": "chatterbox-backend-00017-b84",
+        "service_name": "chatterbox-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "severity": "ERROR",
+    "textPayload": "MongooseError: Operation `chatsessions.insertOne()` buffering timed out after 10000ms\n    at Timeout.<anonymous> (/app/node_modules/mongoose/lib/drivers/node-mongodb-native/collection.js:187:23)\n    at listOnTimeout (node:internal/timers:581:17)\n    at process.processTimers (node:internal/timers:519:7)",
+    "timestamp": "2026-03-10T04:43:12.938824Z"
+  },
+  {
+    "insertId": "69afa1510003fe6ec2e89cfa",
+    "labels": {
+      "instanceId": "00da6cd2c41f343f4ea4e94a33e563e9815679a8d0b4060d49bcde840b810a64ae7e6651ebdff3e5fccdec7a79fc8593737ddd7a3d6c2e13e8706a7f0fa6ec32f6711e8d79e2f970f4f1d6c6feba"
+    },
+    "logName": "projects/trevit/logs/run.googleapis.com%2Fstderr",
+    "receiveTimestamp": "2026-03-10T04:42:57.268285830Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "chatterbox-backend",
+        "location": "us-central1",
+        "project_id": "trevit",
+        "revision_name": "chatterbox-backend-00017-b84",
+        "service_name": "chatterbox-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "Error fetching sessions: MongooseError: Operation `chatsessions.countDocuments()` buffering timed out after 10000ms",
+    "timestamp": "2026-03-10T04:42:57.261742Z"
+  },
+  {
+    "insertId": "69afa121000e8d13d13e757a",
+    "labels": {
+      "instanceId": "00da6cd2c41f343f4ea4e94a33e563e9815679a8d0b4060d49bcde840b810a64ae7e6651ebdff3e5fccdec7a79fc8593737ddd7a3d6c2e13e8706a7f0fa6ec32f6711e8d79e2f970f4f1d6c6feba"
+    },
+    "logName": "projects/trevit/logs/run.googleapis.com%2Fstderr",
+    "receiveTimestamp": "2026-03-10T04:42:10.101887622Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "chatterbox-backend",
+        "location": "us-central1",
+        "project_id": "trevit",
+        "revision_name": "chatterbox-backend-00017-b84",
+        "service_name": "chatterbox-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "MongoDB Connection Error: Could not connect to any servers in your MongoDB Atlas cluster. One common reason is that you're trying to access the database from an IP that isn't whitelisted. Make sure your current IP address is on your Atlas cluster's IP whitelist: https://www.mongodb.com/docs/atlas/security-whitelist/",
+    "timestamp": "2026-03-10T04:42:09.953619Z"
+  },
+  {
+    "errorGroups": [
+      {
+        "id": "CIL3xuOZvJvk6wE"
+      }
+    ],
+    "insertId": "69afa1150005f29098187d6a",
+    "labels": {
+      "instanceId": "00da6cd2c41f343f4ea4e94a33e563e9815679a8d0b4060d49bcde840b810a64ae7e6651ebdff3e5fccdec7a79fc8593737ddd7a3d6c2e13e8706a7f0fa6ec32f6711e8d79e2f970f4f1d6c6feba"
+    },
+    "logName": "projects/trevit/logs/run.googleapis.com%2Fstderr",
+    "receiveTimestamp": "2026-03-10T04:41:57.446202631Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "chatterbox-backend",
+        "location": "us-central1",
+        "project_id": "trevit",
+        "revision_name": "chatterbox-backend-00017-b84",
+        "service_name": "chatterbox-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "severity": "ERROR",
+    "textPayload": "ValidationError: The 'Forwarded' header (standardized X-Forwarded-For) is set but currently being ignored. Add a custom keyGenerator to use a value from this header. See https://express-rate-limit.github.io/ERR_ERL_FORWARDED_HEADER/ for more information.\n    at Object.forwardedHeader (file:///app/node_modules/express-rate-limit/dist/index.mjs:352:13)\n    at wrappedValidations.<computed> [as forwardedHeader] (file:///app/node_modules/express-rate-limit/dist/index.mjs:651:22)\n    at Object.keyGenerator (file:///app/node_modules/express-rate-limit/dist/index.mjs:755:20)\n    at file:///app/node_modules/express-rate-limit/dist/index.mjs:815:32\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async file:///app/node_modules/express-rate-limit/dist/index.mjs:796:5 {",
+    "timestamp": "2026-03-10T04:41:57.389776Z"
+  },
+  {
+    "errorGroups": [
+      {
+        "id": "CIL3xuOZvJvk6wE"
+      }
+    ],
+    "insertId": "69afa1150005ef5b49b42b62",
+    "labels": {
+      "instanceId": "00da6cd2c41f343f4ea4e94a33e563e9815679a8d0b4060d49bcde840b810a64ae7e6651ebdff3e5fccdec7a79fc8593737ddd7a3d6c2e13e8706a7f0fa6ec32f6711e8d79e2f970f4f1d6c6feba"
+    },
+    "logName": "projects/trevit/logs/run.googleapis.com%2Fstderr",
+    "receiveTimestamp": "2026-03-10T04:41:57.446202631Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "chatterbox-backend",
+        "location": "us-central1",
+        "project_id": "trevit",
+        "revision_name": "chatterbox-backend-00017-b84",
+        "service_name": "chatterbox-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "severity": "ERROR",
+    "textPayload": "ValidationError: The 'X-Forwarded-For' header is set but the Express 'trust proxy' setting is false (default). This could indicate a misconfiguration which would prevent express-rate-limit from accurately identifying users. See https://express-rate-limit.github.io/ERR_ERL_UNEXPECTED_X_FORWARDED_FOR/ for more information.\n    at Object.xForwardedForHeader (file:///app/node_modules/express-rate-limit/dist/index.mjs:337:13)\n    at wrappedValidations.<computed> [as xForwardedForHeader] (file:///app/node_modules/express-rate-limit/dist/index.mjs:651:22)\n    at Object.keyGenerator (file:///app/node_modules/express-rate-limit/dist/index.mjs:754:20)\n    at file:///app/node_modules/express-rate-limit/dist/index.mjs:815:32\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async file:///app/node_modules/express-rate-limit/dist/index.mjs:796:5 {",
+    "timestamp": "2026-03-10T04:41:57.388955Z"
+  },
+  {
+    "insertId": "69af9fab000a57329b7128b3",
+    "labels": {
+      "instanceId": "00da6cd2c4fc1560eb85d8b288f1737bb1b82b205a16ab836a8e41e20dd26320bd8ee3983321af99ec993bf2a7d17c470a83d02e4004cd9180ff5de59574755efe430da383e8b8b25c1427c9f48644"
+    },
+    "logName": "projects/trevit/logs/run.googleapis.com%2Fstderr",
+    "receiveTimestamp": "2026-03-10T04:35:55.776545609Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "chatterbox-backend",
+        "location": "us-central1",
+        "project_id": "trevit",
+        "revision_name": "chatterbox-backend-00016-mkl",
+        "service_name": "chatterbox-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "  errorDetails: undefined",
+    "timestamp": "2026-03-10T04:35:55.677682Z"
+  },
+  {
+    "insertId": "69af9fab000a56ec10c60630",
+    "labels": {
+      "instanceId": "00da6cd2c4fc1560eb85d8b288f1737bb1b82b205a16ab836a8e41e20dd26320bd8ee3983321af99ec993bf2a7d17c470a83d02e4004cd9180ff5de59574755efe430da383e8b8b25c1427c9f48644"
+    },
+    "logName": "projects/trevit/logs/run.googleapis.com%2Fstderr",
+    "receiveTimestamp": "2026-03-10T04:35:55.776545609Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "chatterbox-backend",
+        "location": "us-central1",
+        "project_id": "trevit",
+        "revision_name": "chatterbox-backend-00016-mkl",
+        "service_name": "chatterbox-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "Error generating embedding: GoogleGenerativeAIFetchError: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent: [404 Not Found] models/text-embedding-004 is not found for API version v1beta, or is not supported for embedContent. Call ListModels to see the list of available models and their supported methods.",
+    "timestamp": "2026-03-10T04:35:55.677612Z"
+  },
+  {
+    "insertId": "69af9fab0009adabe8101a22",
+    "labels": {
+      "instanceId": "00da6cd2c4fc1560eb85d8b288f1737bb1b82b205a16ab836a8e41e20dd26320bd8ee3983321af99ec993bf2a7d17c470a83d02e4004cd9180ff5de59574755efe430da383e8b8b25c1427c9f48644"
+    },
+    "logName": "projects/trevit/logs/run.googleapis.com%2Fstderr",
+    "receiveTimestamp": "2026-03-10T04:35:55.776545609Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "chatterbox-backend",
+        "location": "us-central1",
+        "project_id": "trevit",
+        "revision_name": "chatterbox-backend-00016-mkl",
+        "service_name": "chatterbox-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "  errorDetails: undefined",
+    "timestamp": "2026-03-10T04:35:55.634283Z"
+  },
+  {
+    "insertId": "69af9fab0009ad575699d0d1",
+    "labels": {
+      "instanceId": "00da6cd2c4fc1560eb85d8b288f1737bb1b82b205a16ab836a8e41e20dd26320bd8ee3983321af99ec993bf2a7d17c470a83d02e4004cd9180ff5de59574755efe430da383e8b8b25c1427c9f48644"
+    },
+    "logName": "projects/trevit/logs/run.googleapis.com%2Fstderr",
+    "receiveTimestamp": "2026-03-10T04:35:55.776545609Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "chatterbox-backend",
+        "location": "us-central1",
+        "project_id": "trevit",
+        "revision_name": "chatterbox-backend-00016-mkl",
+        "service_name": "chatterbox-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "Error generating embedding: GoogleGenerativeAIFetchError: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent: [404 Not Found] models/text-embedding-004 is not found for API version v1beta, or is not supported for embedContent. Call ListModels to see the list of available models and their supported methods.",
+    "timestamp": "2026-03-10T04:35:55.634199Z"
+  }
+]

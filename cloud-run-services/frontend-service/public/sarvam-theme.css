@@ -892,6 +892,40 @@ pre {
 
 
 
+/* ── Theme Picker / Mode Segment Base Styles ── */
+.theme-picker {
+    display: flex;
+    gap: 14px;
+    margin-top: 6px;
+}
+
+.mode-segment {
+    display: flex;
+    margin-top: 8px;
+    width: fit-content;
+    background: rgba(128, 128, 128, 0.12);
+    border: 1px solid rgba(128, 128, 128, 0.2);
+    border-radius: 9999px;
+    padding: 4px;
+    gap: 4px;
+}
+
+.mode-seg-btn {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 22px;
+    border: none;
+    border-radius: 9999px;
+    background: transparent;
+    font-size: 0.88rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    outline: none;
+    color: var(--sarvam-text-secondary);
+}
+
 .mode-seg-btn i {
     font-size: 1.05rem;
 }

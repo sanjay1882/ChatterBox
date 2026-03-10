@@ -1,0 +1,478 @@
+﻿[
+  {
+    "insertId": "69afada8000c59c8c8a50305",
+    "labels": {
+      "instanceId": "00da6cd2c40b11165580a7a200adcc7cb58d336ae04f02dc3d6d9b21884d2a6041aba46d45965b862b948a8ab42813222aabb0fab189b47f11f7ebccbaea49745a8b98803e6c47948f7a077be6e4ac"
+    },
+    "logName": "projects/trevit/logs/run.googleapis.com%2Fstderr",
+    "receiveTimestamp": "2026-03-10T05:35:36.814874811Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "chatterbox-backend",
+        "location": "us-central1",
+        "project_id": "trevit",
+        "revision_name": "chatterbox-backend-00018-krv",
+        "service_name": "chatterbox-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "    at process.processTimers (node:internal/timers:519:7)",
+    "timestamp": "2026-03-10T05:35:36.809416Z"
+  },
+  {
+    "insertId": "69afada8000c59c36ea73989",
+    "labels": {
+      "instanceId": "00da6cd2c40b11165580a7a200adcc7cb58d336ae04f02dc3d6d9b21884d2a6041aba46d45965b862b948a8ab42813222aabb0fab189b47f11f7ebccbaea49745a8b98803e6c47948f7a077be6e4ac"
+    },
+    "logName": "projects/trevit/logs/run.googleapis.com%2Fstderr",
+    "receiveTimestamp": "2026-03-10T05:35:36.814874811Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "chatterbox-backend",
+        "location": "us-central1",
+        "project_id": "trevit",
+        "revision_name": "chatterbox-backend-00018-krv",
+        "service_name": "chatterbox-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "    at listOnTimeout (node:internal/timers:581:17)",
+    "timestamp": "2026-03-10T05:35:36.809411Z"
+  },
+  {
+    "insertId": "69afada8000c59bf58e3ece6",
+    "labels": {
+      "instanceId": "00da6cd2c40b11165580a7a200adcc7cb58d336ae04f02dc3d6d9b21884d2a6041aba46d45965b862b948a8ab42813222aabb0fab189b47f11f7ebccbaea49745a8b98803e6c47948f7a077be6e4ac"
+    },
+    "logName": "projects/trevit/logs/run.googleapis.com%2Fstderr",
+    "receiveTimestamp": "2026-03-10T05:35:36.814874811Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "chatterbox-backend",
+        "location": "us-central1",
+        "project_id": "trevit",
+        "revision_name": "chatterbox-backend-00018-krv",
+        "service_name": "chatterbox-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "    at Timeout.<anonymous> (/app/node_modules/mongoose/lib/drivers/node-mongodb-native/collection.js:187:23)",
+    "timestamp": "2026-03-10T05:35:36.809407Z"
+  },
+  {
+    "insertId": "69afada8000c59a5403e1779",
+    "labels": {
+      "instanceId": "00da6cd2c40b11165580a7a200adcc7cb58d336ae04f02dc3d6d9b21884d2a6041aba46d45965b862b948a8ab42813222aabb0fab189b47f11f7ebccbaea49745a8b98803e6c47948f7a077be6e4ac"
+    },
+    "logName": "projects/trevit/logs/run.googleapis.com%2Fstderr",
+    "receiveTimestamp": "2026-03-10T05:35:36.814874811Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "chatterbox-backend",
+        "location": "us-central1",
+        "project_id": "trevit",
+        "revision_name": "chatterbox-backend-00018-krv",
+        "service_name": "chatterbox-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "Error fetching sessions: MongooseError: Operation `chatsessions.countDocuments()` buffering timed out after 10000ms",
+    "timestamp": "2026-03-10T05:35:36.809381Z"
+  },
+  {
+    "insertId": "69afad9e000bef6d68390cdd",
+    "labels": {
+      "instanceId": "00da6cd2c40b11165580a7a200adcc7cb58d336ae04f02dc3d6d9b21884d2a6041aba46d45965b862b948a8ab42813222aabb0fab189b47f11f7ebccbaea49745a8b98803e6c47948f7a077be6e4ac"
+    },
+    "logName": "projects/trevit/logs/run.googleapis.com%2Fstdout",
+    "receiveTimestamp": "2026-03-10T05:35:26.852702576Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "chatterbox-backend",
+        "location": "us-central1",
+        "project_id": "trevit",
+        "revision_name": "chatterbox-backend-00018-krv",
+        "service_name": "chatterbox-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "Origin: https://treevit.web.app",
+    "timestamp": "2026-03-10T05:35:26.782189Z"
+  },
+  {
+    "insertId": "69afad9e000bef5da2c8bf36",
+    "labels": {
+      "instanceId": "00da6cd2c40b11165580a7a200adcc7cb58d336ae04f02dc3d6d9b21884d2a6041aba46d45965b862b948a8ab42813222aabb0fab189b47f11f7ebccbaea49745a8b98803e6c47948f7a077be6e4ac"
+    },
+    "logName": "projects/trevit/logs/run.googleapis.com%2Fstdout",
+    "receiveTimestamp": "2026-03-10T05:35:26.852702576Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "chatterbox-backend",
+        "location": "us-central1",
+        "project_id": "trevit",
+        "revision_name": "chatterbox-backend-00018-krv",
+        "service_name": "chatterbox-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "Incoming GET /sessions/sanjayrajums@gmail.com",
+    "timestamp": "2026-03-10T05:35:26.782173Z"
+  },
+  {
+    "httpRequest": {
+      "latency": "10.295524122s",
+      "protocol": "HTTP/1.1",
+      "referer": "https://treevit.web.app/",
+      "remoteIp": "2401:4900:caca:8ef9:5013:8d58:9958:1046",
+      "requestMethod": "GET",
+      "requestSize": "1998",
+      "requestUrl": "https://chatterbox-backend-3tlejwqmcq-uc.a.run.app/sessions/sanjayrajums@gmail.com?page=1&limit=20",
+      "responseSize": "1097",
+      "serverIp": "2600:1900:4244:200::",
+      "status": 500,
+      "userAgent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Mobile Safari/537.36"
+    },
+    "insertId": "69afada8000c5ecbf9c931fc",
+    "labels": {
+      "instanceId": "00da6cd2c40b11165580a7a200adcc7cb58d336ae04f02dc3d6d9b21884d2a6041aba46d45965b862b948a8ab42813222aabb0fab189b47f11f7ebccbaea49745a8b98803e6c47948f7a077be6e4ac"
+    },
+    "logName": "projects/trevit/logs/run.googleapis.com%2Frequests",
+    "receiveTimestamp": "2026-03-10T05:35:36.906621212Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "chatterbox-backend",
+        "location": "us-central1",
+        "project_id": "trevit",
+        "revision_name": "chatterbox-backend-00018-krv",
+        "service_name": "chatterbox-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "severity": "ERROR",
+    "spanId": "daf740f30e689b68",
+    "timestamp": "2026-03-10T05:35:26.513625Z",
+    "trace": "projects/trevit/traces/14705e40c0d6a0953e7f44d3983d050e"
+  },
+  {
+    "insertId": "69afad9e0007d2a7d1c62835",
+    "labels": {
+      "instanceId": "00da6cd2c40b11165580a7a200adcc7cb58d336ae04f02dc3d6d9b21884d2a6041aba46d45965b862b948a8ab42813222aabb0fab189b47f11f7ebccbaea49745a8b98803e6c47948f7a077be6e4ac"
+    },
+    "logName": "projects/trevit/logs/run.googleapis.com%2Fstdout",
+    "receiveTimestamp": "2026-03-10T05:35:26.517607227Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "chatterbox-backend",
+        "location": "us-central1",
+        "project_id": "trevit",
+        "revision_name": "chatterbox-backend-00018-krv",
+        "service_name": "chatterbox-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "Origin: https://treevit.web.app",
+    "timestamp": "2026-03-10T05:35:26.512679Z"
+  },
+  {
+    "insertId": "69afad9e0007d293919bae68",
+    "labels": {
+      "instanceId": "00da6cd2c40b11165580a7a200adcc7cb58d336ae04f02dc3d6d9b21884d2a6041aba46d45965b862b948a8ab42813222aabb0fab189b47f11f7ebccbaea49745a8b98803e6c47948f7a077be6e4ac"
+    },
+    "logName": "projects/trevit/logs/run.googleapis.com%2Fstdout",
+    "receiveTimestamp": "2026-03-10T05:35:26.517607227Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "chatterbox-backend",
+        "location": "us-central1",
+        "project_id": "trevit",
+        "revision_name": "chatterbox-backend-00018-krv",
+        "service_name": "chatterbox-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "Incoming GET /credits/sanjayrajums@gmail.com",
+    "timestamp": "2026-03-10T05:35:26.512659Z"
+  },
+  {
+    "httpRequest": {
+      "latency": "0.303530761s",
+      "protocol": "HTTP/1.1",
+      "referer": "https://treevit.web.app/",
+      "remoteIp": "2401:4900:caca:8ef9:5013:8d58:9958:1046",
+      "requestMethod": "GET",
+      "requestSize": "2001",
+      "requestUrl": "https://chatterbox-backend-3tlejwqmcq-uc.a.run.app/credits/sanjayrajums%40gmail.com",
+      "responseSize": "913",
+      "serverIp": "2600:1900:4244:200::",
+      "status": 304,
+      "userAgent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Mobile Safari/537.36"
+    },
+    "insertId": "69afad9e000c5c62fcf8850e",
+    "labels": {
+      "instanceId": "00da6cd2c40b11165580a7a200adcc7cb58d336ae04f02dc3d6d9b21884d2a6041aba46d45965b862b948a8ab42813222aabb0fab189b47f11f7ebccbaea49745a8b98803e6c47948f7a077be6e4ac"
+    },
+    "logName": "projects/trevit/logs/run.googleapis.com%2Frequests",
+    "receiveTimestamp": "2026-03-10T05:35:26.917426578Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "chatterbox-backend",
+        "location": "us-central1",
+        "project_id": "trevit",
+        "revision_name": "chatterbox-backend-00018-krv",
+        "service_name": "chatterbox-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "severity": "INFO",
+    "spanId": "6e23917236155681",
+    "timestamp": "2026-03-10T05:35:26.505095Z",
+    "trace": "projects/trevit/traces/bb434e40241dd47c3e7f44d3983d0a06"
+  },
+  {
+    "httpRequest": {
+      "latency": "0.004543500s",
+      "protocol": "HTTP/1.1",
+      "referer": "https://treevit.web.app/",
+      "remoteIp": "2401:4900:caca:8ef9:5013:8d58:9958:1046",
+      "requestMethod": "OPTIONS",
+      "requestSize": "775",
+      "requestUrl": "https://chatterbox-backend-3tlejwqmcq-uc.a.run.app/credits/sanjayrajums%40gmail.com",
+      "responseSize": "1001",
+      "serverIp": "2600:1900:4244:200::",
+      "status": 204,
+      "userAgent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Mobile Safari/537.36"
+    },
+    "insertId": "69afad9c000ded64ab1658cc",
+    "labels": {
+      "instanceId": "00da6cd2c40b11165580a7a200adcc7cb58d336ae04f02dc3d6d9b21884d2a6041aba46d45965b862b948a8ab42813222aabb0fab189b47f11f7ebccbaea49745a8b98803e6c47948f7a077be6e4ac"
+    },
+    "logName": "projects/trevit/logs/run.googleapis.com%2Frequests",
+    "receiveTimestamp": "2026-03-10T05:35:24.918319148Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "chatterbox-backend",
+        "location": "us-central1",
+        "project_id": "trevit",
+        "revision_name": "chatterbox-backend-00018-krv",
+        "service_name": "chatterbox-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "severity": "INFO",
+    "spanId": "e86889f49f7cb871",
+    "timestamp": "2026-03-10T05:35:24.906824Z",
+    "trace": "projects/trevit/traces/587b45a03cbfefa23e7f44d3983d0945"
+  },
+  {
+    "httpRequest": {
+      "latency": "0.007021649s",
+      "protocol": "HTTP/1.1",
+      "referer": "https://treevit.web.app/",
+      "remoteIp": "2401:4900:caca:8ef9:5013:8d58:9958:1046",
+      "requestMethod": "OPTIONS",
+      "requestSize": "803",
+      "requestUrl": "https://chatterbox-backend-3tlejwqmcq-uc.a.run.app/sessions/sanjayrajums@gmail.com?page=1&limit=20",
+      "responseSize": "1001",
+      "serverIp": "2600:1900:4244:200::",
+      "status": 204,
+      "userAgent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Mobile Safari/537.36"
+    },
+    "insertId": "69afad9c000df716d275d41b",
+    "labels": {
+      "instanceId": "00da6cd2c40b11165580a7a200adcc7cb58d336ae04f02dc3d6d9b21884d2a6041aba46d45965b862b948a8ab42813222aabb0fab189b47f11f7ebccbaea49745a8b98803e6c47948f7a077be6e4ac"
+    },
+    "logName": "projects/trevit/logs/run.googleapis.com%2Frequests",
+    "receiveTimestamp": "2026-03-10T05:35:25.253720295Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "chatterbox-backend",
+        "location": "us-central1",
+        "project_id": "trevit",
+        "revision_name": "chatterbox-backend-00018-krv",
+        "service_name": "chatterbox-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "severity": "INFO",
+    "spanId": "340dd2ba6b4e8291",
+    "timestamp": "2026-03-10T05:35:24.906471Z",
+    "trace": "projects/trevit/traces/fd870aa0bf321cb73e7f44d3983d02a6",
+    "traceSampled": true
+  },
+  {
+    "insertId": "69afacbc0009e91e94053a28",
+    "labels": {
+      "instanceId": "00da6cd2c40b11165580a7a200adcc7cb58d336ae04f02dc3d6d9b21884d2a6041aba46d45965b862b948a8ab42813222aabb0fab189b47f11f7ebccbaea49745a8b98803e6c47948f7a077be6e4ac"
+    },
+    "logName": "projects/trevit/logs/run.googleapis.com%2Fstdout",
+    "receiveTimestamp": "2026-03-10T05:31:40.658555346Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "chatterbox-backend",
+        "location": "us-central1",
+        "project_id": "trevit",
+        "revision_name": "chatterbox-backend-00018-krv",
+        "service_name": "chatterbox-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "Origin: undefined",
+    "timestamp": "2026-03-10T05:31:40.649502Z"
+  },
+  {
+    "insertId": "69afacbc0009e8f9a476cb88",
+    "labels": {
+      "instanceId": "00da6cd2c40b11165580a7a200adcc7cb58d336ae04f02dc3d6d9b21884d2a6041aba46d45965b862b948a8ab42813222aabb0fab189b47f11f7ebccbaea49745a8b98803e6c47948f7a077be6e4ac"
+    },
+    "logName": "projects/trevit/logs/run.googleapis.com%2Fstdout",
+    "receiveTimestamp": "2026-03-10T05:31:40.658555346Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "chatterbox-backend",
+        "location": "us-central1",
+        "project_id": "trevit",
+        "revision_name": "chatterbox-backend-00018-krv",
+        "service_name": "chatterbox-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "Incoming GET /sessions/sanjayrajums@gmail.com",
+    "timestamp": "2026-03-10T05:31:40.649465Z"
+  },
+  {
+    "httpRequest": {
+      "latency": "0.006148081s",
+      "protocol": "HTTP/1.1",
+      "remoteIp": "2401:4900:caca:8ef9:5013:8d58:9958:1046",
+      "requestMethod": "GET",
+      "requestSize": "364",
+      "requestUrl": "https://chatterbox-backend-3tlejwqmcq-uc.a.run.app/sessions/sanjayrajums@gmail.com",
+      "responseSize": "965",
+      "serverIp": "2600:1900:4245:200::",
+      "status": 401,
+      "userAgent": "Mozilla/5.0 (Windows NT; Windows NT 10.0; en-IN) WindowsPowerShell/5.1.26100.7705"
+    },
+    "insertId": "69afacbc0009f301fb355554",
+    "labels": {
+      "instanceId": "00da6cd2c40b11165580a7a200adcc7cb58d336ae04f02dc3d6d9b21884d2a6041aba46d45965b862b948a8ab42813222aabb0fab189b47f11f7ebccbaea49745a8b98803e6c47948f7a077be6e4ac"
+    },
+    "logName": "projects/trevit/logs/run.googleapis.com%2Frequests",
+    "receiveTimestamp": "2026-03-10T05:31:40.659705039Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "chatterbox-backend",
+        "location": "us-central1",
+        "project_id": "trevit",
+        "revision_name": "chatterbox-backend-00018-krv",
+        "service_name": "chatterbox-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "severity": "WARNING",
+    "spanId": "69e0420c9254f1ba",
+    "timestamp": "2026-03-10T05:31:40.643976Z",
+    "trace": "projects/trevit/traces/1b4f4428c4ecdfc7542e477d2837b924",
+    "traceSampled": true
+  },
+  {
+    "insertId": "69afabba0004797436901e53",
+    "labels": {
+      "instanceId": "00da6cd2c40b11165580a7a200adcc7cb58d336ae04f02dc3d6d9b21884d2a6041aba46d45965b862b948a8ab42813222aabb0fab189b47f11f7ebccbaea49745a8b98803e6c47948f7a077be6e4ac"
+    },
+    "logName": "projects/trevit/logs/run.googleapis.com%2Fstdout",
+    "receiveTimestamp": "2026-03-10T05:27:22.301026785Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "chatterbox-backend",
+        "location": "us-central1",
+        "project_id": "trevit",
+        "revision_name": "chatterbox-backend-00018-krv",
+        "service_name": "chatterbox-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "Origin: undefined",
+    "timestamp": "2026-03-10T05:27:22.293236Z"
+  },
+  {
+    "insertId": "69afabba0004795f0eb5b8f4",
+    "labels": {
+      "instanceId": "00da6cd2c40b11165580a7a200adcc7cb58d336ae04f02dc3d6d9b21884d2a6041aba46d45965b862b948a8ab42813222aabb0fab189b47f11f7ebccbaea49745a8b98803e6c47948f7a077be6e4ac"
+    },
+    "logName": "projects/trevit/logs/run.googleapis.com%2Fstdout",
+    "receiveTimestamp": "2026-03-10T05:27:22.301026785Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "chatterbox-backend",
+        "location": "us-central1",
+        "project_id": "trevit",
+        "revision_name": "chatterbox-backend-00018-krv",
+        "service_name": "chatterbox-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "Incoming GET /",
+    "timestamp": "2026-03-10T05:27:22.293215Z"
+  },
+  {
+    "insertId": "69afabba000467eab2d02d89",
+    "labels": {
+      "instanceId": "00da6cd2c40b11165580a7a200adcc7cb58d336ae04f02dc3d6d9b21884d2a6041aba46d45965b862b948a8ab42813222aabb0fab189b47f11f7ebccbaea49745a8b98803e6c47948f7a077be6e4ac"
+    },
+    "logName": "projects/trevit/logs/run.googleapis.com%2Fstderr",
+    "receiveTimestamp": "2026-03-10T05:27:22.628236645Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "chatterbox-backend",
+        "location": "us-central1",
+        "project_id": "trevit",
+        "revision_name": "chatterbox-backend-00018-krv",
+        "service_name": "chatterbox-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "}",
+    "timestamp": "2026-03-10T05:27:22.288746Z"
+  },
+  {
+    "insertId": "69afabba000467e7a2ee2024",
+    "labels": {
+      "instanceId": "00da6cd2c40b11165580a7a200adcc7cb58d336ae04f02dc3d6d9b21884d2a6041aba46d45965b862b948a8ab42813222aabb0fab189b47f11f7ebccbaea49745a8b98803e6c47948f7a077be6e4ac"
+    },
+    "logName": "projects/trevit/logs/run.googleapis.com%2Fstderr",
+    "receiveTimestamp": "2026-03-10T05:27:22.628236645Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "chatterbox-backend",
+        "location": "us-central1",
+        "project_id": "trevit",
+        "revision_name": "chatterbox-backend-00018-krv",
+        "service_name": "chatterbox-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "  help: 'https://express-rate-limit.github.io/ERR_ERL_FORWARDED_HEADER/'",
+    "timestamp": "2026-03-10T05:27:22.288743Z"
+  },
+  {
+    "insertId": "69afabba000467e481c3d6df",
+    "labels": {
+      "instanceId": "00da6cd2c40b11165580a7a200adcc7cb58d336ae04f02dc3d6d9b21884d2a6041aba46d45965b862b948a8ab42813222aabb0fab189b47f11f7ebccbaea49745a8b98803e6c47948f7a077be6e4ac"
+    },
+    "logName": "projects/trevit/logs/run.googleapis.com%2Fstderr",
+    "receiveTimestamp": "2026-03-10T05:27:22.628236645Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "chatterbox-backend",
+        "location": "us-central1",
+        "project_id": "trevit",
+        "revision_name": "chatterbox-backend-00018-krv",
+        "service_name": "chatterbox-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "  code: 'ERR_ERL_FORWARDED_HEADER',",
+    "timestamp": "2026-03-10T05:27:22.288740Z"
+  }
+]

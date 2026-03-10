@@ -1,0 +1,373 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=Instrument+Serif:ital@0;1&display=swap');
+
+/* ═══════════════════════════════════════════════════════════
+   AUTH / LOGIN STYLES  — scoped to .auth-root
+   All rules here are prefixed so they don't clash with the
+   app's global index.css (which sets dark bg, overflow:hidden,
+   and its own .btn-primary / .divider / input rules).
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Root wrapper: reset body-level overrides ─────────── */
+.auth-root {
+  min-height: 100dvh;
+  width: 100vw;          /* ← was 100%, change to 100vw */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #FFFFFF;
+  padding: 24px 20px;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  color: #141414;
+  overflow-y: auto !important;
+  position: fixed;       /* ← add this */
+  inset: 0;              /* ← add this (top/right/bottom/left: 0) */
+  z-index: 999;          /* ← add this so it sits above the app shell */
+}
+
+/* ── Page wrapper ─────────────────────────────────────── */
+.auth-root .auth-page {
+  width: 100%;
+  max-width: 390px;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+}
+
+.auth-root .auth-page.active {
+  display: flex;
+}
+
+/* ── Logo ─────────────────────────────────────────────── */
+.auth-root .auth-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.auth-root .auth-logo span {
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-size: 22px;
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  color: #141414;
+}
+
+/* ── Headings ─────────────────────────────────────────── */
+.auth-root .auth-title {
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-size: 28px;
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  color: #141414;
+  text-align: center;
+  margin-bottom: 6px;
+  line-height: 1.2;
+}
+
+.auth-root .auth-sub {
+  font-size: 14px;
+  color: #757575;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+/* ── Form ─────────────────────────────────────────────── */
+.auth-root .auth-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Field with label above */
+.auth-root .field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 100%;
+}
+
+.auth-root .field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #3D3D3D;
+  letter-spacing: 0.01em;
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* Override index.css dark-theme input rules */
+.auth-root .field input {
+  width: 100%;
+  padding: 11px 14px !important;
+  border: 1.5px solid #E0DEDB !important;
+  border-radius: 8px !important;
+  font-family: 'DM Sans', sans-serif !important;
+  font-size: 14px !important;
+  background: #FFFFFF !important;
+  color: #141414 !important;
+  outline: none !important;
+  box-shadow: none !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.auth-root .field input::placeholder {
+  color: #BFBDBA !important;
+}
+
+.auth-root .field input:focus {
+  border-color: #141414 !important;
+  box-shadow: 0 0 0 3px rgba(20, 20, 20, 0.07) !important;
+}
+
+/* First + Last name side-by-side */
+.auth-root .field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  width: 100%;
+}
+
+/* ── Primary button — override index.css accent color ─── */
+.auth-root .btn-primary {
+  width: 100%;
+  padding: 13px !important;
+  border: none !important;
+  border-radius: 8px !important;
+  background: #141414 !important;
+  color: #FFFFFF !important;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 2px;
+  transition: background 0.2s, opacity 0.2s;
+  box-shadow: none !important;
+  display: block;
+  text-align: center;
+}
+
+.auth-root .btn-primary:hover {
+  background: #2A2A2A !important;
+  box-shadow: none !important;
+}
+
+.auth-root .btn-primary:active {
+  opacity: 0.9;
+}
+
+/* ── Divider — override index.css .divider (height:1px) ─ */
+.auth-root .divider {
+  display: flex !important;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin: 18px 0 14px;
+  color: #BFBDBA;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  height: auto !important;
+  background: transparent !important;
+}
+
+.auth-root .divider::before,
+.auth-root .divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #EDEAE5;
+}
+
+/* ── Social buttons ───────────────────────────────────── */
+.auth-root .social-btns {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.auth-root .btn-social {
+  width: 100%;
+  padding: 11px 16px;
+  border: 1.5px solid #E0DEDB;
+  border-radius: 8px;
+  background: #FFFFFF;
+  color: #141414;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.auth-root .btn-social:hover {
+  background: #F5F4F0;
+  border-color: #C4C2BE;
+}
+
+.auth-root .btn-social i {
+  font-size: 17px;
+  color: #555;
+}
+
+/* ── Switch row ───────────────────────────────────────── */
+.auth-root .auth-switch {
+  margin-top: 20px;
+  font-size: 13.5px;
+  color: #757575;
+  text-align: center;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.auth-root .link-btn {
+  background: none;
+  border: none;
+  color: #141414;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.auth-root .link-btn:hover {
+  color: #3B3B98;
+}
+
+/* ── Message div ──────────────────────────────────────── */
+.auth-root .messageDiv {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 7px;
+  margin-bottom: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: center;
+  display: none;
+  background: #EEEEFF;
+  color: #3B3B98;
+  border: 1px solid #D8D8F6;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.auth-root .messageDiv.show {
+  display: block;
+}
+
+/* ── Focus ring ───────────────────────────────────────── */
+.auth-root .btn-primary:focus,
+.auth-root .field input:focus,
+.auth-root .btn-social:focus,
+.auth-root .link-btn:focus {
+  outline: 2px solid #141414 !important;
+  outline-offset: 2px;
+}
+
+/* ── Loading state ────────────────────────────────────── */
+.auth-root .btn-primary.loading {
+  position: relative;
+  color: transparent !important;
+  pointer-events: none;
+}
+
+.auth-root .btn-primary.loading::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  top: 50%;
+  left: 50%;
+  margin: -8px 0 0 -8px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: auth-spin 0.8s linear infinite;
+}
+
+@keyframes auth-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ── Responsive — Tablet (≤ 600px) ───────────────────── */
+@media (max-width: 600px) {
+  .auth-root {
+    align-items: flex-start;
+    padding: 32px 20px;
+  }
+
+  .auth-root .auth-page {
+    max-width: 100%;
+  }
+
+  .auth-root .auth-title {
+    font-size: 26px;
+  }
+}
+
+/* ── Responsive — Mobile (≤ 480px) ───────────────────── */
+@media (max-width: 480px) {
+  .auth-root {
+    padding: 28px 16px;
+  }
+
+  .auth-root .auth-title {
+    font-size: 24px;
+  }
+
+  .auth-root .auth-sub {
+    font-size: 13px;
+  }
+
+  .auth-root .auth-logo span {
+    font-size: 20px;
+  }
+
+  .auth-root .field input {
+    font-size: 16px !important;
+    /* Prevent iOS zoom on focus */
+    padding: 13px 14px !important;
+  }
+
+  .auth-root .btn-primary {
+    padding: 14px !important;
+    font-size: 15px;
+  }
+
+  .auth-root .btn-social {
+    padding: 13px 16px;
+    font-size: 14px;
+  }
+}
+
+/* ── Responsive — Small mobile (≤ 380px) ─────────────── */
+@media (max-width: 380px) {
+  .auth-root {
+    padding: 24px 14px;
+  }
+
+  .auth-root .auth-logo {
+    margin-bottom: 20px;
+  }
+
+  .auth-root .auth-title {
+    font-size: 22px;
+  }
+
+  .auth-root .field-row {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .auth-root .auth-sub {
+    margin-bottom: 18px;
+  }
+}

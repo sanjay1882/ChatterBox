@@ -1,0 +1,699 @@
+/* ============================================================
+   cosmic-color-fix.css
+   Professional color refinement for the Cosmic (original-index.css) theme.
+   Import AFTER original-index.css to apply overrides.
+   ============================================================ */
+
+/* ── Design Token Layer ─────────────────────────────────── */
+:root {
+  /* Backgrounds — deep midnight layered palette */
+  --c-bg-body:      #0E0D1A;
+  --c-bg-surface:   #16152A;
+  --c-bg-elevated:  #1E1D35;
+  --c-bg-hover:     #25243F;
+  --c-bg-input:     #1A1930;
+
+  /* Borders */
+  --c-border:        rgba(255, 255, 255, 0.08);
+  --c-border-mid:    rgba(255, 255, 255, 0.12);
+  --c-border-strong: rgba(255, 255, 255, 0.18);
+
+  /* Text */
+  --c-text-primary:   #F0EFF8;
+  --c-text-secondary: #9896B8;
+  --c-text-muted:     #5C5A7A;
+
+  /* Accent — refined indigo-violet (replaces raw purple/pink) */
+  --c-accent:         #7B6EF6;
+  --c-accent-soft:    rgba(123, 110, 246, 0.18);
+  --c-accent-glow:    rgba(123, 110, 246, 0.30);
+
+  /* Teal secondary accent (replaces harsh #e52e71 pink) */
+  --c-teal:           #38C9A4;
+  --c-teal-soft:      rgba(56, 201, 164, 0.15);
+
+  /* Utility */
+  --c-danger:         #F87171;
+  --c-danger-soft:    rgba(248, 113, 113, 0.12);
+  --c-success:        #4ADE80;
+  --c-success-soft:   rgba(74, 222, 128, 0.12);
+
+  /* Shadows */
+  --c-shadow-sm:  0 2px 8px rgba(0, 0, 0, 0.35);
+  --c-shadow:     0 4px 20px rgba(0, 0, 0, 0.45);
+  --c-shadow-lg:  0 8px 40px rgba(0, 0, 0, 0.55);
+}
+
+/* ── Global Base ────────────────────────────────────────── */
+body {
+  background: var(--c-bg-body) !important;
+  color: var(--c-text-primary) !important;
+}
+
+/* Fix jarring white scrollbar thumb */
+::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.14) !important;
+  border-radius: 10px !important;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.22) !important;
+}
+
+/* ── Header ─────────────────────────────────────────────── */
+.chatbot header {
+  background: var(--c-bg-body) !important;
+  border-bottom: 1px solid var(--c-border) !important;
+}
+
+.chatbot header h2 {
+  color: var(--c-text-primary) !important;
+}
+
+.chatbot header h2:hover {
+  font-size: 1.3rem !important; /* remove jarring size jump */
+  color: var(--c-accent) !important;
+}
+
+.bx-menu,
+.right-heder-bar .bxs-sun,
+.right-heder-bar .bxs-moon,
+.bx-share {
+  color: var(--c-text-secondary) !important;
+  transition: color 0.2s ease !important;
+}
+.bx-menu:hover,
+.right-heder-bar .bxs-sun:hover,
+.right-heder-bar .bxs-moon:hover {
+  color: var(--c-text-primary) !important;
+}
+
+/* ── Sidebar ────────────────────────────────────────────── */
+.sidebar {
+  background: var(--c-bg-surface) !important;
+  border-right: 1px solid var(--c-border) !important;
+  box-shadow: var(--c-shadow) !important;
+}
+
+.sidebar i,
+.sidebar .logo_name,
+.sidebar li a .links_name {
+  color: var(--c-text-secondary) !important;
+}
+
+/* Fix: sidebar nav links had jarring solid-white hover */
+.sidebar li a {
+  background: transparent !important;
+  border-radius: 10px !important;
+  transition: background 0.2s ease !important;
+}
+
+.sidebar li a:hover {
+  background: var(--c-bg-hover) !important;
+}
+
+.sidebar li a:hover .links_name,
+.sidebar li a:hover i {
+  color: var(--c-text-primary) !important;
+}
+
+/* Fix: sidebar search had jarring white hover */
+.sidebar .bx-search {
+  background: var(--c-bg-elevated) !important;
+  color: var(--c-text-secondary) !important;
+}
+
+.sidebar .bx-search:hover {
+  background: var(--c-bg-hover) !important;
+  color: var(--c-text-primary) !important;
+}
+
+.sidebar.open .bx-search:hover {
+  background: var(--c-bg-hover) !important;
+  color: var(--c-text-primary) !important;
+}
+
+.sidebar input {
+  background: var(--c-bg-elevated) !important;
+  color: var(--c-text-primary) !important;
+  border: 1px solid var(--c-border) !important;
+}
+
+/* Profile card */
+.sidebar li.profile {
+  background: var(--c-bg-elevated) !important;
+  border: 1px solid var(--c-border) !important;
+}
+
+.sidebar li.profile:hover {
+  background: var(--c-bg-hover) !important;
+  border-color: var(--c-accent-soft) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25) !important;
+}
+
+.sidebar li.profile .name {
+  color: var(--c-text-primary) !important;
+}
+
+.sidebar li.profile .job {
+  color: var(--c-text-secondary) !important;
+}
+
+/* Fix: logout button had white bg with dark text — jarring */
+#logout {
+  background: transparent !important;
+  color: var(--c-text-muted) !important;
+}
+
+#logout:hover {
+  background: var(--c-danger-soft) !important;
+  color: var(--c-danger) !important;
+  transform: scale(1.05) !important;
+}
+
+/* History items */
+.history-item {
+  color: var(--c-text-secondary) !important;
+  border-radius: 8px !important;
+}
+
+.history-item:hover {
+  background: var(--c-bg-hover) !important;
+  color: var(--c-text-primary) !important;
+}
+
+.history-item.active {
+  background: var(--c-bg-elevated) !important;
+  border: 1px solid var(--c-border-mid) !important;
+  color: var(--c-text-primary) !important;
+}
+
+/* ── Welcome / Greeting ──────────────────────────────────── */
+.Greet-tag {
+  color: var(--c-text-primary) !important;
+}
+
+/* Fix: raw pink/orange gradient on greeting — replace with refined palette */
+#Hello-txt {
+  background: linear-gradient(135deg, var(--c-accent), var(--c-teal)) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+.welcome-subtitle {
+  color: var(--c-text-secondary) !important;
+}
+
+/* ── Suggestion Cards ────────────────────────────────────── */
+.suggestion-card {
+  background: var(--c-bg-surface) !important;
+  border: 1px solid var(--c-border) !important;
+  transition: all 0.22s ease !important;
+}
+
+.suggestion-card:hover {
+  background: var(--c-bg-elevated) !important;
+  border-color: var(--c-accent-soft) !important;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.4),
+              0 0 0 1px var(--c-accent-soft) !important;
+  transform: translateY(-3px) !important;
+}
+
+.card-content h3 {
+  color: var(--c-text-primary) !important;
+}
+
+.card-content p {
+  color: var(--c-text-secondary) !important;
+}
+
+.card-send-icon {
+  color: var(--c-text-muted) !important;
+}
+
+/* ── Chat Input ──────────────────────────────────────────── */
+.chat-input-container {
+  background: var(--c-bg-body) !important;
+}
+
+.chat-input {
+  background: var(--c-bg-input) !important;
+  border: 1px solid var(--c-border) !important;
+  box-shadow: var(--c-shadow-sm) !important;
+}
+
+.chat-input:focus-within {
+  border-color: var(--c-accent) !important;
+  box-shadow: 0 0 0 3px var(--c-accent-glow), var(--c-shadow-sm) !important;
+}
+
+.chat-input textarea {
+  color: var(--c-text-primary) !important;
+}
+
+.chat-input textarea::placeholder {
+  color: var(--c-text-muted) !important;
+}
+
+.icon-btn,
+.mic-btn {
+  color: var(--c-text-secondary) !important;
+}
+
+.icon-btn:hover,
+.mic-btn:hover {
+  background: var(--c-bg-hover) !important;
+  color: var(--c-text-primary) !important;
+}
+
+/* Fix: ugly grey/blue web-search active state */
+#web-search.active {
+  background: var(--c-teal-soft) !important;
+  color: var(--c-teal) !important;
+  box-shadow: none !important;
+}
+
+.model-select {
+  color: var(--c-text-secondary) !important;
+  border-color: var(--c-border) !important;
+}
+
+.model-select:hover {
+  background: var(--c-bg-hover) !important;
+}
+
+.model-select:focus {
+  border-color: var(--c-accent) !important;
+  box-shadow: 0 0 0 2px var(--c-accent-glow) !important;
+}
+
+.model-select option {
+  background: var(--c-bg-surface) !important;
+  color: var(--c-text-primary) !important;
+}
+
+/* Send button */
+#send-button {
+  background: var(--c-accent) !important;
+  color: #fff !important;
+  box-shadow: 0 4px 14px var(--c-accent-glow) !important;
+}
+
+#send-button:hover {
+  opacity: 0.88 !important;
+  transform: scale(1.05) !important;
+  box-shadow: 0 6px 20px var(--c-accent-glow) !important;
+}
+
+/* ── Chat Messages ────────────────────────────────────────── */
+/* Fix: outgoing .chat p had #171616 — nearly invisible on dark */
+.chatbox .chat p {
+  color: var(--c-text-primary) !important;
+}
+
+/* Outgoing bubble */
+.chatbox .outgoing .chat-content {
+  background: var(--c-bg-elevated) !important;
+  border: 1px solid var(--c-border) !important;
+  border-radius: 18px 18px 4px 18px !important;
+}
+
+/* Incoming AI content */
+.chatbox .incoming .chat-content {
+  color: var(--c-text-primary) !important;
+  background: transparent !important;
+}
+
+/* Fix: bold text had gaudy orange-pink gradient */
+.chat-content p b {
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  background-clip: unset !important;
+  -webkit-text-fill-color: var(--c-accent) !important;
+  color: var(--c-accent) !important;
+  font-weight: 600 !important;
+}
+
+/* Fix: list-bold-text was hot pink (#e52e71) */
+.list-bold-text {
+  color: var(--c-accent) !important;
+}
+
+.Bold-head {
+  color: var(--c-text-primary) !important;
+}
+
+/* Typing cursor */
+.typing-cursor::after {
+  color: var(--c-accent) !important;
+}
+
+/* ── Action Buttons (copy, regenerate, etc.) ─────────────── */
+.action-btn {
+  background: var(--c-bg-elevated) !important;
+  border: 1px solid var(--c-border) !important;
+  color: var(--c-text-secondary) !important;
+  border-radius: 8px !important;
+  transition: all 0.2s ease !important;
+}
+
+.action-btn:hover {
+  background: var(--c-accent) !important;
+  border-color: var(--c-accent) !important;
+  color: #fff !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px var(--c-accent-glow) !important;
+}
+
+.action-btn.copied {
+  background: var(--c-success-soft) !important;
+  border-color: var(--c-success) !important;
+  color: var(--c-success) !important;
+}
+
+.user-chat-actions .action-btn {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid var(--c-border) !important;
+  color: var(--c-text-secondary) !important;
+}
+
+.user-chat-actions .action-btn:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: var(--c-text-primary) !important;
+  border-color: var(--c-border-strong) !important;
+}
+
+/* ── Code Blocks ──────────────────────────────────────────── */
+pre {
+  background-color: #0A0917 !important;
+  border: 1px solid var(--c-border) !important;
+  color: #D4D0F0 !important;
+}
+
+.code-container {
+  background-color: var(--c-bg-surface) !important;
+  border: 1px solid var(--c-border) !important;
+  border-radius: 12px !important;
+}
+
+.progem-lan {
+  color: var(--c-text-secondary) !important;
+}
+
+/* ── Waveform (speaking modal) ───────────────────────────── */
+.wave-bar {
+  background: linear-gradient(180deg, var(--c-accent), var(--c-teal)) !important;
+}
+
+.speaking-modal {
+  background: rgba(14, 13, 26, 0.94) !important;
+  border: 1px solid rgba(123, 110, 246, 0.25) !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55),
+              0 0 0 1px rgba(123, 110, 246, 0.15) !important;
+}
+
+.live-transcript:not(:empty) {
+  color: var(--c-accent) !important;
+}
+
+/* ── Source Cards ─────────────────────────────────────────── */
+.source-item {
+  background: var(--c-bg-surface) !important;
+  border: 1px solid var(--c-border) !important;
+}
+
+.source-item:hover {
+  background: var(--c-bg-hover) !important;
+}
+
+.source-title {
+  color: var(--c-text-primary) !important;
+}
+
+.source-domain {
+  color: var(--c-text-muted) !important;
+}
+
+/* ── Toasts ───────────────────────────────────────────────── */
+.toast {
+  background: var(--c-bg-elevated) !important;
+  color: var(--c-text-primary) !important;
+  border: 1px solid var(--c-border-mid) !important;
+  box-shadow: var(--c-shadow-lg) !important;
+}
+
+/* ── Preloader ────────────────────────────────────────────── */
+#preloader {
+  background: var(--c-bg-body) !important;
+  color: var(--c-text-primary) !important;
+}
+
+#preloader h4 { color: var(--c-text-primary) !important; }
+#preloader h6 { color: var(--c-text-secondary) !important; }
+
+/* ── Delete / Chat History Buttons ───────────────────────── */
+.delete-chat-btn {
+  color: var(--c-text-muted) !important;
+}
+
+.delete-chat-btn:hover {
+  color: var(--c-danger) !important;
+}
+
+/* ── Mic Recording ────────────────────────────────────────── */
+.mic-btn.recording {
+  background: var(--c-danger-soft) !important;
+  color: var(--c-danger) !important;
+}
+
+/* ── Chat Section Items (sidebar nav) ─────────────────────── */
+.chat-section-item:hover {
+  background-color: var(--c-bg-hover) !important;
+}
+
+.chat-section-item span,
+.chat-section-item i {
+  color: var(--c-text-secondary) !important;
+}
+
+.chat-section-item:hover span,
+.chat-section-item:hover i {
+  color: var(--c-text-primary) !important;
+}
+
+#new-chat-btn span {
+  color: var(--c-text-primary) !important;
+}
+
+/* ── Translation Dropdown ─────────────────────────────────── */
+.translation-dropdown {
+  background: var(--c-bg-surface) !important;
+  border: 1px solid var(--c-border-mid) !important;
+  box-shadow: var(--c-shadow) !important;
+}
+
+/* ── Dot Stepper / CTA ────────────────────────────────────── */
+.go-dot {
+  background: var(--c-border-mid) !important;
+}
+
+.go-dot.active {
+  background: linear-gradient(90deg, var(--c-accent), var(--c-teal)) !important;
+}
+
+.go-btn {
+  background: linear-gradient(135deg, var(--c-accent) 0%, var(--c-teal) 100%) !important;
+  box-shadow: 0 8px 30px var(--c-accent-glow) !important;
+}
+
+.go-btn:hover {
+  box-shadow: 0 12px 40px var(--c-accent-glow) !important;
+}
+
+.go-hint {
+  color: var(--c-text-muted) !important;
+}
+
+/* ── Settings modal sidebar border ───────────────────────── */
+.settings-sidebar {
+  border-bottom: 1px solid var(--c-border) !important;
+}
+
+/* ── WHITE / LIGHT MODE overrides ────────────────────────── */
+body.white-mode {
+  background-color: #F5F4FB !important;
+  color: #18172E !important;
+}
+
+.white-mode .chatbot header {
+  background: #F5F4FB !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Fix: white-mode header had full purple gradient — too heavy */
+.white-mode .chatbot header h2 {
+  color: #18172E !important;
+}
+
+.white-mode .chatbox .chat p {
+  background: rgba(0, 0, 0, 0.06) !important;
+  color: #18172E !important;
+}
+
+/* Fix: white-mode .chat p used same purple gradient as header */
+.white-mode .chatbox .outgoing .chat-content {
+  background: rgba(0, 0, 0, 0.05) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  color: #18172E !important;
+}
+
+.white-mode .chatbox .incoming .chat-content {
+  color: #18172E !important;
+  background: transparent !important;
+}
+
+.white-mode .chat-input-container {
+  background: #F5F4FB !important;
+}
+
+.white-mode .chatbot .chat-input,
+.white-mode .chatbot .chat-input textarea {
+  background: #FFFFFF !important;
+  color: #18172E !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+
+.white-mode .chat-input:focus-within {
+  border-color: var(--c-accent) !important;
+  box-shadow: 0 0 0 3px rgba(123, 110, 246, 0.12) !important;
+}
+
+.white-mode .chat-input textarea::placeholder {
+  color: #9896B8 !important;
+}
+
+/* Fix: white-mode sidebar had baby-blue E3F2FD bg */
+.white-mode .sidebar {
+  background: #FFFFFF !important;
+  border-right: 1px solid rgba(0, 0, 0, 0.08) !important;
+  color: #18172E !important;
+}
+
+.white-mode .sidebar li a {
+  background: transparent !important;
+  color: #18172E !important;
+}
+
+.white-mode .sidebar li a:hover {
+  background: rgba(123, 110, 246, 0.08) !important;
+}
+
+.white-mode .sidebar li a:hover .links_name,
+.white-mode .sidebar li a:hover i {
+  color: var(--c-accent) !important;
+}
+
+.white-mode .sidebar.open li a .links_name,
+.white-mode .sidebar li i {
+  color: #5C5A7A !important;
+}
+
+.white-mode .sidebar.open li.profile {
+  background: rgba(123, 110, 246, 0.07) !important;
+  border: 1px solid rgba(123, 110, 246, 0.15) !important;
+}
+
+.white-mode .sidebar .logo-details .logo_name,
+.white-mode .sidebar .logo-details i {
+  color: #18172E !important;
+}
+
+.white-mode .suggestion-card {
+  background: #FFFFFF !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+.white-mode .suggestion-card:hover {
+  background: rgba(123, 110, 246, 0.05) !important;
+  border-color: rgba(123, 110, 246, 0.2) !important;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.08) !important;
+}
+
+.white-mode .card-content h3 { color: #18172E !important; }
+.white-mode .card-content p  { color: #5C5A7A !important; }
+
+.white-mode .action-btn {
+  background: rgba(0, 0, 0, 0.04) !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  color: #5C5A7A !important;
+}
+
+.white-mode .action-btn:hover {
+  background: var(--c-accent) !important;
+  border-color: var(--c-accent) !important;
+  color: #fff !important;
+}
+
+.white-mode .toast {
+  background: rgba(255, 255, 255, 0.96) !important;
+  color: #18172E !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+
+.white-mode #send-button {
+  background: var(--c-accent) !important;
+  color: #fff !important;
+}
+
+.white-mode .icon-btn,
+.white-mode .mic-btn {
+  color: #5C5A7A !important;
+  background: rgba(0, 0, 0, 0.05) !important;
+}
+
+.white-mode .icon-btn:hover,
+.white-mode .mic-btn:hover {
+  background: rgba(0, 0, 0, 0.1) !important;
+  color: #18172E !important;
+}
+
+.white-mode #web-search.active {
+  background: var(--c-teal-soft) !important;
+  color: #0D8C70 !important;
+}
+
+.white-mode .speaking-modal {
+  background: rgba(245, 244, 251, 0.97) !important;
+  border-color: rgba(123, 110, 246, 0.2) !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12) !important;
+}
+
+.white-mode .speaking-label { color: #18172E !important; }
+
+.white-mode .Bold-head { color: #18172E !important; }
+
+.white-mode pre {
+  background-color: #F0EFF8 !important;
+  color: #18172E !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+.white-mode .user-chat-actions .action-btn {
+  background: rgba(0, 0, 0, 0.04) !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  color: rgba(0, 0, 0, 0.45) !important;
+}
+
+.white-mode .user-chat-actions .action-btn:hover {
+  background: rgba(0, 0, 0, 0.09) !important;
+  color: #18172E !important;
+}
+
+.white-mode .chat-content p b {
+  -webkit-text-fill-color: var(--c-accent) !important;
+  color: var(--c-accent) !important;
+}
+
+.white-mode .list-bold-text {
+  color: var(--c-accent) !important;
+}

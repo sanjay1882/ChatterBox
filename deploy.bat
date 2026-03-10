@@ -47,7 +47,7 @@ call gcloud services enable cloudbuild.googleapis.com run.googleapis.com contain
 REM 2. Deploy Backend (Build Docker image and push to Cloud Run)
 ECHO --------------------------------------------------
 ECHO Deploying Backend...
-cd backend
+cd cloud-run-services\api-service
 call gcloud builds submit --tag "gcr.io/%PROJECT_ID%/chatterbox-backend" --project "%PROJECT_ID%"
 call gcloud run deploy chatterbox-backend ^
   --image "gcr.io/%PROJECT_ID%/chatterbox-backend" ^
@@ -60,7 +60,7 @@ call gcloud run deploy chatterbox-backend ^
 REM Capture Backend URL
 FOR /F "tokens=*" %%i IN ('call gcloud run services describe chatterbox-backend --platform managed --region "%REGION%" --project "%PROJECT_ID%" --format "value(status.url)"') DO SET BACKEND_URL=%%i
 ECHO Backend Deployed at: %BACKEND_URL%
-cd ..
+cd ..\..
 
 ECHO ==================================================
 ECHO Deployment Complete!
@@ -68,7 +68,7 @@ ECHO Backend URL: %BACKEND_URL%
 ECHO --------------------------------------------------
 ECHO NEXT STEPS:
 ECHO 1. Frontend live at: https://treevit.web.app
-ECHO 2. If backend URL changed, update frontend/config.js
+ECHO 2. If backend URL changed, update cloud-run-services\frontend-service\.env
 ECHO 3. Run: firebase deploy --only hosting
 ECHO ==================================================
 ENDLOCAL

@@ -23,7 +23,7 @@ gcloud services enable cloudbuild.googleapis.com run.googleapis.com containerreg
 # 2. Deploy Backend
 echo "--------------------------------------------------"
 echo "Deploying Backend..."
-cd backend
+cd cloud-run-services/api-service
 gcloud builds submit --tag "gcr.io/$PROJECT_ID/chatterbox-backend" --project "$PROJECT_ID"
 gcloud run deploy chatterbox-backend \
   --image "gcr.io/$PROJECT_ID/chatterbox-backend" \
@@ -36,12 +36,12 @@ gcloud run deploy chatterbox-backend \
 # Capture Backend URL
 BACKEND_URL=$(gcloud run services describe chatterbox-backend --platform managed --region "$REGION" --project "$PROJECT_ID" --format 'value(status.url)')
 echo "Backend Deployed at: $BACKEND_URL"
-cd ..
+cd ../..
 
 # 3. Deploy Scraper
 echo "--------------------------------------------------"
 echo "Deploying Scraper..."
-cd backend/Python-scripts
+cd cloud-run-services/api-service/Python-scripts
 gcloud builds submit --tag "gcr.io/$PROJECT_ID/chatterbox-scraper" --project "$PROJECT_ID"
 gcloud run deploy chatterbox-scraper \
   --image "gcr.io/$PROJECT_ID/chatterbox-scraper" \
@@ -53,7 +53,7 @@ gcloud run deploy chatterbox-scraper \
 # Capture Scraper URL
 SCRAPER_URL=$(gcloud run services describe chatterbox-scraper --platform managed --region "$REGION" --project "$PROJECT_ID" --format 'value(status.url)')
 echo "Scraper Deployed at: $SCRAPER_URL"
-cd ../..
+cd ../../..
 
 echo "--------------------------------------------------"
 echo "Updating Backend with Scraper URL..."
@@ -70,7 +70,7 @@ echo "Backend URL: $BACKEND_URL"
 echo "Scraper URL: $SCRAPER_URL"
 echo "--------------------------------------------------"
 echo "NEXT STEPS:"
-echo "1. Update your 'frontend/config.js' (or build env) to use the Backend URL: $BACKEND_URL"
+echo "1. Update your 'cloud-run-services/frontend-service/.env' (or build env) to use the Backend URL: $BACKEND_URL"
 echo "2. Deploy Frontend to Firebase: firebase deploy --only hosting"
 echo "3. After Frontend deploy, update Backend 'FRONTEND_URL' env var:"
 echo "   gcloud run services update chatterbox-backend --set-env-vars='FRONTEND_URL=YOUR_FIREBASE_URL'"

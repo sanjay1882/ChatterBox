@@ -1,0 +1,1162 @@
+/* ── Word Agent Layout ──────────────────────────────────── */
+/*    Accent: Word Blue  #2b579a / #3b82f6 / #93c5fd        */
+/*    Structure mirrors ExcelAgent.css 1-to-1               */
+
+.word-agent {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    background: transparent;
+    animation: wordFadeIn 0.3s ease;
+    color: var(--sarvam-text-main, #fff);
+    box-sizing: border-box;
+    font-family: var(--sarvam-font-body), sans-serif;
+}
+
+@keyframes wordFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* ── Chat Panel (left) ───────────────────────────────────── */
+.word-chat-panel {
+    display: flex;
+    flex-direction: column;
+    background: transparent;
+    flex-shrink: 0;
+    transition: none;
+}
+
+.word-agent.is-resizing {
+    cursor: col-resize;
+    user-select: none;
+}
+
+.word-agent.is-resizing .word-canvas {
+    pointer-events: none;
+}
+
+/* ── Resizer ── */
+.word-resizer {
+    width: 6px;
+    height: 100%;
+    cursor: col-resize;
+    position: relative;
+    background: transparent;
+    transition: background 0.2s;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 -3px;
+}
+
+.word-resizer:hover,
+.word-resizer.active {
+    background: rgba(59, 130, 246, 0.3);
+}
+
+.word-resizer .resizer-handle {
+    width: 2px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    transition: background 0.2s;
+}
+
+.word-resizer:hover .resizer-handle,
+.word-resizer.active .resizer-handle {
+    background: #fff;
+}
+
+/* ── Chat Header ── */
+.word-chat-header {
+    padding: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.word-chat-header-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: rgba(43, 87, 154, 0.35);
+    color: #93c5fd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.word-chat-header h3 {
+    font-family: var(--sarvam-font-heading), serif !important;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--sarvam-text-main, #fff);
+    margin: 0;
+}
+
+.word-chat-header p {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 4px 0 0;
+}
+
+/* ── Messages ── */
+.word-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    scroll-behavior: smooth;
+}
+
+.word-messages::-webkit-scrollbar {
+    width: 4px;
+}
+
+.word-messages::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.word-message-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.word-op-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    border-radius: 99px;
+    font-size: 11px;
+    font-weight: 600;
+    background: rgba(59, 130, 246, 0.1);
+    color: #93c5fd;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: -4px;
+}
+
+/* ── AI Avatar & Bubble overrides for Word Theme ── */
+.word-message-wrapper .ai-avatar {
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+}
+
+.word-message-wrapper .ai-bubble {
+    background: rgba(37, 99, 235, 0.1);
+    /* Light blue background for dark mode */
+}
+
+body.white-mode .word-message-wrapper .ai-bubble {
+    background: #eff6ff;
+    /* Lighter blue for white mode */
+}
+
+/* ── Chat Input Area ── */
+.word-chat-input-area {
+    padding: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.word-quick-prompts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.word-chip {
+    font-size: 11px;
+    padding: 6px 14px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--sarvam-text-secondary, rgba(255, 255, 255, 0.7));
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.word-chip:hover {
+    border-color: #3b82f6;
+    color: #93c5fd;
+    background: rgba(59, 130, 246, 0.08);
+    transform: translateY(-1px);
+}
+
+.word-chat-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #1d1b31;
+    border-radius: 16px;
+    padding: 6px 6px 6px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.2s ease;
+}
+
+.word-chat-box:focus-within {
+    border-color: #3b82f6;
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
+}
+
+.word-chat-box textarea {
+    flex: 1;
+    resize: none;
+    background: transparent;
+    border: none !important;
+    padding: 8px 0;
+    font-size: 14.5px;
+    color: #fff;
+    outline: none !important;
+    box-shadow: none !important;
+    min-height: 24px;
+    max-height: 120px;
+    font-family: inherit;
+}
+
+.word-chat-box textarea::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* Send button — Word blue instead of Excel green */
+.word-send-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    background: #2563eb;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+}
+
+.word-send-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    background: #1d4ed8;
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.45);
+}
+
+.word-send-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.3);
+    box-shadow: none;
+}
+
+/* ── Right Panel: Canvas ── */
+.word-canvas {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: transparent;
+    overflow: hidden;
+    position: relative;
+    min-width: 0;
+}
+
+/* ── Toolbar ── */
+.word-toolbar {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    background: rgba(255, 255, 255, 0.02);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    flex-shrink: 0;
+}
+
+.word-toolbar-left {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    padding-right: 20px;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.word-toolbar-left::-webkit-scrollbar {
+    display: none;
+}
+
+.word-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+/* ── File Tabs ── */
+.word-files-list {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+    overflow-x: auto;
+    padding: 4px;
+    scrollbar-width: none;
+}
+
+.word-files-list::-webkit-scrollbar {
+    display: none;
+}
+
+.word-file-tab {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    height: 36px;
+    padding: 0 10px;
+    font-size: 12px;
+    color: var(--sarvam-text-main, #fff);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.word-file-tab:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.word-file-tab.active {
+    background: rgba(37, 99, 235, 0.15);
+    border-color: rgba(59, 130, 246, 0.4);
+    color: #93c5fd;
+}
+
+.word-file-tab i {
+    font-size: 14px;
+    color: #3b82f6;
+}
+
+.word-file-tab span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 140px;
+}
+
+.word-file-tab .close-file {
+    font-size: 14px;
+    cursor: pointer;
+    margin-left: 4px;
+    opacity: 0.4;
+    transition: all 0.2s;
+}
+
+.word-file-tab .close-file:hover {
+    opacity: 1;
+    color: #ef4444;
+    transform: scale(1.1);
+}
+
+/* ── View Mode Toggle ── */
+.word-view-toggle {
+    display: flex;
+    height: 34px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 3px;
+    gap: 2px;
+}
+
+/* ── History Controls ── */
+.history-controls {
+    display: flex;
+    gap: 4px;
+    margin-right: 6px;
+    padding-right: 12px;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ── Toolbar Buttons ── */
+.word-toolbar-btn {
+    height: 34px;
+    padding: 0 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid transparent;
+    font-family: var(--sarvam-font-body), sans-serif;
+}
+
+.word-toolbar-btn i {
+    font-size: 16px;
+}
+
+.word-toolbar-btn.square {
+    width: 34px;
+    padding: 0;
+}
+
+.word-toolbar-btn.primary {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.word-toolbar-btn.primary:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Download — Word blue accent instead of Excel green */
+.word-toolbar-btn.success {
+    background: #2563eb;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.word-toolbar-btn.success:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+}
+
+.word-toolbar-btn.danger {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+}
+
+.word-toolbar-btn.danger:hover {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+.word-toolbar-btn.ghost {
+    background: transparent;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.word-toolbar-btn.ghost:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+
+/* Active state — blue tint instead of green */
+.word-toolbar-btn.ghost.active {
+    background: rgba(37, 99, 235, 0.15);
+    color: #93c5fd;
+    border-color: rgba(59, 130, 246, 0.35);
+}
+
+.word-toolbar-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* ── Upload Zone ── */
+.word-upload-zone {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 40px;
+}
+
+.word-upload-zone .upload-dropzone {
+    width: 100%;
+    max-width: 500px;
+    padding: 60px 40px;
+    border: 2px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    background: rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.word-upload-zone .upload-dropzone:hover,
+.word-upload-zone .upload-dropzone.drag-over {
+    border-color: #3b82f6;
+    background: rgba(37, 99, 235, 0.06);
+    transform: translateY(-2px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+}
+
+.word-upload-zone .upload-dropzone-icon {
+    font-size: 64px;
+    color: #3b82f6;
+    margin-bottom: 24px;
+}
+
+.word-upload-zone .upload-dropzone h3 {
+    font-family: var(--sarvam-font-heading), serif !important;
+    font-size: 24px;
+    font-weight: 500;
+    color: inherit;
+    margin: 0 0 10px;
+}
+
+.word-upload-zone .upload-dropzone p {
+    font-size: 15px;
+    color: var(--sarvam-text-secondary, rgba(255, 255, 255, 0.6));
+    margin-bottom: 24px;
+}
+
+.word-upload-zone .supported {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+.word-upload-zone .supported span {
+    padding: 4px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.blank-doc-btn {
+    font-size: 13px;
+}
+
+.word-editor-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+}
+
+.word-doc-paper-wrapper {
+    flex: 1;
+    overflow-y: auto;
+    background: rgba(0, 0, 0, 0.15);
+    padding: 24px;
+}
+
+.word-doc-paper-wrapper::-webkit-scrollbar {
+    width: 6px;
+}
+
+.word-doc-paper-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+
+
+/* ── Doc Paper — signature Word look ── */
+.word-doc-paper {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(59, 130, 246, 0.15);
+    border-top: 3px solid #2563eb;
+    color: var(--sarvam-text-main, #fff);
+    max-width: 760px;
+    margin: 0 auto;
+    min-height: 100%;
+    /* Quill container reset */
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 32px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(59, 130, 246, 0.08);
+    border-radius: 4px;
+}
+
+.word-doc-paper .quill {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.word-doc-paper .ql-toolbar.ql-snow {
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    padding: 12px 24px;
+    border-radius: 4px 4px 0 0;
+}
+
+.word-doc-paper .ql-stroke {
+    stroke: rgba(255, 255, 255, 0.7);
+}
+
+.word-doc-paper .ql-fill {
+    fill: rgba(255, 255, 255, 0.7);
+}
+
+.word-doc-paper .ql-picker-label {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.word-doc-paper .ql-container.ql-snow {
+    border: none;
+    flex: 1;
+    border-radius: 0 0 4px 4px;
+}
+
+.word-doc-paper .ql-editor {
+    min-height: 500px;
+    padding: 48px 64px;
+    font-family: var(--sarvam-font-heading), Georgia, serif;
+    font-size: 15px;
+    line-height: 1.85;
+}
+
+.word-doc-paper .ql-editor.ql-blank::before {
+    color: rgba(255, 255, 255, 0.3);
+    font-style: italic;
+    left: 64px;
+}
+
+.word-doc-paper .ql-editor h1 {
+    font-size: 26px;
+    font-weight: 600;
+    margin: 0 0 20px;
+    color: var(--sarvam-text-main, #fff);
+    border-bottom: 2px solid rgba(59, 130, 246, 0.3);
+    padding-bottom: 12px;
+}
+
+.word-doc-paper .ql-editor h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 28px 0 10px;
+    color: #93c5fd;
+}
+
+.word-doc-paper .ql-editor h3 {
+    font-size: 16px;
+    font-weight: 500;
+    margin: 18px 0 8px;
+    color: var(--sarvam-text-secondary, rgba(255, 255, 255, 0.7));
+}
+
+.word-doc-paper .ql-editor p {
+    margin: 0 0 12px;
+}
+
+.word-doc-paper .ql-editor li {
+    margin: 4px 0;
+}
+
+/* ── AI highlight — blue instead of green ── */
+.word-doc-paper .ql-editor .ai-highlight {
+    background: rgba(37, 99, 235, 0.12);
+    border-left: 3px solid #3b82f6;
+    padding-left: 10px;
+    border-radius: 0 4px 4px 0;
+    animation: wordHighlightFade 2.5s ease-out forwards;
+}
+
+@keyframes wordHighlightFade {
+    0% {
+        background: rgba(37, 99, 235, 0.25);
+    }
+
+    100% {
+        background: transparent;
+    }
+}
+
+/* ── Status Bar ── */
+.word-status-bar {
+    height: 38px;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: rgba(29, 27, 49, 0.4);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.6);
+    flex-shrink: 0;
+}
+
+.word-status-bar .stat {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.word-status-bar strong {
+    color: #fff;
+    font-weight: 600;
+}
+
+.word-status-bar .stat.dirty {
+    color: #f59e0b;
+}
+
+.word-status-bar .stat.ai-updated {
+    color: #93c5fd;
+}
+
+/* blue instead of green */
+.word-status-bar .stat.filename {
+    margin-left: auto;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* ── Typing dots — blue ── */
+.word-typing-dots {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    padding: 4px 0;
+}
+
+.word-typing-dots span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #3b82f6;
+    animation: wordTypingBounce 1.2s infinite;
+}
+
+.word-typing-dots span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.word-typing-dots span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes wordTypingBounce {
+
+    0%,
+    80%,
+    100% {
+        transform: translateY(0);
+        opacity: 0.5;
+    }
+
+    40% {
+        transform: translateY(-5px);
+        opacity: 1;
+    }
+}
+
+/* ── Spinner ── */
+.spin {
+    animation: spinAnim 0.8s linear infinite;
+}
+
+@keyframes spinAnim {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ────────────────────────────────────────────────────────────
+   WHITE MODE OVERRIDES  (mirrors ExcelAgent white-mode block)
+   ──────────────────────────────────────────────────────────── */
+body.white-mode .word-chat-header {
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+body.white-mode .word-chat-header h3 {
+    color: var(--sarvam-text-main);
+}
+
+body.white-mode .word-chat-header p {
+    color: rgba(0, 0, 0, 0.6);
+}
+
+body.white-mode .word-chat-header-icon {
+    background: rgba(37, 99, 235, 0.1);
+    color: #2563eb;
+}
+
+body.white-mode .word-chat-input-area {
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+body.white-mode .word-chat-box {
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body.white-mode .word-chat-box:focus-within {
+    border-color: #2563eb;
+    box-shadow: 0 0 10px rgba(37, 99, 235, 0.15);
+}
+
+body.white-mode .word-chat-box textarea {
+    color: var(--sarvam-text-main);
+}
+
+body.white-mode .word-chat-box textarea::placeholder {
+    color: rgba(0, 0, 0, 0.4);
+}
+
+body.white-mode .word-chip {
+    background: #fff;
+    border-color: var(--sarvam-border);
+    color: var(--sarvam-text-secondary);
+    box-shadow: var(--sarvam-shadow-sm);
+}
+
+body.white-mode .word-chip:hover {
+    background: #eff6ff;
+    color: #2563eb;
+    border-color: #3b82f6;
+}
+
+body.white-mode .word-send-btn:disabled {
+    background: var(--sarvam-bg-elevated);
+    color: var(--sarvam-text-tertiary);
+    border: 1px solid var(--sarvam-border);
+    box-shadow: none;
+}
+
+body.white-mode .word-send-btn:not(:disabled) {
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+body.white-mode .word-op-badge {
+    background: rgba(37, 99, 235, 0.08);
+    color: #2563eb;
+}
+
+body.white-mode .word-toolbar {
+    background: #fdfdfd;
+    border-bottom-color: var(--sarvam-border);
+}
+
+body.white-mode .word-file-tab {
+    background: #fff;
+    border-color: var(--sarvam-border);
+    color: var(--sarvam-text-main);
+    box-shadow: var(--sarvam-shadow-sm);
+}
+
+body.white-mode .word-file-tab i {
+    color: #2563eb;
+}
+
+body.white-mode .word-file-tab:hover {
+    border-color: #3b82f6;
+}
+
+body.white-mode .word-file-tab.active {
+    background: #eff6ff;
+    border-color: #2563eb;
+    color: #2563eb;
+}
+
+body.white-mode .word-toolbar-btn.primary {
+    background: #fff;
+    border-color: var(--sarvam-border);
+    color: var(--sarvam-text-main);
+    box-shadow: var(--sarvam-shadow-sm);
+}
+
+body.white-mode .word-toolbar-btn.primary:hover {
+    background: #fafafa;
+    border-color: var(--sarvam-text-tertiary);
+}
+
+body.white-mode .word-toolbar-btn.success {
+    background: #2563eb;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+body.white-mode .word-toolbar-btn.success:hover {
+    background: #1d4ed8;
+}
+
+body.white-mode .word-toolbar-btn.ghost {
+    color: var(--sarvam-text-secondary);
+}
+
+body.white-mode .word-toolbar-btn.ghost:hover:not(:disabled) {
+    background: var(--sarvam-bg-elevated);
+    color: var(--sarvam-text-main);
+}
+
+body.white-mode .word-toolbar-btn.ghost.active {
+    background: #eff6ff;
+    color: #2563eb;
+    border-color: #3b82f6;
+}
+
+body.white-mode .history-controls {
+    border-right-color: var(--sarvam-border);
+}
+
+body.white-mode .word-view-toggle {
+    background: var(--sarvam-bg-elevated);
+    border-color: var(--sarvam-border);
+}
+
+body.white-mode .word-resizer {
+    border-right: 1px solid var(--sarvam-border);
+}
+
+body.white-mode .word-resizer .resizer-handle {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+body.white-mode .word-resizer:hover .resizer-handle,
+body.white-mode .word-resizer.active .resizer-handle {
+    background: #2563eb;
+}
+
+body.white-mode .word-resizer:hover,
+body.white-mode .word-resizer.active {
+    background: rgba(37, 99, 235, 0.05);
+}
+
+body.white-mode .word-upload-zone .upload-dropzone {
+    background: rgba(255, 255, 255, 0.8);
+    border-color: rgba(0, 0, 0, 0.15);
+}
+
+body.white-mode .word-upload-zone .upload-dropzone:hover,
+body.white-mode .word-upload-zone .upload-dropzone.drag-over {
+    background: #eff6ff;
+    border-color: #2563eb;
+}
+
+body.white-mode .word-upload-zone .upload-dropzone-icon {
+    color: #2563eb;
+}
+
+body.white-mode .word-upload-zone .upload-dropzone h3 {
+    color: var(--sarvam-text-main);
+}
+
+body.white-mode .word-upload-zone .upload-dropzone p {
+    color: rgba(0, 0, 0, 0.6);
+}
+
+body.white-mode .word-upload-zone .supported span {
+    background: #fff;
+    border-color: var(--sarvam-border);
+    color: rgba(0, 0, 0, 0.6);
+}
+
+body.white-mode .word-pane-label {
+    background: #f0f5ff;
+    border-bottom-color: var(--sarvam-border);
+    color: #2563eb;
+}
+
+body.white-mode .word-editor-area.view-split .word-edit-pane {
+    border-right-color: var(--sarvam-border);
+}
+
+body.white-mode .word-raw-editor {
+    color: var(--sarvam-text-main);
+    caret-color: #2563eb;
+}
+
+body.white-mode .word-raw-editor::placeholder {
+    color: var(--sarvam-text-tertiary);
+}
+
+body.white-mode .word-preview-pane {
+    background: #e8edf5;
+}
+
+body.white-mode .word-doc-paper {
+    background: #fff;
+    border-color: var(--sarvam-border);
+    border-top-color: #2563eb;
+    color: var(--sarvam-text-main);
+    box-shadow: var(--sarvam-shadow-sm),
+        0 0 0 1px rgba(37, 99, 235, 0.06);
+}
+
+body.white-mode .doc-preview-content {
+    color: var(--sarvam-text-main);
+}
+
+body.white-mode .doc-preview-content h1 {
+    color: var(--sarvam-text-main);
+    border-bottom-color: rgba(37, 99, 235, 0.2);
+}
+
+body.white-mode .doc-preview-content h2 {
+    color: #2563eb;
+}
+
+body.white-mode .doc-preview-content h3 {
+    color: var(--sarvam-text-secondary);
+}
+
+body.white-mode .doc-placeholder {
+    color: var(--sarvam-text-tertiary);
+}
+
+body.white-mode .doc-preview-content .ai-highlight {
+    background: rgba(37, 99, 235, 0.08);
+    border-left-color: #2563eb;
+}
+
+body.white-mode .word-status-bar {
+    background: #f0f5ff;
+    border-top-color: rgba(37, 99, 235, 0.15);
+    color: var(--sarvam-text-secondary);
+}
+
+body.white-mode .word-status-bar strong {
+    color: var(--sarvam-text-main);
+}
+
+body.white-mode .word-status-bar .stat.ai-updated {
+    color: #2563eb;
+}
+
+body.white-mode .word-messages::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+/* ── Mobile ── */
+@media screen and (max-width: 768px) {
+    .word-agent.is-mobile {
+        flex-direction: column;
+    }
+
+    .word-mobile-tabs {
+        display: flex;
+        width: 100%;
+        height: 60px;
+        background: #171616;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        flex-shrink: 0;
+        z-index: 50;
+    }
+
+    body.white-mode .word-mobile-tabs {
+        background: #fff;
+        border-bottom-color: var(--sarvam-border);
+    }
+
+    .word-mobile-tab {
+        flex: 1;
+        background: transparent;
+        border: none;
+        color: var(--sarvam-text-secondary, rgba(255, 255, 255, 0.6));
+        font-family: var(--sarvam-font-body);
+        font-size: 15px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        cursor: pointer;
+        position: relative;
+        transition: all 0.2s ease;
+    }
+
+    body.white-mode .word-mobile-tab {
+        color: rgba(0, 0, 0, 0.5);
+    }
+
+    .word-mobile-tab.active {
+        color: #3b82f6;
+        font-weight: 600;
+        background: rgba(37, 99, 235, 0.05);
+    }
+
+    body.white-mode .word-mobile-tab.active {
+        color: #2563eb;
+    }
+
+    .word-mobile-tab.active::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: #2563eb;
+        border-radius: 3px 3px 0 0;
+    }
+
+    .mobile-doc-badge {
+        width: 8px;
+        height: 8px;
+        background: #ef4444;
+        border-radius: 50%;
+        margin-left: 4px;
+    }
+
+    .word-chat-panel,
+    .word-canvas {
+        height: calc(100vh - 60px) !important;
+        border: none !important;
+        min-width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .word-toolbar {
+        height: auto;
+        min-height: 60px;
+        flex-wrap: wrap;
+        padding: 10px;
+        gap: 10px;
+    }
+
+    .word-toolbar-left {
+        width: 100%;
+        padding-right: 0;
+    }
+
+    .word-toolbar-right {
+        width: 100%;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .word-upload-zone .upload-dropzone {
+        padding: 40px 20px;
+        margin: 20px;
+    }
+
+    .word-doc-paper {
+        padding: 32px 24px;
+    }
+}

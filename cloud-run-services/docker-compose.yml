@@ -1,0 +1,57 @@
+services:
+  # Base datastore for background message queues
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    restart: always
+
+  # Fast, C-bound Python engine
+  ai-engine:
+    build: ./ai-engine-service
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./api-service/.env
+    restart: on-failure
+
+  # Primary API Gateway serving the frontend
+  api-gateway:
+    build: ./api-service
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./api-service/.env
+    environment:
+      - PORT=3000
+      - REDIS_URL=redis://redis:6379
+      - AI_ENGINE_URL=http://ai-engine:8000
+    depends_on:
+      - redis
+      - ai-engine
+    restart: on-failure
+
+  # Headless worker reading from Redis queues
+  worker:
+    build: ./worker-service
+    env_file:
+      - ./api-service/.env
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - AI_ENGINE_URL=http://ai-engine:8000
+    depends_on:
+      - redis
+    restart: always
+
+  # React frontend
+  frontend:
+    build:
+      context: ./frontend-service
+      args:
+        # Bake the gateway address into the React app
+        - VITE_BACKEND_URL=http://localhost:3000
+    ports:
+      - "8081:80"
+    depends_on:
+      - api-gateway
+    restart: on-failure

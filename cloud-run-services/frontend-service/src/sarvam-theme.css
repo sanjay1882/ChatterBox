@@ -466,7 +466,7 @@ body.white-mode #send-button {
 }
 
 /* INCOMING (AI) messages */
-.chatbox .incoming p {
+.chatbox .incoming .chat-content {
     /* background: var(--sarvam-bg-surface) !important; */
     color: var(--sarvam-text-main) !important;
     border: 1px solid var(--sarvam-border-subtle) !important;
@@ -475,11 +475,13 @@ body.white-mode #send-button {
 }
 
 /* OUTGOING (user) messages */
-.chatbox .outgoing p {
+.chatbox .outgoing .chat-content {
     background: var(--sarvam-bg-elevated) !important;
     color: var(--sarvam-text-main) !important;
     border: 1px solid var(--sarvam-border) !important;
     border-top-right-radius: 6px !important;
+    max-height: 350px !important;
+    overflow-y: auto !important;
 }
 
 .chatbox .outgoing span {
@@ -489,7 +491,7 @@ body.white-mode #send-button {
 
 /* Bold text in responses — remove gradient fill */
 .chat-content p b,
-.chatbox .incoming p b,
+.chatbox .incoming .chat-content b,
 .chatbox p b {
     background: none !important;
     -webkit-background-clip: unset !important;
@@ -511,39 +513,61 @@ body.white-mode #send-button {
 }
 
 /* ============================================================
-   CODE BLOCKS — Catppuccin Mocha (always dark, both modes)
-   .code-block-wrapper styles are in index.css — no overrides needed.
+   CODE BLOCKS — Gemini / Dracula palette (always dark, both modes)
+   .code-block-wrapper and .code-pre handle all dark styling.
+   Token colors are defined in original-index.css .hljs-* rules.
    ============================================================ */
-pre {
-    background-color: #1e1e2e !important;
-    color: #cdd6f4 !important;
-    border-radius: 12px !important;
-    padding: 16px 20px !important;
-    font-size: 0.875rem !important;
-    line-height: 1.8 !important;
-    /* border: 1px solid #313244 !important; */
+.code-block-wrapper .code-pre {
+    background: transparent !important;
+    margin: 0 !important;
+    padding: 16px !important;
     box-shadow: none !important;
+    border-radius: 0 !important;
 }
 
-.code-container {
-    background-color: #1e1e2e !important;
-    border-radius: 12px !important;
+.code-block-wrapper {
+    background: #1e1e2e !important;
     border: 1px solid #313244 !important;
-    box-shadow: none !important;
+    border-radius: 12px !important;
     overflow: hidden !important;
     margin: 12px 0 !important;
+    box-shadow: none !important;
 }
 
-.progem-lan {
-    color: #6c7086 !important;
-    font-size: 0.75rem !important;
-    padding: 8px 14px !important;
+.code-block-wrapper .code-header {
     background: #181825 !important;
     border-bottom: 1px solid #313244 !important;
-    display: block !important;
-    letter-spacing: 0.5px !important;
 }
 
+.code-block-wrapper code {
+    background: transparent !important;
+    color: #F8F8F2 !important;
+    /* Dracula base text — brighter than Catppuccin #cdd6f4 */
+    font-size: 0.875rem !important;
+    line-height: 1.8 !important;
+}
+
+
+/* ── Temp Chat Button (Sarvam theme) ─────────────────── */
+.temp-chat-btn {
+    border-color: var(--sarvam-border) !important;
+    color: var(--sarvam-text-secondary) !important;
+    background: transparent !important;
+}
+
+.temp-chat-btn:hover {
+    border-color: var(--sarvam-text-secondary) !important;
+    color: var(--sarvam-text-main) !important;
+    background: var(--sarvam-bg-elevated) !important;
+    box-shadow: none !important;
+}
+
+.temp-chat-btn.active {
+    border-color: #ff6b6b !important;
+    background: rgba(255, 85, 85, 0.12) !important;
+    color: #ff6b6b !important;
+    box-shadow: 0 0 10px rgba(255, 85, 85, 0.18) !important;
+}
 
 /* ============================================================
    ACTION BUTTONS (under AI message)
@@ -737,6 +761,48 @@ pre {
     padding: 18px 22px !important;
 }
 
+/* ============================================================
+   APPS MODAL (exactly like settings-modal)
+   ============================================================ */
+.apps-modal {
+    display: none !important;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(4px);
+    z-index: 4000;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.2s ease;
+    font-family: 'DM Sans', sans-serif;
+}
+
+.apps-modal.show {
+    display: flex !important;
+}
+
+.apps-modal-content {
+    background: var(--bg-color);
+    width: 90%;
+    max-width: 1200px;
+    height: 80vh;
+    min-height: 500px;
+    max-height: 700px;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transform: translateY(20px) scale(0.98);
+    opacity: 0;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s;
+}
+
+.apps-modal.show .apps-modal-content {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+}
+
 .settings-header h3,
 .confirm-modal-header h3,
 .settings-header i,
@@ -790,6 +856,20 @@ pre {
 
 .form-group input::placeholder {
     color: var(--sarvam-text-tertiary) !important;
+}
+
+/* make settings textarea nicer */
+.form-group textarea {
+    width: 100%;
+    background: var(--sarvam-bg-elevated) !important;
+    border: 1px solid var(--sarvam-border) !important;
+    color: var(--sarvam-text-main) !important;
+    border-radius: 10px !important;
+    padding: 8px 12px !important;
+    resize: vertical;
+    min-height: 60px;
+    font-family: var(--sarvam-font-body) !important;
+    font-size: 0.875rem !important;
 }
 
 
@@ -891,6 +971,40 @@ pre {
 
 
 
+
+/* ── Theme Picker / Mode Segment Base Styles ── */
+.theme-picker {
+    display: flex;
+    gap: 14px;
+    margin-top: 6px;
+}
+
+.mode-segment {
+    display: flex;
+    margin-top: 8px;
+    width: fit-content;
+    background: rgba(128, 128, 128, 0.12);
+    border: 1px solid rgba(128, 128, 128, 0.2);
+    border-radius: 9999px;
+    padding: 4px;
+    gap: 4px;
+}
+
+.mode-seg-btn {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 22px;
+    border: none;
+    border-radius: 9999px;
+    background: transparent;
+    font-size: 0.88rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    outline: none;
+    color: var(--sarvam-text-secondary);
+}
 
 .mode-seg-btn i {
     font-size: 1.05rem;
@@ -1191,20 +1305,20 @@ body.white-mode {
     background: var(--sarvam-bg-elevated) !important;
 }
 
-.white-mode .chatbox .incoming p {
-    background: var(--sarvam-bg-surface) !important;
+.white-mode .chatbox .incoming .chat-content {
+    background: transparent !important;
     color: var(--sarvam-text-main) !important;
 }
 
 /* Loading/generating state — no card background while spinner is shown */
-.chatbox .incoming p:has(#Loading_out_Icon),
-.white-mode .chatbox .incoming p:has(#Loading_out_Icon) {
+.chatbox .incoming .chat-content:has(#Loading_out_Icon),
+.white-mode .chatbox .incoming .chat-content:has(#Loading_out_Icon) {
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
 }
 
-.white-mode .chatbox .outgoing p {
+.white-mode .chatbox .outgoing .chat-content {
     background: var(--sarvam-bg-elevated) !important;
     color: var(--sarvam-text-main) !important;
 }

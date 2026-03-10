@@ -1,0 +1,480 @@
+/* ═══════════════════════════════════════════════════════════
+   UPGRADE MODAL — Matches Treevit/Chatterbox Dark Theme
+   ═══════════════════════════════════════════════════════════ */
+
+.upgrade-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.72);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 9000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    animation: upgradeOverlayIn 0.2s ease;
+}
+
+@keyframes upgradeOverlayIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* ── Modal card — compact, everything fits without scroll ── */
+.upgrade-modal {
+    position: relative;
+    width: 100%;
+    max-width: 500px;
+    background: #1d1b31;
+    border: 1px solid rgba(167, 21, 235, 0.3);
+    border-radius: 20px;
+    padding: 28px 28px 22px;
+    box-shadow:
+        0 0 0 1px rgba(167, 21, 235, 0.12),
+        0 32px 80px rgba(0, 0, 0, 0.65),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    animation: upgradeModalIn 0.32s cubic-bezier(0.34, 1.36, 0.64, 1);
+}
+
+@keyframes upgradeModalIn {
+    from {
+        opacity: 0;
+        transform: translateY(24px) scale(0.97);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Shimmer top border — uses app's purple */
+.upgrade-modal::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 18%;
+    right: 18%;
+    height: 1.5px;
+    background: linear-gradient(90deg, transparent, #A715EB, #673ab7, transparent);
+    border-radius: 2px;
+}
+
+/* ── Close ── */
+.upgrade-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 17px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.18s;
+}
+
+.upgrade-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+/* ── Header ── */
+.upgrade-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 18px;
+    padding-right: 28px;
+}
+
+.upgrade-icon-ring {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, rgba(167, 21, 235, 0.25), rgba(103, 58, 183, 0.2));
+    border: 1.5px solid rgba(167, 21, 235, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    color: #c083f0;
+    box-shadow: 0 0 20px rgba(167, 21, 235, 0.2);
+}
+
+.upgrade-header-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.upgrade-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #f0eef8;
+    margin: 0 0 3px;
+    line-height: 1.3;
+}
+
+.upgrade-subtitle {
+    font-size: 0.82rem;
+    color: rgba(255, 255, 255, 0.48);
+    margin: 0;
+    line-height: 1.45;
+}
+
+/* ── Billing Toggle ── */
+.billing-toggle {
+    display: flex;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 4px;
+    margin-bottom: 14px;
+}
+
+.billing-btn {
+    flex: 1;
+    padding: 7px 12px;
+    border-radius: 7px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 500;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.45);
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    font-family: inherit;
+}
+
+.billing-btn.active {
+    background: linear-gradient(135deg, #512da8, #673ab7);
+    color: #fff;
+    box-shadow: 0 3px 10px rgba(103, 58, 183, 0.35);
+}
+
+.save-badge {
+    background: #4ade80;
+    color: #000;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 99px;
+    letter-spacing: 0.03em;
+}
+
+/* ── Price row ── */
+.upgrade-price-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding: 13px 16px;
+    background: rgba(167, 21, 235, 0.08);
+    border: 1px solid rgba(167, 21, 235, 0.2);
+    border-radius: 12px;
+}
+
+.upgrade-price {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #c083f0;
+    line-height: 1;
+}
+
+.upgrade-price-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.45);
+}
+
+.usd-note {
+    font-size: 0.73rem;
+    color: rgba(255, 255, 255, 0.28);
+}
+
+/* ── Features grid ── */
+.upgrade-features {
+    display: grid;
+    grid-template-columns: 1fr 1px 1fr;
+    gap: 0 14px;
+    margin-bottom: 18px;
+}
+
+.features-col {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.features-col-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.35);
+    margin: 0 0 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+}
+
+.feature-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    font-size: 0.79rem;
+    line-height: 1.35;
+}
+
+.feature-row.pro {
+    color: rgba(255, 255, 255, 0.82);
+}
+
+.feature-row.pro i {
+    color: #4ade80;
+    font-size: 14px;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.feature-row.free {
+    color: rgba(255, 255, 255, 0.35);
+}
+
+.feature-row.free i {
+    color: rgba(255, 255, 255, 0.2);
+    font-size: 14px;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.features-divider {
+    background: rgba(255, 255, 255, 0.07);
+    align-self: stretch;
+    width: 1px;
+}
+
+/* ── Error ── */
+.upgrade-error {
+    color: #f87171;
+    font-size: 0.82rem;
+    text-align: center;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+/* ── Buttons ── */
+.upgrade-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.pay-btn {
+    width: 100%;
+    padding: 12px 20px;
+    border-radius: 12px;
+    border: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    letter-spacing: 0.01em;
+}
+
+.pay-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* Primary — UPI / Razorpay (India) — uses app's purple gradient */
+.razorpay-btn {
+    background: linear-gradient(135deg, #673ab7 0%, #512da8 100%);
+    color: #fff;
+    box-shadow: 0 6px 20px rgba(103, 58, 183, 0.4);
+}
+
+.razorpay-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, #7e57c2, #5e35b1);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(103, 58, 183, 0.5);
+}
+
+/* Secondary — Stripe (International) */
+.stripe-btn {
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stripe-btn:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.09);
+    border-color: rgba(255, 255, 255, 0.18);
+    transform: translateY(-1px);
+}
+
+/* ── Footer ── */
+.upgrade-footer {
+    text-align: center;
+    font-size: 0.72rem;
+    color: rgba(255, 255, 255, 0.22);
+    margin: 0;
+    letter-spacing: 0.02em;
+}
+
+/* ── White Mode ── */
+body.white-mode .upgrade-modal {
+    background: #ffffff;
+    border-color: rgba(103, 58, 183, 0.25);
+    box-shadow: 0 0 0 1px rgba(103, 58, 183, 0.1), 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+body.white-mode .upgrade-modal::before {
+    background: linear-gradient(90deg, transparent, #673ab7, #512da8, transparent);
+}
+
+body.white-mode .upgrade-title {
+    color: #11101d;
+}
+
+body.white-mode .upgrade-subtitle {
+    color: rgba(0, 0, 0, 0.5);
+}
+
+body.white-mode .upgrade-close {
+    border-color: rgba(0, 0, 0, 0.1);
+    background: rgba(0, 0, 0, 0.04);
+    color: rgba(0, 0, 0, 0.45);
+}
+
+body.white-mode .upgrade-close:hover {
+    background: rgba(0, 0, 0, 0.08);
+    color: #000;
+}
+
+body.white-mode .billing-toggle {
+    background: rgba(0, 0, 0, 0.04);
+    border-color: rgba(0, 0, 0, 0.08);
+}
+
+body.white-mode .billing-btn {
+    color: rgba(0, 0, 0, 0.4);
+}
+
+body.white-mode .billing-btn.active {
+    background: linear-gradient(135deg, #512da8, #673ab7);
+    color: #fff;
+}
+
+body.white-mode .upgrade-price-row {
+    background: rgba(103, 58, 183, 0.06);
+    border-color: rgba(103, 58, 183, 0.18);
+}
+
+body.white-mode .upgrade-price {
+    color: #673ab7;
+}
+
+body.white-mode .upgrade-price-meta {
+    color: rgba(0, 0, 0, 0.45);
+}
+
+body.white-mode .usd-note {
+    color: rgba(0, 0, 0, 0.28);
+}
+
+body.white-mode .features-col-label {
+    color: rgba(0, 0, 0, 0.38);
+}
+
+body.white-mode .feature-row.pro {
+    color: rgba(0, 0, 0, 0.82);
+}
+
+body.white-mode .feature-row.pro i {
+    color: #16a34a;
+}
+
+body.white-mode .feature-row.free {
+    color: rgba(0, 0, 0, 0.3);
+}
+
+body.white-mode .feature-row.free i {
+    color: rgba(0, 0, 0, 0.18);
+}
+
+body.white-mode .features-divider {
+    background: rgba(0, 0, 0, 0.07);
+}
+
+body.white-mode .stripe-btn {
+    background: rgba(0, 0, 0, 0.04);
+    color: rgba(0, 0, 0, 0.65);
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+body.white-mode .stripe-btn:hover:not(:disabled) {
+    background: rgba(0, 0, 0, 0.08);
+    border-color: rgba(0, 0, 0, 0.18);
+}
+
+body.white-mode .upgrade-footer {
+    color: rgba(0, 0, 0, 0.22);
+}
+
+/* ── Mobile ── */
+@media (max-width: 520px) {
+    .upgrade-modal {
+        padding: 22px 16px 18px;
+        border-radius: 16px;
+    }
+
+    .upgrade-title {
+        font-size: 1rem;
+    }
+
+    .upgrade-features {
+        grid-template-columns: 1fr;
+        gap: 12px 0;
+    }
+
+    .features-divider {
+        display: none;
+    }
+
+    .upgrade-price {
+        font-size: 1.7rem;
+    }
+
+    .pay-btn {
+        font-size: 0.85rem;
+        padding: 11px 16px;
+    }
+}
