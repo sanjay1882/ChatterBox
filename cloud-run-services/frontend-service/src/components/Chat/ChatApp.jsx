@@ -2595,7 +2595,7 @@ export default function ChatApp({ initialAppsOpen = false, initialSettingsOpen =
                                     ))}
                                 </div>
                                 <div className="settings-body">
-                                    {/* show hint while selecting or loading */}
+                                   
                                     {!appsSelected && (
                                         <div style={{ padding: '20px', color: 'var(--sarvam-text-secondary)', fontSize: '16px' }}>Choose an app from the left panel</div>
                                     )}
@@ -2603,7 +2603,7 @@ export default function ChatApp({ initialAppsOpen = false, initialSettingsOpen =
                                         const agent = AGENTS.find(a => a.id === appsSelected);
                                         return (
                                             <div style={{ display: 'flex', flexDirection: 'column', height: '100%', maxWidth: '800px', margin: '0 auto', padding: '20px 40px' }}>
-                                                {/* Header Profile Section */}
+                                            
                                                 <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start', marginBottom: '32px' }}>
                                                     <div style={{
                                                         width: '100px', height: '100px', borderRadius: '24px',
