@@ -1,0 +1,17 @@
+{
+  "name": "chatterbox-root",
+  "version": "1.0.0",
+  "description": "Root orchestration for ChatterBox services",
+  "main": "index.js",
+  "scripts": {
+    "start": "concurrently --kill-others -n \"API,AI,BROWSER,FE\" -c \"green,blue,magenta,cyan\" \"npm run start-api\" \"npm run start-ai\" \"npm run start-browser\" \"npm run start-frontend\"",
+    "start-api": "cd api-service && npm start",
+    "start-ai": "cd ai-engine-service && venv\\Scripts\\python main.py",
+    "start-browser": "cd browser-worker-service && set PORT=8082 && npm start",
+    "start-frontend": "cd frontend-service && npm run dev",
+    "install-all": "npm install && cd api-service && npm install && cd ..\\browser-worker-service && npm install && cd ..\\frontend-service && npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

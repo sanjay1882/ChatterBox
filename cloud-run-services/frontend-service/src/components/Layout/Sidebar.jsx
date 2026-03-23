@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { AGENTS } from '../../config/agents';
 
 // Skeleton shimmer for conversation loading
@@ -17,6 +18,8 @@ function ConversationSkeleton() {
 export default function Sidebar({
     sidebarOpen,
     setSidebarOpen,
+    sidebarWidth,
+    onResize,
     user,
     logout,
     isGuest,
@@ -26,6 +29,7 @@ export default function Sidebar({
     setSearchQuery,
     startNewChat,
     filteredSessions,
+    sessionId,
     currentSessionId,
     setCurrentSessionId,
     setDeleteModal,
@@ -35,153 +39,225 @@ export default function Sidebar({
     sessPage,
     setSettingsOpen,
     setAppsOpen,
+    onOpenLegal,
     galleryCount = 0,
     onOpenGallery,
 }) {
+    const isResizing = React.useRef(false);
+
+    const startResizing = React.useCallback((mouseDownEvent) => {
+        isResizing.current = true;
+        document.addEventListener('mousemove', handleResizing);
+        document.addEventListener('mouseup', stopResizing);
+        document.body.style.cursor = 'col-resize';
+        document.body.style.userSelect = 'none';
+    }, []);
+
+    const handleResizing = React.useCallback((mouseMoveEvent) => {
+        if (isResizing.current) {
+            onResize(mouseMoveEvent.clientX);
+        }
+    }, [onResize]);
+
+    const stopResizing = React.useCallback(() => {
+        isResizing.current = false;
+        document.removeEventListener('mousemove', handleResizing);
+        document.removeEventListener('mouseup', stopResizing);
+        document.body.style.cursor = 'default';
+        document.body.style.userSelect = 'auto';
+    }, [handleResizing]);
+
     return (
-        <div className={`sidebar${sidebarOpen ? ' open' : ''}`}>
+        <div 
+            className={`sidebar ${sidebarOpen ? 'open' : 'collapsed'}`}
+            style={sidebarOpen && window.innerWidth > 768 ? { width: `${sidebarWidth}px` } : {}}
+        >
             <div className="logo-details">
-                <i className='bx bx-doughnut-chart' />
-                <i className='bx bx-menu-alt-right' id="btn" onClick={() => setSidebarOpen(false)} />
+                {!sidebarOpen ? (
+                   <i className='bx bx-doughnut-chart' onClick={() => setSidebarOpen(true)} style={{ cursor: 'pointer' }} data-tooltip="Treevit" />
+                ) : (
+                    <>
+                        <i className='bx bx-doughnut-chart' />
+                        
+                    </>
+                )}
+                <i 
+                    className={`bx ${sidebarOpen ? 'bx-menu-alt-right' : 'bx-menu'}`} 
+                    id="btn" 
+                    onClick={() => setSidebarOpen(!sidebarOpen)} 
+                    data-tooltip={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+                />
             </div>
 
             <ul className="nav-list">
-                {/* Search */}
-                <li>
-                    <i className='bx bx-search' />
-                    <input
-                        type="text"
-                        placeholder="Search..."
-                        id="sidebar-search-input"
-                        value={searchQuery}
-                        onChange={e => setSearchQuery(e.target.value)}
-                    />
-                </li>
+                {/* Search - Hidden in collapsed */}
+                {sidebarOpen && (
+                    <li>
+                        <div className="sidebar-search-container">
+                            <div className="sidebar-search">
+                            
+                                <input
+                                    type="text"
+                                    placeholder="Search..."
+                                    id="sidebar-search-input"
+                                    value={searchQuery}
+                                    onChange={e => setSearchQuery(e.target.value)}
+                                />
+                            </div>
+                        </div>
+                    </li>
+                )}
 
                 {/* New Chat */}
                 <li className="Newchat-Btn">
-                    <a href="#" onClick={e => { e.preventDefault(); startNewChat(); }}>
-                        <i className='bx bx-chat' />
+                    <a href="#" onClick={e => { e.preventDefault(); startNewChat(); }} data-tooltip="New Chat">
+                        <i className='bx bx-plus' />
                         <span className="links_name">New Chat</span>
                     </a>
                 </li>
 
-                {/* Gallery — now functional */}
-                <li>
-                    <a
-                        href="#"
-                        id="gallery-btn"
-                        onClick={e => { e.preventDefault(); onOpenGallery?.(); setSidebarOpen(false); }}
-                        title="View generated images"
-                    >
-                        <i className='bx bx-images' />
-                        <span className="links_name">
-                            Gallery
-                            {galleryCount > 0 && (
-                                <span className="gallery-badge">{galleryCount}</span>
-                            )}
-                        </span>
-                    </a>
-                </li>
+                {/* Gallery - Hidden in collapsed */}
+                {sidebarOpen && (
+                    <li>
+                        <a
+                            href="#"
+                            id="gallery-btn"
+                            onClick={e => { e.preventDefault(); onOpenGallery?.(); if(window.innerWidth <= 768) setSidebarOpen(false); }}
+                            data-tooltip="Gallery"
+                        >
+                            <i className='bx bx-images' />
+                            <span className="links_name">
+                                Gallery
+                                {galleryCount > 0 && (
+                                    <span className="gallery-badge">{galleryCount}</span>
+                                )}
+                            </span>
+                        </a>
+                    </li>
+                )}
 
-                {/* Apps trigger (opens modal) */}
+                {/* Apps */}
                 <li>
                     <a href="#" id="apps-btn" onClick={e => {
                         e.preventDefault();
                         setAppsOpen(true);
-                        setSidebarOpen(false);
-                    }}>
+                        if(window.innerWidth <= 768) setSidebarOpen(false);
+                    }} data-tooltip="Apps Explorer">
                         <i className='bx bx-grid-alt' />
                         <span className="links_name">Apps</span>
                     </a>
                 </li>
 
-                {/* Dynamic Agents Registry */}
-                <div className="sidebar-divider" style={{ borderTop: '1px solid rgba(255,255,255,0.05)', margin: '10px 15px' }} />
-
-                {AGENTS.filter(a => a.id !== 'chat' && !a.hideInSidebar).map(agent => (
-                    <li key={agent.id}>
-                        <a
-                            href="#"
-                            onClick={e => { e.preventDefault(); setAppMode(agent.id); setSidebarOpen(false); }}
-                            className={appMode === agent.id ? 'active-agent' : ''}
-                            style={appMode === agent.id ? { background: agent.color + '15', color: agent.color } : {}}
-                        >
-                            <i className={`bx ${agent.icon}`} style={appMode === agent.id ? { color: agent.color } : {}} />
-                            <span className="links_name">
-                                {agent.name}
-                                {agent.badge && <span className="agent-badge">{agent.badge}</span>}
-                            </span>
-                        </a>
-                    </li>
-                ))}
-
-                {/* History */}
-                <div className="history-container">
-                    <ul id="chat-history-list">
-                        {isGuest ? (
-                            <li style={{ padding: '10px', color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>
-                                Sign in to save history
+                {/* Agents Section - Hidden in collapsed */}
+                {sidebarOpen && (
+                    <>
+                        {AGENTS.filter(a => a.id !== 'chat' && !a.hideInSidebar).map(agent => (
+                            <li key={agent.id}>
+                                <a
+                                    href="#"
+                                    onClick={e => { e.preventDefault(); setAppMode(agent.id); if(window.innerWidth <= 768) setSidebarOpen(false); }}
+                                    className={appMode === agent.id ? 'active-agent' : ''}
+                                    style={{ background: agent.color + '15', color: agent.color }}
+                                    data-tooltip={agent.name}
+                                >
+                                    {agent.logo ? (
+                                        <img
+                                            src={agent.logo}
+                                            alt={agent.name}
+                                            style={{
+                                                height: '20px',
+                                                width: '20px',
+                                                objectFit: 'contain'
+                                            }}
+                                        />
+                                    ) : (
+                                        <i className={`bx ${agent.icon}`} style={appMode === agent.id ? { color: agent.color } : {}} />
+                                    )}
+                                    <span className="links_name">
+                                        {agent.name}
+                                    </span>
+                                </a>
                             </li>
-                        ) : (
-                            <>
-                                {/* Initial load skeleton */}
-                                {sessionsLoading && filteredSessions.length === 0 ? (
-                                    <ConversationSkeleton />
-                                ) : (
-                                    filteredSessions.map(s => (
-                                        <li
-                                            key={s._id}
-                                            className={`history-item${currentSessionId === s._id ? ' active' : ''}`}
-                                            onClick={() => { setCurrentSessionId(s._id); setSidebarOpen(false); }}
-                                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 10px', borderRadius: 8, cursor: 'pointer', margin: '2px 0' }}
-                                        >
-                                            <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 13 }}>
-                                                {s.title}
-                                            </span>
-                                            <i
-                                                className='bx bx-trash'
-                                                style={{ fontSize: 14, opacity: 0.5, marginLeft: 6, flexShrink: 0 }}
-                                                onClick={e => { e.stopPropagation(); setDeleteModal({ open: true, id: s._id }); }}
-                                            />
-                                        </li>
-                                    ))
-                                )}
+                        ))}
+                    </>
+                )}
+                <div className="sidebar-divider" />
 
-                                {/* Load more */}
-                                {sessHasMore && (
-                                    <li style={{ textAlign: 'center', padding: '8px 0' }}>
-                                        {sessionsLoading ? (
-                                            <div className="conv-load-more-spinner">
-                                                <span /><span /><span />
-                                            </div>
-                                        ) : (
-                                            <a
-                                                href="#"
-                                                onClick={e => { e.preventDefault(); loadSessions(sessPage + 1, true); }}
-                                                style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}
+                {/* History - Hidden in collapsed */}
+                {sidebarOpen && (
+                    <div className="history-container">
+                        <ul id="chat-history-list">
+                            {isGuest ? (
+                                <li style={{ padding: '10px', color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>
+                                    Sign in to save history
+                                </li>
+                            ) : (
+                                <>
+                                    {sessionsLoading && filteredSessions.length === 0 ? (
+                                        <ConversationSkeleton />
+                                    ) : (
+                                        filteredSessions.map(s => (
+                                            <li
+                                                key={s._id}
+                                                className={`history-item${(currentSessionId === s._id || sessionId === s._id) ? ' active' : ''}`}
+                                                onClick={() => { setCurrentSessionId(s._id); if(window.innerWidth <= 768) setSidebarOpen(false); }}
+                                                data-tooltip={s.title || "Untitled Chat"}
                                             >
-                                                Load more
-                                            </a>
-                                        )}
-                                    </li>
-                                )}
-                            </>
-                        )}
-                    </ul>
-                </div>
+                                                <i className='bx bx-message-square-detail' />
+                                                <span className="history-item-title">
+                                                    {s.title || "Untitled Chat"}
+                                                </span>
+                                                <i
+                                                    className='bx bx-trash delete-chat-icon'
+                                                    onClick={e => { e.stopPropagation(); setDeleteModal({ open: true, id: s._id }); }}
+                                                />
+                                            </li>
+                                        ))
+                                    )}
 
-                {/* Settings */}
-                <li id="settings-li">
-                    <a href="#" id="settings-btn" title="Settings" onClick={e => { e.preventDefault(); setSettingsOpen(true); }}>
+                                    {sessHasMore && (
+                                        <li style={{ textAlign: 'center', padding: '8px 0' }}>
+                                            {sessionsLoading ? (
+                                                <div className="conv-load-more-spinner">
+                                                    <span /><span /><span />
+                                                </div>
+                                            ) : (
+                                                <a
+                                                    href="#"
+                                                    onClick={e => { e.preventDefault(); loadSessions(sessPage + 1, true); }}
+                                                    style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}
+                                                >
+                                                    Load more
+                                                </a>
+                                            )}
+                                        </li>
+                                    )}
+                                </>
+                            )}
+                        </ul>
+                    </div>
+                )}
+            </ul>
+
+            <div className="sidebar-footer">
+                <div className="sidebar-footer-item">
+                    <a href="#" id="settings-btn" data-tooltip="Settings" onClick={e => { e.preventDefault(); if(window.innerWidth <= 768) setSidebarOpen(false); setSettingsOpen(true); }}>
                         <i className='bx bx-cog' />
                         <span className="links_name">Settings</span>
                     </a>
-                </li>
+                </div>
 
-                {/* Profile */}
-                <li className="profile" id="profile-li">
-                    <div className="profile-details">
+            
+                {sidebarOpen && (
+                    <div className="sidebar-legal-links">
+                        <Link to="/privacy">Privacy</Link>
+                        <span className="dot">·</span>
+                        <Link to="/terms-of-service">Terms</Link>
+                    </div>
+                )}
+
+                <div className="profile-section">
+                    <div className="profile-details" id="profile-li" data-tooltip={user?.displayName || user?.email}>
                         <img id="_imgField" src={user?.photoURL || '/assets/Designer.png'} alt="Profile" />
                         <div className="name_job">
                             <div className="name">
@@ -191,10 +267,13 @@ export default function Sidebar({
                                 <span id="loggedUserEmail">{isGuest ? 'Guest Mode' : user?.email}</span>
                             </div>
                         </div>
-                        <i className='bx bx-log-out' id="logout" title="Logout" onClick={logout} />
+                        <i className='bx bx-log-out' id="logout" data-tooltip="Logout" onClick={logout} />
                     </div>
-                </li>
-            </ul>
+                </div>
+            </div>
+
+           
+            {sidebarOpen && <div className="sidebar-resizer" onMouseDown={startResizing} />}
         </div>
     );
 }

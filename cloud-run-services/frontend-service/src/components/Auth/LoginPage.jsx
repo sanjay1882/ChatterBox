@@ -7,7 +7,7 @@ import {
 } from 'firebase/auth';
 import { auth } from '../../firebase';
 import { useAuth } from '../../contexts/AuthContext';
-import '../../login-style.css';
+
 
 const GoogleSVG = () => (
     <svg width="18" height="18" viewBox="0 0 18 18">

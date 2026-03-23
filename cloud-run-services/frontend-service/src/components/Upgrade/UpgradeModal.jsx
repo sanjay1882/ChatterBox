@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCredits } from '../../contexts/CreditsContext';
-import './UpgradeModal.css';
+
 
 const BACKEND = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
 

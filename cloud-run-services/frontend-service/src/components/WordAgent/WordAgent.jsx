@@ -7,8 +7,6 @@ import { highlightAllCodeBlocks } from '../../utils/markdown';
 import * as mammoth from 'mammoth';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
-import '../Chat/Chat.css';
-import './WordAgent.css';
 
 const QUICK_PROMPTS = [
     'Summarize this document',

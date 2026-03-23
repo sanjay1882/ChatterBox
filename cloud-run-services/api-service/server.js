@@ -10,6 +10,7 @@ import userRoutes from "./routes/userRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
 import agentRoutes from "./routes/agentRoutes.js";
 import creditsRoutes from "./routes/creditsRoutes.js";
+import settingsRoutes from "./routes/settingsRoutes.js";
 
 dotenv.config();
 
@@ -110,13 +111,15 @@ app.use("/session", sessionRoutes);
 app.use("/sessions", sessionRoutes);
 app.use("/user", userRoutes);
 app.use("/credits", creditsRoutes);
+app.use("/settings", settingsRoutes);
 
 // Direct root routes for backwards compatibility
 app.use("/", chatRoutes);
 app.use("/", agentRoutes);
 
 const PORT = process.env.PORT || 3000;
+const HOST = '127.0.0.1'; // Force IPv4 specifically for local stability
 
-app.listen(PORT, () => {
-    console.log(`API Gateway running on port ${PORT}`);
+app.listen(PORT, HOST, () => {
+    console.log(`API Gateway running on http://${HOST}:${PORT}`);
 });

@@ -3,7 +3,7 @@ import { useAuth } from './AuthContext';
 
 const CreditsContext = createContext(null);
 
-const BACKEND = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
+const BACKEND = import.meta.env.VITE_BACKEND_URL || (import.meta.env.DEV ? '/api' : 'http://127.0.0.1:3000');
 
 export function CreditsProvider({ children }) {
     const { user, token, loading: authLoading } = useAuth();
@@ -22,14 +22,19 @@ export function CreditsProvider({ children }) {
     const fetchCredits = useCallback(async () => {
         if (!user?.email || !token) return;
         try {
-            const res = await fetch(`${BACKEND}/credits/${encodeURIComponent(user.email)}`, {
+            const url = `${BACKEND}/credits/${encodeURIComponent(user.email)}`;
+            console.log("[CreditsContext] fetching from:", url);
+            const res = await fetch(url, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            if (!res.ok) return;
+            if (!res.ok) {
+              console.error("[CreditsContext] HTTP Error:", res.status, res.statusText);
+              return;
+            }
             const data = await res.json();
             setCredits(data);
         } catch (e) {
-            console.warn('Could not fetch credits:', e.message);
+            console.error('[CreditsContext] Critical Fail:', e.message, e);
         } finally {
             setLoading(false);
         }

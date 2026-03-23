@@ -5,20 +5,20 @@
    CSS Variables
    ============================================================ */
 :root {
-    --sarvam-bg-body: #F7F5F3;
-    --sarvam-bg-surface: #FFFFFF;
-    --sarvam-bg-elevated: #F2EFEC;
-    --sarvam-text-main: #1A1A1A;
-    --sarvam-text-secondary: #5C5C5C;
-    --sarvam-text-tertiary: #9A9A9A;
-    --sarvam-border: #E6E3DF;
-    --sarvam-border-subtle: #EEEBE7;
-    --sarvam-accent: #2D6A4F;
-    --sarvam-radius-card: 18px;
-    --sarvam-radius-pill: 9999px;
-    --sarvam-shadow-sm: 0px 2px 8px rgba(0, 0, 0, 0.05);
-    --sarvam-shadow: 0px 4px 20px rgba(0, 0, 0, 0.06);
-    --sarvam-shadow-lg: 0px 8px 32px rgba(0, 0, 0, 0.08);
+    --sarvam-bg-body: var(--bg-base);
+    --sarvam-bg-surface: var(--bg-surface);
+    --sarvam-bg-elevated: var(--bg-elevated);
+    --sarvam-text-main: var(--text-primary);
+    --sarvam-text-secondary: var(--text-secondary);
+    --sarvam-text-tertiary: var(--text-muted);
+    --sarvam-border: var(--border);
+    --sarvam-border-subtle: var(--border-md);
+    --sarvam-accent: var(--accent);
+    --sarvam-radius-card: var(--radius-lg, 18px);
+    --sarvam-radius-pill: var(--radius-full, 9999px);
+    --sarvam-shadow-sm: var(--shadow-sm);
+    --sarvam-shadow: var(--shadow-md);
+    --sarvam-shadow-lg: var(--shadow-lg);
     --sarvam-font-heading: "Outfit", sans-serif;
     --sarvam-font-body: 'DM Sans', 'Outfit', sans-serif;
 }

@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from '../firebase';
 
@@ -9,6 +9,7 @@ export function AuthProvider({ children }) {
     const [token, setToken] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isGuest, setIsGuest] = useState(false);
+    const [googleAccessToken, setGoogleAccessToken] = useState(() => localStorage.getItem('google_access_token') || null);
 
     useEffect(() => {
         const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
@@ -18,8 +19,8 @@ export function AuthProvider({ children }) {
                 setToken(idToken);
                 setIsGuest(false);
                 localStorage.setItem('fb_token', idToken);
+                setGoogleAccessToken(localStorage.getItem('google_access_token') || null);
             } else {
-                // Check if continuing as guest
                 const guestMode = localStorage.getItem('guest_mode') === 'true';
                 if (guestMode) {
                     setIsGuest(true);
@@ -38,8 +39,10 @@ export function AuthProvider({ children }) {
         await signOut(auth);
         localStorage.removeItem('fb_token');
         localStorage.removeItem('guest_mode');
+        localStorage.removeItem('google_access_token');
         setUser(null);
         setToken(null);
+        setGoogleAccessToken(null);
         setIsGuest(false);
     };
 
@@ -50,7 +53,16 @@ export function AuthProvider({ children }) {
         setLoading(false);
     };
 
-    // Refresh token periodically
+    const getFreshToken = async () => {
+        if (auth.currentUser) {
+            const newToken = await auth.currentUser.getIdToken(true);
+            setToken(newToken);
+            localStorage.setItem('fb_token', newToken);
+            return newToken;
+        }
+        return token;
+    };
+
     useEffect(() => {
         const interval = setInterval(async () => {
             if (auth.currentUser) {
@@ -58,12 +70,33 @@ export function AuthProvider({ children }) {
                 setToken(newToken);
                 localStorage.setItem('fb_token', newToken);
             }
-        }, 55 * 60 * 1000); // every 55 min
+            setGoogleAccessToken(localStorage.getItem('google_access_token') || null);
+        }, 55 * 60 * 1000);
         return () => clearInterval(interval);
     }, []);
 
+    useEffect(() => {
+        const syncGoogleToken = () => {
+            setGoogleAccessToken(localStorage.getItem('google_access_token') || null);
+        };
+        window.addEventListener('storage', syncGoogleToken);
+        return () => window.removeEventListener('storage', syncGoogleToken);
+    }, []);
+
+    const value = useMemo(() => ({
+        user,
+        token,
+        loading,
+        isGuest,
+        logout,
+        continueAsGuest,
+        getFreshToken,
+        googleAccessToken,
+        googleConnected: Boolean(googleAccessToken),
+    }), [user, token, loading, isGuest, googleAccessToken]);
+
     return (
-        <AuthContext.Provider value={{ user, token, loading, isGuest, logout, continueAsGuest }}>
+        <AuthContext.Provider value={value}>
             {children}
         </AuthContext.Provider>
     );

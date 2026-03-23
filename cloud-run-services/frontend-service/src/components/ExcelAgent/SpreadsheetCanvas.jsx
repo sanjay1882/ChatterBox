@@ -1,5 +1,5 @@
 import { useState, useCallback, memo, useRef, useLayoutEffect } from 'react';
-import './ExcelAgent.css';
+
 
 // Convert column index to Excel-style lettering (0→A, 25→Z, 26→AA, …)
 function colLabel(idx) {

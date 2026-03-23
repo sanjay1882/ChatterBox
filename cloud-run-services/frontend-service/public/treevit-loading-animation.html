@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Treevit — Loading Animation</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Sora', sans-serif;
+    background: #0e0e0e;
+    color: #fff;
+    padding: 60px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 64px;
+  }
+
+  .section-label {
+    font-size: 10px;
+    letter-spacing: 0.4em;
+    color: #333;
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  /* ─── TYPEWRITER ANIMATION ─── */
+  .tw circle {
+    opacity: 0;
+    animation: typeOn 2.5s ease-in-out infinite;
+    transform-origin: center;
+    transform-box: fill-box;
+  }
+  .tw circle:nth-child(1) { animation-delay: 0.00s; }
+  .tw circle:nth-child(2) { animation-delay: 0.18s; }
+  .tw circle:nth-child(3) { animation-delay: 0.36s; }
+  .tw circle:nth-child(4) { animation-delay: 0.54s; }
+  .tw circle:nth-child(5) { animation-delay: 0.72s; }
+  .tw circle:nth-child(6) { animation-delay: 0.90s; }
+  .tw circle:nth-child(7) { animation-delay: 1.08s; }
+  .tw circle:nth-child(8) { animation-delay: 1.26s; }
+  .tw circle:nth-child(9) { animation-delay: 1.44s; }
+  @keyframes typeOn {
+    0%       { opacity: 0; transform: scale(0.3); }
+    15%, 70% { opacity: 1; transform: scale(1);   }
+    90%,100% { opacity: 0; transform: scale(0.3); }
+  }
+
+  /* trunk always visible */
+  .tw .trunk { opacity: 1 !important; animation: none !important; }
+
+  /* ─── SIZE DEMOS ─── */
+  .sizes-row {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .size-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .size-item .px {
+    font-size: 10px;
+    color: #333;
+    letter-spacing: 0.2em;
+  }
+
+  /* ─── CHAT MOCKUP ─── */
+  .mockup-row {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .chat-window {
+    width: 340px;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid #222;
+  }
+
+  .chat-header {
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid #1a1a1a;
+  }
+  .chat-header .app-name {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+  }
+
+  .chat-body {
+    padding: 20px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-height: 180px;
+  }
+
+  .msg {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+  }
+  .msg.user { flex-direction: row-reverse; }
+
+  .bubble {
+    padding: 10px 14px;
+    border-radius: 16px;
+    font-size: 12px;
+    line-height: 1.5;
+    max-width: 220px;
+  }
+
+  .msg.ai .bubble {
+    border-radius: 4px 16px 16px 16px;
+  }
+  .msg.user .bubble {
+    border-radius: 16px 4px 16px 16px;
+    font-size: 12px;
+  }
+
+  /* loading bubble */
+  .loading-bubble {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 4px 16px 16px 16px;
+  }
+  .loading-bubble span {
+    font-size: 11px;
+    opacity: 0.5;
+    letter-spacing: 0.05em;
+  }
+
+  /* ── DARK CHAT ── */
+  .chat-dark { background: #141414; }
+  .chat-dark .chat-header { background: #111; }
+  .chat-dark .app-name { color: #ccc; }
+  .chat-dark .msg.ai .bubble { background: #1e1e1e; color: #ddd; }
+  .chat-dark .msg.user .bubble { background: #2a2a2a; color: #bbb; }
+  .chat-dark .loading-bubble { background: #1e1e1e; }
+
+  /* ── GREEN/LIGHT CHAT ── */
+  .chat-green { background: #f8fffe; }
+  .chat-green .chat-header { background: #fff; border-bottom: 1px solid #eee; }
+  .chat-green .app-name { color: #1a1a1a; }
+  .chat-green .msg.ai .bubble { background: #f0faf6; color: #1a1a1a; border: 1px solid #e0f5ec; }
+  .chat-green .msg.user .bubble { background: #16a085; color: #fff; }
+  .chat-green .loading-bubble { background: #f0faf6; border: 1px solid #e0f5ec; }
+  .chat-green .loading-bubble span { color: #555; }
+
+  /* avatar dot */
+  .avatar {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .avatar svg { width: 28px; height: 28px; border-radius: 50%; }
+</style>
+</head>
+<body>
+
+<!-- ═══ SECTION 1: SIZE COMPARISON ═══ -->
+<div>
+  <p class="section-label">Recommended Size · 44×44px · Like Claude / ChatGPT / Gemini</p>
+  <div class="sizes-row">
+
+    <!-- 24px -->
+    <div class="size-item">
+      <svg width="24" height="24" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <rect width="200" height="200" rx="100" fill="#1a1a1a"/>
+        <rect class="trunk" x="96" y="130" width="8" height="28" rx="4" fill="#fff" opacity="1"/>
+        <g class="tw">
+          <circle cx="100" cy="54" r="14" fill="#fff"/>
+          <circle cx="82" cy="80" r="11" fill="#fff"/>
+          <circle cx="118" cy="80" r="11" fill="#fff"/>
+          <circle cx="68" cy="106" r="9" fill="#fff"/>
+          <circle cx="100" cy="100" r="13" fill="#fff"/>
+          <circle cx="132" cy="106" r="9" fill="#fff"/>
+          <circle cx="56" cy="128" r="8" fill="#fff"/>
+          <circle cx="85" cy="122" r="10" fill="#fff"/>
+          <circle cx="115" cy="122" r="10" fill="#fff"/>
+        </g>
+      </svg>
+      <span class="px">24px</span>
+    </div>
+
+    <!-- 32px -->
+    <div class="size-item">
+      <svg width="32" height="32" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <rect width="200" height="200" rx="100" fill="#1a1a1a"/>
+        <rect class="trunk" x="96" y="130" width="8" height="28" rx="4" fill="#fff" opacity="1"/>
+        <g class="tw">
+          <circle cx="100" cy="54" r="14" fill="#fff"/>
+          <circle cx="82" cy="80" r="11" fill="#fff"/>
+          <circle cx="118" cy="80" r="11" fill="#fff"/>
+          <circle cx="68" cy="106" r="9" fill="#fff"/>
+          <circle cx="100" cy="100" r="13" fill="#fff"/>
+          <circle cx="132" cy="106" r="9" fill="#fff"/>
+          <circle cx="56" cy="128" r="8" fill="#fff"/>
+          <circle cx="85" cy="122" r="10" fill="#fff"/>
+          <circle cx="115" cy="122" r="10" fill="#fff"/>
+        </g>
+      </svg>
+      <span class="px">32px</span>
+    </div>
+
+    <!-- 44px — RECOMMENDED -->
+    <div class="size-item">
+      <svg width="44" height="44" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <rect width="200" height="200" rx="100" fill="#1a1a1a"/>
+        <rect class="trunk" x="96" y="130" width="8" height="28" rx="4" fill="#fff" opacity="1"/>
+        <g class="tw">
+          <circle cx="100" cy="54" r="14" fill="#fff"/>
+          <circle cx="82" cy="80" r="11" fill="#fff"/>
+          <circle cx="118" cy="80" r="11" fill="#fff"/>
+          <circle cx="68" cy="106" r="9" fill="#fff"/>
+          <circle cx="100" cy="100" r="13" fill="#fff"/>
+          <circle cx="132" cy="106" r="9" fill="#fff"/>
+          <circle cx="56" cy="128" r="8" fill="#fff"/>
+          <circle cx="85" cy="122" r="10" fill="#fff"/>
+          <circle cx="115" cy="122" r="10" fill="#fff"/>
+        </g>
+      </svg>
+      <span class="px" style="color:#16a085">44px ✦ ideal</span>
+    </div>
+
+    <!-- 56px -->
+    <div class="size-item">
+      <svg width="56" height="56" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <rect width="200" height="200" rx="100" fill="#1a1a1a"/>
+        <rect class="trunk" x="96" y="130" width="8" height="28" rx="4" fill="#fff" opacity="1"/>
+        <g class="tw">
+          <circle cx="100" cy="54" r="14" fill="#fff"/>
+          <circle cx="82" cy="80" r="11" fill="#fff"/>
+          <circle cx="118" cy="80" r="11" fill="#fff"/>
+          <circle cx="68" cy="106" r="9" fill="#fff"/>
+          <circle cx="100" cy="100" r="13" fill="#fff"/>
+          <circle cx="132" cy="106" r="9" fill="#fff"/>
+          <circle cx="56" cy="128" r="8" fill="#fff"/>
+          <circle cx="85" cy="122" r="10" fill="#fff"/>
+          <circle cx="115" cy="122" r="10" fill="#fff"/>
+        </g>
+      </svg>
+      <span class="px">56px</span>
+    </div>
+
+    <!-- 72px -->
+    <div class="size-item">
+      <svg width="72" height="72" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <rect width="200" height="200" rx="100" fill="#1a1a1a"/>
+        <rect class="trunk" x="96" y="130" width="8" height="28" rx="4" fill="#fff" opacity="1"/>
+        <g class="tw">
+          <circle cx="100" cy="54" r="14" fill="#fff"/>
+          <circle cx="82" cy="80" r="11" fill="#fff"/>
+          <circle cx="118" cy="80" r="11" fill="#fff"/>
+          <circle cx="68" cy="106" r="9" fill="#fff"/>
+          <circle cx="100" cy="100" r="13" fill="#fff"/>
+          <circle cx="132" cy="106" r="9" fill="#fff"/>
+          <circle cx="56" cy="128" r="8" fill="#fff"/>
+          <circle cx="85" cy="122" r="10" fill="#fff"/>
+          <circle cx="115" cy="122" r="10" fill="#fff"/>
+        </g>
+      </svg>
+      <span class="px">72px</span>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ SECTION 2: BOTH VERSIONS AT 44px ═══ -->
+<div>
+  <p class="section-label">Both Versions · 44×44px</p>
+  <div class="sizes-row">
+
+    <!-- Dark version -->
+    <div class="size-item">
+      <svg width="44" height="44" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <rect width="200" height="200" rx="100" fill="#1a1a1a"/>
+        <rect class="trunk" x="96" y="130" width="8" height="28" rx="4" fill="#fff" opacity="1"/>
+        <g class="tw">
+          <circle cx="100" cy="54" r="14" fill="#fff"/>
+          <circle cx="82" cy="80" r="11" fill="#fff"/>
+          <circle cx="118" cy="80" r="11" fill="#fff"/>
+          <circle cx="68" cy="106" r="9" fill="#fff"/>
+          <circle cx="100" cy="100" r="13" fill="#fff"/>
+          <circle cx="132" cy="106" r="9" fill="#fff"/>
+          <circle cx="56" cy="128" r="8" fill="#fff"/>
+          <circle cx="85" cy="122" r="10" fill="#fff"/>
+          <circle cx="115" cy="122" r="10" fill="#fff"/>
+        </g>
+      </svg>
+      <span class="px">Dark · 44px</span>
+    </div>
+
+    <!-- Green version -->
+    <div class="size-item">
+      <svg width="44" height="44" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <rect width="200" height="200" rx="100" fill="#ffffff"/>
+        <rect class="trunk" x="96" y="130" width="8" height="28" rx="4" fill="#16a085" opacity="1"/>
+        <g class="tw">
+          <circle cx="100" cy="54" r="14" fill="#16a085"/>
+          <circle cx="82" cy="80" r="11" fill="#1abc9c"/>
+          <circle cx="118" cy="80" r="11" fill="#1abc9c"/>
+          <circle cx="68" cy="106" r="9" fill="#2ecc71"/>
+          <circle cx="100" cy="100" r="13" fill="#16a085"/>
+          <circle cx="132" cy="106" r="9" fill="#2ecc71"/>
+          <circle cx="56" cy="128" r="8" fill="#27ae60"/>
+          <circle cx="85" cy="122" r="10" fill="#27ae60"/>
+          <circle cx="115" cy="122" r="10" fill="#27ae60"/>
+        </g>
+      </svg>
+      <span class="px">Green · 44px</span>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ SECTION 3: LIVE CHAT MOCKUPS ═══ -->
+<div>
+  <p class="section-label">How It Looks Inside a Chat Interface</p>
+  <div class="mockup-row">
+
+    <!-- DARK CHAT -->
+    <div class="chat-window chat-dark">
+      <div class="chat-header">
+        <svg width="22" height="22" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" style="border-radius:50%">
+          <rect width="200" height="200" rx="100" fill="#1a1a1a"/>
+          <rect x="96" y="130" width="8" height="28" rx="4" fill="#fff"/>
+          <circle cx="100" cy="54" r="14" fill="#fff"/>
+          <circle cx="82" cy="80" r="11" fill="#fff" opacity=".85"/>
+          <circle cx="118" cy="80" r="11" fill="#fff" opacity=".85"/>
+          <circle cx="68" cy="106" r="9" fill="#fff" opacity=".65"/>
+          <circle cx="100" cy="100" r="13" fill="#fff" opacity=".9"/>
+          <circle cx="132" cy="106" r="9" fill="#fff" opacity=".65"/>
+        </svg>
+        <span class="app-name">Treevit</span>
+      </div>
+      <div class="chat-body">
+        <div class="msg user">
+          <div class="bubble">What is photosynthesis?</div>
+        </div>
+        <!-- AI loading -->
+        <div class="msg ai">
+          <div class="avatar">
+            <svg width="28" height="28" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+              <rect width="200" height="200" rx="100" fill="#1a1a1a"/>
+              <rect class="trunk" x="96" y="130" width="8" height="28" rx="4" fill="#fff" opacity="1"/>
+              <g class="tw">
+                <circle cx="100" cy="54" r="14" fill="#fff"/>
+                <circle cx="82" cy="80" r="11" fill="#fff"/>
+                <circle cx="118" cy="80" r="11" fill="#fff"/>
+                <circle cx="68" cy="106" r="9" fill="#fff"/>
+                <circle cx="100" cy="100" r="13" fill="#fff"/>
+                <circle cx="132" cy="106" r="9" fill="#fff"/>
+                <circle cx="56" cy="128" r="8" fill="#fff"/>
+                <circle cx="85" cy="122" r="10" fill="#fff"/>
+                <circle cx="115" cy="122" r="10" fill="#fff"/>
+              </g>
+            </svg>
+          </div>
+          <div class="loading-bubble">
+            <svg width="44" height="44" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" style="border-radius:50%">
+              <rect width="200" height="200" rx="100" fill="#1a1a1a"/>
+              <rect class="trunk" x="96" y="130" width="8" height="28" rx="4" fill="#fff" opacity="1"/>
+              <g class="tw">
+                <circle cx="100" cy="54" r="14" fill="#fff"/>
+                <circle cx="82" cy="80" r="11" fill="#fff"/>
+                <circle cx="118" cy="80" r="11" fill="#fff"/>
+                <circle cx="68" cy="106" r="9" fill="#fff"/>
+                <circle cx="100" cy="100" r="13" fill="#fff"/>
+                <circle cx="132" cy="106" r="9" fill="#fff"/>
+                <circle cx="56" cy="128" r="8" fill="#fff"/>
+                <circle cx="85" cy="122" r="10" fill="#fff"/>
+                <circle cx="115" cy="122" r="10" fill="#fff"/>
+              </g>
+            </svg>
+            <span>Thinking…</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GREEN/LIGHT CHAT -->
+    <div class="chat-window chat-green">
+      <div class="chat-header">
+        <svg width="22" height="22" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" style="border-radius:50%">
+          <rect width="200" height="200" rx="100" fill="#fff" stroke="#e0f5ec" stroke-width="8"/>
+          <rect x="96" y="130" width="8" height="28" rx="4" fill="#16a085"/>
+          <circle cx="100" cy="54" r="14" fill="#16a085"/>
+          <circle cx="82" cy="80" r="11" fill="#1abc9c" opacity=".85"/>
+          <circle cx="118" cy="80" r="11" fill="#1abc9c" opacity=".85"/>
+          <circle cx="68" cy="106" r="9" fill="#2ecc71" opacity=".65"/>
+          <circle cx="100" cy="100" r="13" fill="#16a085" opacity=".9"/>
+          <circle cx="132" cy="106" r="9" fill="#2ecc71" opacity=".65"/>
+        </svg>
+        <span class="app-name">Treevit</span>
+      </div>
+      <div class="chat-body">
+        <div class="msg user">
+          <div class="bubble">What is photosynthesis?</div>
+        </div>
+        <div class="msg ai">
+          <div class="avatar">
+            <svg width="28" height="28" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+              <rect width="200" height="200" rx="100" fill="#fff" stroke="#e0f5ec" stroke-width="8"/>
+              <rect class="trunk" x="96" y="130" width="8" height="28" rx="4" fill="#16a085" opacity="1"/>
+              <g class="tw">
+                <circle cx="100" cy="54" r="14" fill="#16a085"/>
+                <circle cx="82" cy="80" r="11" fill="#1abc9c"/>
+                <circle cx="118" cy="80" r="11" fill="#1abc9c"/>
+                <circle cx="68" cy="106" r="9" fill="#2ecc71"/>
+                <circle cx="100" cy="100" r="13" fill="#16a085"/>
+                <circle cx="132" cy="106" r="9" fill="#2ecc71"/>
+                <circle cx="56" cy="128" r="8" fill="#27ae60"/>
+                <circle cx="85" cy="122" r="10" fill="#27ae60"/>
+                <circle cx="115" cy="122" r="10" fill="#27ae60"/>
+              </g>
+            </svg>
+          </div>
+          <div class="loading-bubble">
+            <svg width="44" height="44" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" style="border-radius:50%">
+              <rect width="200" height="200" rx="100" fill="#fff"/>
+              <rect class="trunk" x="96" y="130" width="8" height="28" rx="4" fill="#16a085" opacity="1"/>
+              <g class="tw">
+                <circle cx="100" cy="54" r="14" fill="#16a085"/>
+                <circle cx="82" cy="80" r="11" fill="#1abc9c"/>
+                <circle cx="118" cy="80" r="11" fill="#1abc9c"/>
+                <circle cx="68" cy="106" r="9" fill="#2ecc71"/>
+                <circle cx="100" cy="100" r="13" fill="#16a085"/>
+                <circle cx="132" cy="106" r="9" fill="#2ecc71"/>
+                <circle cx="56" cy="128" r="8" fill="#27ae60"/>
+                <circle cx="85" cy="122" r="10" fill="#27ae60"/>
+                <circle cx="115" cy="122" r="10" fill="#27ae60"/>
+              </g>
+            </svg>
+            <span>Thinking…</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ SECTION 4: NO BACKGROUND — TREE ONLY ═══ -->
+<div>
+  <p class="section-label">No Background · Tree Structure Only · Drop-in Ready</p>
+
+  <!-- Preview on dark bg -->
+  <p style="font-size:10px;color:#2a2a2a;letter-spacing:0.25em;text-transform:uppercase;text-align:center;margin-bottom:16px">On Dark Background</p>
+  <div class="sizes-row" style="background:#141414;padding:32px 40px;border-radius:20px;border:1px solid #1e1e1e;margin-bottom:28px">
+
+    <!-- White tree no bg — 24px -->
+    <div class="size-item">
+      <svg width="24" height="24" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <rect class="trunk" x="96" y="130" width="8" height="28" rx="4" fill="#fff" opacity="1"/>
+        <g class="tw">
+          <circle cx="100" cy="54" r="14" fill="#fff"/>
+          <circle cx="82" cy="80" r="11" fill="#fff"/>
+          <circle cx="118" cy="80" r="11" fill="#fff"/>
+          <circle cx="68" cy="106" r="9" fill="#fff"/>
+          <circle cx="100" cy="100" r="13" fill="#fff"/>
+          <circle cx="132" cy="106" r="9" fill="#fff"/>
+          <circle cx="56" cy="128" r="8" fill="#fff"/>
+          <circle cx="85" cy="122" r="10" fill="#fff"/>
+          <circle cx="115" cy="122" r="10" fill="#fff"/>
+        </g>
+      </svg>
+      <span class="px">24px</span>
+    </div>
+
+    <!-- White tree no bg — 32px -->
+    <div class="size-item">
+      <svg width="32" height="32" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <rect class="trunk" x="96" y="130" width="8" height="28" rx="4" fill="#fff" opacity="1"/>
+        <g class="tw">
+          <circle cx="100" cy="54" r="14" fill="#fff"/>
+          <circle cx="82" cy="80" r="11" fill="#fff"/>
+          <circle cx="118" cy="80" r="11" fill="#fff"/>
+          <circle cx="68" cy="106" r="9" fill="#fff"/>
+          <circle cx="100" cy="100" r="13" fill="#fff"/>
+          <circle cx="132" cy="106" r="9" fill="#fff"/>
+          <circle cx="56" cy="128" r="8" fill="#fff"/>
+          <circle cx="85" cy="122" r="10" fill="#fff"/>
+          <circle cx="115" cy="122" r="10" fill="#fff"/>
+        </g>
+      </svg>
+      <span class="px">32px</span>
+    </div>
+
+    <!-- White tree no bg — 44px IDEAL -->
+    <div class="size-item">
+      <svg width="44" height="44" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <rect class="trunk" x="96" y="130" width="8" height="28" rx="4" fill="#fff" opacity="1"/>
+        <g class="tw">
+          <circle cx="100" cy="54" r="14" fill="#fff"/>
+          <circle cx="82" cy="80" r="11" fill="#fff"/>
+          <circle cx="118" cy="80" r="11" fill="#fff"/>
+          <circle cx="68" cy="106" r="9" fill="#fff"/>
+          <circle cx="100" cy="100" r="13" fill="#fff"/>
+          <circle cx="132" cy="106" r="9" fill="#fff"/>
+          <circle cx="56" cy="128" r="8" fill="#fff"/>
+          <circle cx="85" cy="122" r="10" fill="#fff"/>
+          <circle cx="115" cy="122" r="10" fill="#fff"/>
+        </g>
+      </svg>
+      <span class="px" style="color:#16a085">44px ✦ ideal</span>
+    </div>
+
+    <!-- White tree no bg — 56px -->
+    <div class="size-item">
+      <svg width="56" height="56" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <rect class="trunk" x="96" y="130" width="8" height="28" rx="4" fill="#fff" opacity="1"/>
+        <g class="tw">
+          <circle cx="100" cy="54" r="14" fill="#fff"/>
+          <circle cx="82" cy="80" r="11" fill="#fff"/>
+          <circle cx="118" cy="80" r="11" fill="#fff"/>
+          <circle cx="68" cy="106" r="9" fill="#fff"/>
+          <circle cx="100" cy="100" r="13" fill="#fff"/>
+          <circle cx="132" cy="106" r="9" fill="#fff"/>
+          <circle cx="56" cy="128" r="8" fill="#fff"/>
+          <circle cx="85" cy="122" r="10" fill="#fff"/>
+          <circle cx="115" cy="122" r="10" fill="#fff"/>
+        </g>
+      </svg>
+      <span class="px">56px</span>
+    </div>
+
+    <!-- White tree no bg — 72px -->
+    <div class="size-item">
+      <svg width="72" height="72" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <rect class="trunk" x="96" y="130" width="8" height="28" rx="4" fill="#fff" opacity="1"/>
+        <g class="tw">
+          <circle cx="100" cy="54" r="14" fill="#fff"/>
+          <circle cx="82" cy="80" r="11" fill="#fff"/>
+          <circle cx="118" cy="80" r="11" fill="#fff"/>
+          <circle cx="68" cy="106" r="9" fill="#fff"/>
+          <circle cx="100" cy="100" r="13" fill="#fff"/>
+          <circle cx="132" cy="106" r="9" fill="#fff"/>
+          <circle cx="56" cy="128" r="8" fill="#fff"/>
+          <circle cx="85" cy="122" r="10" fill="#fff"/>
+          <circle cx="115" cy="122" r="10" fill="#fff"/>
+        </g>
+      </svg>
+      <span class="px">72px</span>
+    </div>
+  </div>
+
+  <!-- Preview on light bg -->
+  <p style="font-size:10px;color:#aaa;letter-spacing:0.25em;text-transform:uppercase;text-align:center;margin-bottom:16px">On Light Background</p>
+  <div class="sizes-row" style="background:#f5f5f5;padding:32px 40px;border-radius:20px;border:1px solid #e8e8e8;margin-bottom:40px">
+
+    <!-- Green tree no bg — 24px -->
+    <div class="size-item">
+      <svg width="24" height="24" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <rect class="trunk" x="96" y="130" width="8" height="28" rx="4" fill="#16a085" opacity="1"/>
+        <g class="tw">
+          <circle cx="100" cy="54" r="14" fill="#16a085"/>
+          <circle cx="82" cy="80" r="11" fill="#1abc9c"/>
+          <circle cx="118" cy="80" r="11" fill="#1abc9c"/>
+          <circle cx="68" cy="106" r="9" fill="#2ecc71"/>
+          <circle cx="100" cy="100" r="13" fill="#16a085"/>
+          <circle cx="132" cy="106" r="9" fill="#2ecc71"/>
+          <circle cx="56" cy="128" r="8" fill="#27ae60"/>
+          <circle cx="85" cy="122" r="10" fill="#27ae60"/>
+          <circle cx="115" cy="122" r="10" fill="#27ae60"/>
+        </g>
+      </svg>
+      <span class="px" style="color:#888">24px</span>
+    </div>
+
+    <!-- Green tree no bg — 32px -->
+    <div class="size-item">
+      <svg width="32" height="32" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <rect class="trunk" x="96" y="130" width="8" height="28" rx="4" fill="#16a085" opacity="1"/>
+        <g class="tw">
+          <circle cx="100" cy="54" r="14" fill="#16a085"/>
+          <circle cx="82" cy="80" r="11" fill="#1abc9c"/>
+          <circle cx="118" cy="80" r="11" fill="#1abc9c"/>
+          <circle cx="68" cy="106" r="9" fill="#2ecc71"/>
+          <circle cx="100" cy="100" r="13" fill="#16a085"/>
+          <circle cx="132" cy="106" r="9" fill="#2ecc71"/>
+          <circle cx="56" cy="128" r="8" fill="#27ae60"/>
+          <circle cx="85" cy="122" r="10" fill="#27ae60"/>
+          <circle cx="115" cy="122" r="10" fill="#27ae60"/>
+        </g>
+      </svg>
+      <span class="px" style="color:#888">32px</span>
+    </div>
+
+    <!-- Green tree no bg — 44px IDEAL -->
+    <div class="size-item">
+      <svg width="44" height="44" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <rect class="trunk" x="96" y="130" width="8" height="28" rx="4" fill="#16a085" opacity="1"/>
+        <g class="tw">
+          <circle cx="100" cy="54" r="14" fill="#16a085"/>
+          <circle cx="82" cy="80" r="11" fill="#1abc9c"/>
+          <circle cx="118" cy="80" r="11" fill="#1abc9c"/>
+          <circle cx="68" cy="106" r="9" fill="#2ecc71"/>
+          <circle cx="100" cy="100" r="13" fill="#16a085"/>
+          <circle cx="132" cy="106" r="9" fill="#2ecc71"/>
+          <circle cx="56" cy="128" r="8" fill="#27ae60"/>
+          <circle cx="85" cy="122" r="10" fill="#27ae60"/>
+          <circle cx="115" cy="122" r="10" fill="#27ae60"/>
+        </g>
+      </svg>
+      <span class="px" style="color:#16a085">44px ✦ ideal</span>
+    </div>
+
+    <!-- Green tree no bg — 56px -->
+    <div class="size-item">
+      <svg width="56" height="56" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <rect class="trunk" x="96" y="130" width="8" height="28" rx="4" fill="#16a085" opacity="1"/>
+        <g class="tw">
+          <circle cx="100" cy="54" r="14" fill="#16a085"/>
+          <circle cx="82" cy="80" r="11" fill="#1abc9c"/>
+          <circle cx="118" cy="80" r="11" fill="#1abc9c"/>
+          <circle cx="68" cy="106" r="9" fill="#2ecc71"/>
+          <circle cx="100" cy="100" r="13" fill="#16a085"/>
+          <circle cx="132" cy="106" r="9" fill="#2ecc71"/>
+          <circle cx="56" cy="128" r="8" fill="#27ae60"/>
+          <circle cx="85" cy="122" r="10" fill="#27ae60"/>
+          <circle cx="115" cy="122" r="10" fill="#27ae60"/>
+        </g>
+      </svg>
+      <span class="px" style="color:#888">56px</span>
+    </div>
+
+    <!-- Green tree no bg — 72px -->
+    <div class="size-item">
+      <svg width="72" height="72" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <rect class="trunk" x="96" y="130" width="8" height="28" rx="4" fill="#16a085" opacity="1"/>
+        <g class="tw">
+          <circle cx="100" cy="54" r="14" fill="#16a085"/>
+          <circle cx="82" cy="80" r="11" fill="#1abc9c"/>
+          <circle cx="118" cy="80" r="11" fill="#1abc9c"/>
+          <circle cx="68" cy="106" r="9" fill="#2ecc71"/>
+          <circle cx="100" cy="100" r="13" fill="#16a085"/>
+          <circle cx="132" cy="106" r="9" fill="#2ecc71"/>
+          <circle cx="56" cy="128" r="8" fill="#27ae60"/>
+          <circle cx="85" cy="122" r="10" fill="#27ae60"/>
+          <circle cx="115" cy="122" r="10" fill="#27ae60"/>
+        </g>
+      </svg>
+      <span class="px" style="color:#888">72px</span>
+    </div>
+  </div>
+
+  <!-- Copy-paste code block -->
+  <p style="font-size:10px;color:#2a2a2a;letter-spacing:0.25em;text-transform:uppercase;text-align:center;margin-bottom:16px">Copy-Paste SVG Code · No Background</p>
+  <div style="display:flex;gap:24px;flex-wrap:wrap;justify-content:center">
+
+    <!-- White code card -->
+    <div style="background:#111;border:1px solid #1e1e1e;border-radius:16px;padding:20px 24px;max-width:420px;width:100%">
+      <p style="font-size:9px;color:#16a085;letter-spacing:0.3em;text-transform:uppercase;margin-bottom:12px">White · For Dark UI</p>
+      <pre style="font-size:10px;color:#555;line-height:1.7;overflow-x:auto;white-space:pre-wrap">&lt;!-- White tree, no background, 44px --&gt;
+&lt;svg width="44" height="44" viewBox="0 0 200 200"
+  xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;rect x="96" y="130" width="8" height="28"
+    rx="4" fill="#fff"/&gt;
+  &lt;g class="tw"&gt;
+    &lt;circle cx="100" cy="54"  r="14" fill="#fff"/&gt;
+    &lt;circle cx="82"  cy="80"  r="11" fill="#fff"/&gt;
+    &lt;circle cx="118" cy="80"  r="11" fill="#fff"/&gt;
+    &lt;circle cx="68"  cy="106" r="9"  fill="#fff"/&gt;
+    &lt;circle cx="100" cy="100" r="13" fill="#fff"/&gt;
+    &lt;circle cx="132" cy="106" r="9"  fill="#fff"/&gt;
+    &lt;circle cx="56"  cy="128" r="8"  fill="#fff"/&gt;
+    &lt;circle cx="85"  cy="122" r="10" fill="#fff"/&gt;
+    &lt;circle cx="115" cy="122" r="10" fill="#fff"/&gt;
+  &lt;/g&gt;
+&lt;/svg&gt;</pre>
+    </div>
+
+    <!-- Green code card -->
+    <div style="background:#111;border:1px solid #1e1e1e;border-radius:16px;padding:20px 24px;max-width:420px;width:100%">
+      <p style="font-size:9px;color:#16a085;letter-spacing:0.3em;text-transform:uppercase;margin-bottom:12px">Green · For Light UI</p>
+      <pre style="font-size:10px;color:#555;line-height:1.7;overflow-x:auto;white-space:pre-wrap">&lt;!-- Green tree, no background, 44px --&gt;
+&lt;svg width="44" height="44" viewBox="0 0 200 200"
+  xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;rect x="96" y="130" width="8" height="28"
+    rx="4" fill="#16a085"/&gt;
+  &lt;g class="tw"&gt;
+    &lt;circle cx="100" cy="54"  r="14" fill="#16a085"/&gt;
+    &lt;circle cx="82"  cy="80"  r="11" fill="#1abc9c"/&gt;
+    &lt;circle cx="118" cy="80"  r="11" fill="#1abc9c"/&gt;
+    &lt;circle cx="68"  cy="106" r="9"  fill="#2ecc71"/&gt;
+    &lt;circle cx="100" cy="100" r="13" fill="#16a085"/&gt;
+    &lt;circle cx="132" cy="106" r="9"  fill="#2ecc71"/&gt;
+    &lt;circle cx="56"  cy="128" r="8"  fill="#27ae60"/&gt;
+    &lt;circle cx="85"  cy="122" r="10" fill="#27ae60"/&gt;
+    &lt;circle cx="115" cy="122" r="10" fill="#27ae60"/&gt;
+  &lt;/g&gt;
+&lt;/svg&gt;</pre>
+    </div>
+
+  </div>
+</div>
+
+<p style="text-align:center;color:#222;font-size:10px;letter-spacing:0.3em;text-transform:uppercase">Treevit · Typewriter Loading Animation · 44px</p>
+
+</body>
+</html>

@@ -4,8 +4,11 @@ import { findRelevantContext, saveContextChunk } from "../utils/vectorUtils.js";
 import * as scraper from "../utils/scraper.js";
 import fetch from "node-fetch";
 import { genAI, anthropic, groq } from "../services/aiService.js";
+import { runBrowserAutomationTask } from "../services/browserAutomationService.js";
 import { Queue } from 'bullmq';
 import IORedis from 'ioredis';
+
+const AI_ENGINE_URL = (process.env.AI_ENGINE_URL || "http://localhost:8000").replace(/\/$/, "");
 
 let connection = null;
 let taskQueue = null;
@@ -685,6 +688,115 @@ export const getGallery = async (req, res) => {
     } catch (error) {
         console.error("Gallery fetch error:", error);
         res.status(500).json({ error: "Failed to fetch gallery" });
+    }
+};
+
+
+
+async function proxyAiEngineAgentStream(req, res, agentName, contextBuilder = () => ({})) {
+    try {
+        const { message, email, sessionId } = req.body;
+        if (!message || !email) {
+            return res.status(400).json({ error: "Message and email are required" });
+        }
+        if (req.user.email !== email) {
+            return res.status(403).json({ error: "Unauthorized access" });
+        }
+
+        const context = contextBuilder(req.body);
+        const upstream = await fetch(`${AI_ENGINE_URL}/run-agent`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                agent: agentName,
+                prompt: message,
+                context,
+            }),
+        });
+
+        if (!upstream.ok || !upstream.body) {
+            const errText = await upstream.text().catch(() => 'AI engine error');
+            throw new Error(errText || `AI engine failed with status ${upstream.status}`);
+        }
+
+        res.setHeader("Content-Type", "text/event-stream");
+        res.setHeader("Cache-Control", "no-cache");
+        res.setHeader("Connection", "keep-alive");
+
+        if (sessionId) {
+            res.write(`event: session_id\ndata: ${sessionId}\n\n`);
+        }
+
+        for await (const chunk of upstream.body) {
+            res.write(chunk.toString());
+        }
+
+        res.write(`event: end\ndata: done\n\n`);
+        res.end();
+    } catch (error) {
+        console.error(`${agentName} stream proxy error:`, error);
+        if (!res.headersSent) {
+            res.setHeader("Content-Type", "text/event-stream");
+        }
+        res.write(`event: error\ndata: ${JSON.stringify({ error: error.message || 'Agent stream failed' })}\n\n`);
+        res.end();
+    }
+}
+
+export const canvaAgentStream = async (req, res) => {
+    return proxyAiEngineAgentStream(req, res, "canva", (body) => {
+        let parsedSlide = null;
+        try {
+            parsedSlide = body.slideContext ? JSON.parse(body.slideContext) : null;
+        } catch {
+            parsedSlide = null;
+        }
+
+        const fallbackSlide = {
+            background: parsedSlide?.background || '#1e1b31',
+            elements: Array.isArray(parsedSlide?.elements) ? parsedSlide.elements : [],
+        };
+
+        return {
+            sessionId: body.sessionId || 'default',
+            activeSlideIndex: parsedSlide?.slideIndex ? Math.max(Number(parsedSlide.slideIndex) - 1, 0) : 0,
+            slides: [fallbackSlide],
+            email: body.email,
+            settings: body.settings || {},
+        };
+    });
+};
+
+export const gmailAgentStream = async (req, res) => {
+    return proxyAiEngineAgentStream(req, res, "gmail", (body) => ({
+        email: body.email,
+        googleAccessToken: body.googleAccessToken,
+        emails: Array.isArray(body.emails) ? body.emails : [],
+        settings: body.settings || {},
+    }));
+};
+
+export const googleDriveAgentStream = async (req, res) => {
+    return proxyAiEngineAgentStream(req, res, "googledrive", (body) => ({
+        email: body.email,
+        googleAccessToken: body.googleAccessToken,
+        driveContent: Array.isArray(body.driveContent) ? body.driveContent : [],
+        conversationHistory: Array.isArray(body.conversationHistory) ? body.conversationHistory : [],
+        settings: body.settings || {},
+    }));
+};
+
+export const browserAutomation = async (req, res) => {
+    try {
+        const { taskType, url, options, sessionId } = req.body;
+        if (!taskType) {
+            return res.status(400).json({ error: "taskType is required" });
+        }
+
+        const result = await runBrowserAutomationTask({ taskType, url, options, sessionId });
+        return res.json(result);
+    } catch (error) {
+        return res.status(500).json({ error: error.message || "Browser automation failed" });
     }
 };
 

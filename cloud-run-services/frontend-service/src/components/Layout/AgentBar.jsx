@@ -1,11 +1,10 @@
-import { useState } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
-import './Layout.css';
+import { AGENTS as CONFIG_AGENTS } from '../../config/agents';
 
+// Merge or use the central AGENTS config. 
+// Note: AgentBar seems to specific only a subset but let's make it consistent.
 const AGENTS = [
     { id: 'chat', icon: 'bx-chat', label: 'Chat', tip: 'Chat Agent' },
-    { id: 'excel', icon: 'bx-spreadsheet', label: 'Excel Agent', tip: 'Excel Assistant' },
-    // future agents go here
+    ...CONFIG_AGENTS.map(a => ({ id: a.id, icon: a.icon, logo: a.logo, label: a.name, tip: a.name }))
 ];
 
 export default function AgentBar({ activeAgent, onAgentChange }) {
@@ -23,7 +22,15 @@ export default function AgentBar({ activeAgent, onAgentChange }) {
                     data-tip={agent.tip}
                     title={agent.tip}
                 >
-                    <i className={`bx ${agent.icon}`} />
+                    {agent.logo ? (
+                        <img 
+                            src={agent.logo} 
+                            alt={agent.label} 
+                            style={{ width: '20px', height: '20px', objectFit: 'contain' }} 
+                        />
+                    ) : (
+                        <i className={`bx ${agent.icon}`} />
+                    )}
                 </button>
             ))}
 

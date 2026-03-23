@@ -13,7 +13,7 @@ function escapeHtml(str) {
  * After inserting this HTML into the DOM, call highlightAllCodeBlocks()
  * so highlight.js can do syntax highlighting.
  */
-export function renderMarkdown(text) {
+export function renderMarkdown(text, isStreaming = false) {
     if (!text) return '';
 
     let responseText = text;
@@ -22,21 +22,49 @@ export function renderMarkdown(text) {
     responseText = responseText.replace(/```(\w+)?\n?([\s\S]*?)```/g, (_, lang, code) => {
         const langLabel = lang || '';
         const trimCode = code.trim();
-        let formattedCode = escapeHtml(trimCode);
+        let codeToFormat = trimCode;
+
+        const lowLang = (langLabel || '').toLowerCase();
+        if (lowLang === 'json' || (!langLabel && codeToFormat.startsWith('{'))) {
+            try {
+                const parsed = JSON.parse(codeToFormat);
+                codeToFormat = JSON.stringify(parsed, null, 2);
+            } catch (e) {
+                // Ignore if not valid JSON
+            }
+        }
+
+        let formattedCode = escapeHtml(codeToFormat);
 
         try {
             if (window.hljs) {
                 if (langLabel && window.hljs.getLanguage(langLabel)) {
-                    formattedCode = window.hljs.highlight(trimCode, { language: langLabel, ignoreIllegals: true }).value;
+                    formattedCode = window.hljs.highlight(codeToFormat, { language: langLabel, ignoreIllegals: true }).value;
                 } else {
-                    formattedCode = window.hljs.highlightAuto(trimCode).value;
+                    formattedCode = window.hljs.highlightAuto(codeToFormat).value;
                 }
             }
         } catch (e) {
             console.error("Syntax Highlighting Error:", e);
         }
 
-        return `<div class="code-container"><div class="code-header"><span class="progem-lan">${langLabel}</span><button class="copy-code-btn" onclick="(function(btn){var code=btn.closest('.code-container').querySelector('code');navigator.clipboard.writeText(code.innerText).then(function(){var orig=btn.innerHTML;btn.innerHTML='<i class=\\'bx bx-check\\'></i> Copied';setTimeout(function(){btn.innerHTML=orig},2000)});})(this)"><i class='bx bx-copy'></i> Copy</button></div><pre><code class="language-${langLabel} hljs">${formattedCode}</code></pre></div>`;
+        const lineCount = (codeToFormat.match(/\n/g) || []).length + 1;
+        const showExpand = lineCount > 18 && !isStreaming;
+
+        return `
+        <div class="code-block-wrapper ${showExpand ? 'has-expansion' : ''}" data-lang="${langLabel}">
+            <div class="code-header">
+                <span class="code-lang-label">${langLabel}</span>
+                <div class="code-header-actions">
+                    ${showExpand ? `<button class="expand-code-btn" onclick="window.toggleCodeExpansion(this)"><i class='bx bx-chevron-down'></i> Show more</button>` : ''}
+                    <button class="copy-code-btn" onclick="window.copyCodeBlock(this)"><i class='bx bx-copy'></i> Copy</button>
+                    <button class="download-code-btn" onclick="window.downloadCodeBlock(this)"><i class='bx bx-download'></i> Download</button>
+                </div>
+            </div>
+            <div class="code-pre-container">
+                <pre class="code-pre"><code class="language-${langLabel} hljs">${formattedCode}</code></pre>
+            </div>
+        </div>`.trim();
     });
 
     // ── Inline code ──────────────────────────────────────────────────────────
@@ -108,7 +136,7 @@ export function highlightAllCodeBlocks(container) {
     if (!container || typeof window === 'undefined') return;
     const hljs = window.hljs;
     if (!hljs) return;
-    container.querySelectorAll('pre code').forEach(block => {
+    container.querySelectorAll('pre code:not(.hljs)').forEach(block => {
         hljs.highlightElement(block);
     });
 }

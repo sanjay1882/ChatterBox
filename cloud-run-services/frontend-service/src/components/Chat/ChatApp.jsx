@@ -1466,12 +1466,20 @@ export default function ChatApp({ initialAppsOpen = false, initialSettingsOpen =
                             <div className="chatbot" style={{ height: '100%', width: '100%', maxWidth: '100%', display: 'flex', flexDirection: 'column', borderRadius: 0, boxShadow: 'none', background: 'var(--sarvam-bg-surface, #FFFFFF)' }}>
                                 <header style={{ width: '100%', maxWidth: '100%', flexShrink: 0, margin: 0, padding: '0 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '56px' }}>
                                     <div className="left-header" style={{ display: 'flex', alignItems: 'center', paddingLeft: '10px', flex: 1, minWidth: 0 }}>
-                                        <i className='bx bx-menu' id="btn-header-toggle" onClick={() => setSidebarOpen(!sidebarOpen)} style={{ cursor: 'pointer' }} />
+                                        <i className='bx bx-sidebar-right bx-flip-horizontal' id="btn-header-toggle" onClick={() => setSidebarOpen(!sidebarOpen)} style={{ cursor: 'pointer' }} />
                                     </div>
                                     <div className="center-header" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 10 }}>
-                                        <h2 style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                                            <i className={`bx ${agent.icon}`} style={{ color: agent.color || 'var(--accent)' }} />
-                                            Treevit
+                                        <h2 style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                            {agent.logo ? (
+                                                <img 
+                                                    src={agent.logo} 
+                                                    alt={agent.name} 
+                                                    style={{ width: '24px', height: '24px', objectFit: 'contain' }} 
+                                                />
+                                            ) : (
+                                                <i className={`bx ${agent.icon}`} style={{ color: agent.color || 'var(--accent)' }} />
+                                            )}
+                                            {agent.name}
                                         </h2>
                                     </div>
                                     <div className="right-header" style={{ paddingRight: '10px', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', flex: 1, minWidth: 0 }}>
@@ -1519,7 +1527,7 @@ export default function ChatApp({ initialAppsOpen = false, initialSettingsOpen =
                         }}>
                             <div className="left-header" style={{ display: 'flex', alignItems: 'center', paddingLeft: '10px', flex: 1, minWidth: 0 }}>
                                 <i 
-                                    className='bx bx-menu' 
+                                    className='bx bx-sidebar-right bx-flip-horizontal' 
                                     id="btn-header-toggle" 
                                     onClick={() => setSidebarOpen(true)} 
                                     style={{ cursor: 'pointer', fontSize: '24px' }} 

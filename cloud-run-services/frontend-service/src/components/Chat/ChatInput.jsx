@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import './Chat.css';
+
 
 const MODELS = [
     { value: 'gemini-2.5-flash', label: 'Auto', desc: 'Fast & Smart' },

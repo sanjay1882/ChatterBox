@@ -1,0 +1,36 @@
+﻿ M cloud-run-services/frontend-service/src/components/Chat/Chat.css
+ M cloud-run-services/frontend-service/src/components/Chat/ChatApp.jsx
+ M cloud-run-services/frontend-service/src/components/Layout/Layout.css
+ M cloud-run-services/frontend-service/src/components/Layout/Sidebar.jsx
+ M cloud-run-services/frontend-service/src/index.css
+ M cloud-run-services/frontend-service/src/main.jsx
+ M cloud-run-services/frontend-service/src/utils/markdown.js
+?? cloud-run-services/README.md
+?? cloud-run-services/Structure/
+?? cloud-run-services/ai-engine-service/agents/canva_agent.py
+?? cloud-run-services/ai-engine-service/agents/gmail_agent.py
+?? cloud-run-services/ai-engine-service/agents/googledrive_agent.py
+?? cloud-run-services/ai-engine-service/deploy.mjs
+?? cloud-run-services/ai-engine-service/utils/
+?? cloud-run-services/api-service/config/
+?? cloud-run-services/api-service/controllers/settingsController.js
+?? cloud-run-services/api-service/middleware/browserTaskRateLimit.js
+?? cloud-run-services/api-service/routes/settingsRoutes.js
+?? cloud-run-services/api-service/services/browserAutomationService.js
+?? cloud-run-services/api-service/services/orchestratorService.js
+?? cloud-run-services/browser-worker-service/
+?? cloud-run-services/frontend-service/public/treevit-favicon-circle-16px.png
+?? cloud-run-services/frontend-service/public/treevit-favicon-circle-32px.png
+?? cloud-run-services/frontend-service/public/treevit-loading-animation.html
+?? cloud-run-services/frontend-service/src/Legal.css
+?? cloud-run-services/frontend-service/src/components/CanvaAgent/
+?? cloud-run-services/frontend-service/src/components/Chat/Canvas/
+?? cloud-run-services/frontend-service/src/components/Chat/TreevitLoader.jsx
+?? cloud-run-services/frontend-service/src/components/GmailAgent/
+?? cloud-run-services/frontend-service/src/components/GoogleDriveAgent/
+?? cloud-run-services/frontend-service/src/components/Legal/
+?? cloud-run-services/frontend-service/src/utils/windowHandlers.js
+?? cloud-run-services/package-lock.json
+?? cloud-run-services/package.json
+?? cloud-run-services/run-all.ps1
+?? git_status_full.txt

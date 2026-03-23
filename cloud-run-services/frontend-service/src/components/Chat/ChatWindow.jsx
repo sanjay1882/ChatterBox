@@ -4,7 +4,7 @@ import { streamChat, getSession } from '../../services/api';
 import MessageBubble from './MessageBubble';
 import ChatInput from './ChatInput';
 import { highlightAllCodeBlocks } from '../../utils/markdown';
-import './Chat.css';
+
 
 // same speed modifier used by plain‑JS chat to keep animation identical
 const STREAMING_SPEED_MODIFIER = 500;

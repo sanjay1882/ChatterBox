@@ -6,8 +6,7 @@ import { formatStreamedText } from '../../utils/formatStreamedText';
 import { highlightAllCodeBlocks } from '../../utils/markdown';
 import SpreadsheetCanvas from './SpreadsheetCanvas';
 import MessageBubble from '../Chat/MessageBubble';
-import '../Chat/Chat.css';
-import './ExcelAgent.css';
+
 
 // speed tuning for the character‑by‑character animation; matches the vanilla HTML version
 const STREAMING_SPEED_MODIFIER = 500;

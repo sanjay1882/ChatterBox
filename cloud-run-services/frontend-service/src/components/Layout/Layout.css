@@ -101,9 +101,7 @@
 }
 
 .sidebar.collapsed {
-    width: 0;
-    opacity: 0;
-    pointer-events: none;
+    /* Styles handled in index.css to retain 60px mini-sidebar */
 }
 
 .sidebar-header {

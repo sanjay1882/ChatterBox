@@ -1,8 +1,8 @@
-const API_BASE_URL = import.meta.env.PROD
-    ? import.meta.env.VITE_BACKEND_URL
-    : 'http://localhost:3000';
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || (import.meta.env.DEV ? '/api' : 'http://127.0.0.1:3000'); // old logic below
+    // ? import.meta.env.VITE_BACKEND_URL
+    // : (import.meta.env.DEV ? '/api' : 'http://localhost:3000');
 
-// ── Stream Chat ─────────────────────────────────────────────────────────────
+// â”€â”€ Stream Chat â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export async function streamChat({ formData, token, onChunk, onSessionId, onEnd, onError, onSources }) {
     try {
         const headers = {};
@@ -92,7 +92,7 @@ export async function streamChat({ formData, token, onChunk, onSessionId, onEnd,
     }
 }
 
-// ── Get Sessions ─────────────────────────────────────────────────────────────
+// â”€â”€ Get Sessions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export async function getSessions(email, token, page = 1) {
     const headers = { 'Content-Type': 'application/json' };
     if (token) headers['Authorization'] = `Bearer ${token}`;
@@ -102,7 +102,7 @@ export async function getSessions(email, token, page = 1) {
     return res.json();
 }
 
-// ── Get Single Session ────────────────────────────────────────────────────────
+// â”€â”€ Get Single Session â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export async function getSession(email, sessionId, token) {
     const headers = {};
     if (token) headers['Authorization'] = `Bearer ${token}`;
@@ -112,7 +112,7 @@ export async function getSession(email, sessionId, token) {
     return res.json();
 }
 
-// ── Delete Session ────────────────────────────────────────────────────────────
+// â”€â”€ Delete Session â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export async function deleteSession(email, sessionId, token) {
     const headers = { 'Content-Type': 'application/json' };
     if (token) headers['Authorization'] = `Bearer ${token}`;
@@ -125,7 +125,7 @@ export async function deleteSession(email, sessionId, token) {
     return res.json();
 }
 
-// ── Share Session ─────────────────────────────────────────────────────────────
+// â”€â”€ Share Session â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export async function toggleSessionShare(email, sessionId, token) {
     const headers = { 'Content-Type': 'application/json' };
     if (token) headers['Authorization'] = `Bearer ${token}`;
@@ -138,14 +138,14 @@ export async function toggleSessionShare(email, sessionId, token) {
     return res.json();
 }
 
-// ── Get Public Session ────────────────────────────────────────────────────────
+// â”€â”€ Get Public Session â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export async function getPublicSession(sessionId) {
     const res = await fetch(`${API_BASE_URL}/session/public/${sessionId}`);
     if (!res.ok) throw new Error('Failed to fetch public session or session not shared');
     return res.json();
 }
 
-// ── Excel Agent ───────────────────────────────────────────────────────────────
+// â”€â”€ Excel Agent â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export async function excelAgentStream({ message, sheetData, token, email, onChunk, onData, onJobQueued }) {
     try {
         const headers = { 'Content-Type': 'application/json' };
@@ -213,7 +213,7 @@ export async function excelAgentStream({ message, sheetData, token, email, onChu
     }
 }
 
-// ── User Preferences ──────────────────────────────────────────────────────────
+// â”€â”€ User Preferences â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export async function getUserPreferences(email, token) {
     const headers = {};
     if (token) headers['Authorization'] = `Bearer ${token}`;
@@ -256,7 +256,7 @@ export async function getGallery(email, token) {
     return res.json();
 }
 
-// ── Word Agent ───────────────────────────────────────────────────────────────
+// â”€â”€ Word Agent â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export async function wordAgentStream({ message, docContent, fileName, token, email, onChunk, onData }) {
     try {
         const headers = { 'Content-Type': 'application/json' };
@@ -314,3 +314,157 @@ export async function wordAgentStream({ message, docContent, fileName, token, em
         throw err;
     }
 }
+
+async function streamAgentEndpoint(endpoint, { body, token, onChunk, onData, onSessionId }) {
+    const headers = { 'Content-Type': 'application/json' };
+    if (token && token !== 'guest') headers['Authorization'] = `Bearer ${token}`;
+
+    const res = await fetch(`${API_BASE_URL}${endpoint}`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(body),
+    });
+
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: 'Server error' }));
+        throw new Error(err.error || res.statusText);
+    }
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let currentEvent = 'message';
+
+    while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() ?? '';
+
+        for (const line of lines) {
+            if (line.startsWith('event: ')) {
+                currentEvent = line.slice(7).trim();
+                continue;
+            }
+
+            if (line === '') {
+                currentEvent = 'message';
+                continue;
+            }
+
+            if (!line.startsWith('data: ')) continue;
+            const raw = line.slice(6).trim();
+            if (!raw || raw === '[DONE]' || raw === 'done') continue;
+
+            if (currentEvent === 'session_id') {
+                onSessionId?.(raw.replace(/^"|"$/g, ''));
+                currentEvent = 'message';
+                continue;
+            }
+
+            try {
+                const json = JSON.parse(raw);
+                if (json.sessionId || json.sid) onSessionId?.(json.sessionId || json.sid);
+                if (json.chunk) onChunk?.(json.chunk);
+                if (json.text) onChunk?.(json.text);
+                if (json.fullMessage || json.patch || json.actions || json.operation || json.done || json.error || json.deckRestore || json.slideOps) {
+                    onData?.(json);
+                }
+                if (json.error) throw new Error(json.error);
+            } catch (e) {
+                if (!raw.startsWith('{')) {
+                    onChunk?.(raw);
+                } else {
+                    console.warn('Agent stream parse failure:', line, e);
+                }
+            }
+        }
+    }
+}
+
+export async function canvaAgentStream({ message, slideContext, token, email, sessionId, onChunk, onData, onSessionId }) {
+    return streamAgentEndpoint('/canva-agent', {
+        body: { message, slideContext, email, sessionId },
+        token,
+        onChunk,
+        onData,
+        onSessionId,
+    });
+}
+
+export async function gmailAgentStream({ message, emails, token, email, googleAccessToken, sessionId, settings, onChunk, onData, onSessionId }) {
+    return streamAgentEndpoint('/gmail-agent', {
+        body: { message, emails, email, googleAccessToken, sessionId, settings },
+        token,
+        onChunk,
+        onData,
+        onSessionId,
+    });
+}
+
+export async function googleDriveAgentStream({ message, driveContent, conversationHistory, token, email, googleAccessToken, sessionId, settings, onChunk, onData, onSessionId }) {
+    return streamAgentEndpoint('/google-drive-agent', {
+        body: { message, driveContent, conversationHistory, email, googleAccessToken, sessionId, settings },
+        token,
+        onChunk,
+        onData,
+        onSessionId,
+    });
+}
+
+export async function browserAutomationTask({ token, taskType, url = '', options = {}, sessionId = '' }) {
+    const headers = { 'Content-Type': 'application/json' };
+    if (token && token !== 'guest') headers['Authorization'] = `Bearer ${token}`;
+
+    const res = await fetch(`${API_BASE_URL}/browser-automation`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ taskType, url, options, sessionId }),
+    });
+
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) {
+        throw new Error(json.error || 'Browser automation request failed');
+    }
+    return json;
+}
+
+// â”€â”€ Settings â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+export async function updateTheme(token, theme) {
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    const res = await fetch(`${API_BASE_URL}/settings/theme`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ theme }),
+    });
+    if (!res.ok) throw new Error('Failed to update theme');
+    return res.json();
+}
+
+export async function updateVoice(token, voiceEnabled, voice) {
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    const res = await fetch(`${API_BASE_URL}/settings/voice`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ voiceEnabled, voice }),
+    });
+    if (!res.ok) throw new Error('Failed to update voice');
+    return res.json();
+}
+
+export async function updateModel(token, defaultModel) {
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    const res = await fetch(`${API_BASE_URL}/settings/model`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ defaultModel }),
+    });
+    if (!res.ok) throw new Error('Failed to update model');
+    return res.json();
+}
+
