@@ -1,0 +1,203 @@
+/* Input Area — flex row so disclaimer sits to the right of the input */
+.input-area {
+    width: 100%;
+    max-width: 850px;
+    margin: 0 auto;
+    padding: 0 16px 20px 16px;
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+}
+
+.input-box {
+    flex: 1;
+    min-width: 0;
+    background: var(--sarvam-bg-elevated, #f0f4f9) !important;
+    border: 1px solid transparent !important;
+    border-radius: 28px !important;
+    padding: 12px 16px 8px 16px !important;
+    transition: all 0.2s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    box-shadow: none !important;
+}
+
+.input-box:focus-within {
+    background: var(--sarvam-bg-surface, #ffffff) !important;
+    border-color: var(--border-md) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Textarea - Expands naturally */
+.input-box textarea {
+    width: 100%;
+    border: none !important;
+    background: transparent !important;
+    color: var(--sarvam-text-main, #1f1f1f) !important;
+    font-size: 16px !important;
+    line-height: 1.5;
+    padding: 4px 8px !important;
+    resize: none;
+    outline: none !important;
+    min-height: 24px;
+}
+
+/* Integrated Bottom Toolbar */
+.input-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 8px;
+    border-top: none !important; /* Remove any old top borders */
+    padding-top: 0 !important;
+}
+
+.input-toolbar-left, 
+.input-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Circle Icon Buttons */
+.toolbar-icon-btn, .mic-btn {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50% !important;
+    color: var(--sarvam-text-secondary, #444746) !important;
+    cursor: pointer;
+    transition: background 0.2s;
+    background: transparent !important;
+    border: none !important;
+}
+
+.toolbar-icon-btn:hover, .mic-btn:hover {
+    background: rgba(0, 0, 0, 0.05) !important;
+}
+
+.toolbar-icon-btn.active {
+    color: var(--accent) !important;
+    background: var(--accent-dim) !important;
+}
+
+/* Model Selector Pill */
+.model-pill {
+    background: var(--bg-surface) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 12px !important;
+    padding: 4px 10px !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    color: var(--text-secondary) !important;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+/* The Send/Stop Button */
+.send-btn {
+    width: 34px !important;
+    height: 34px !important;
+    border-radius: 50% !important; /* Circular like Gemini */
+    background: var(--accent) !important;
+    color: #ffffff !important;
+    border: none !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s;
+}
+
+.send-btn:hover:not(:disabled) {
+    transform: scale(1.08);
+    background: var(--accent-light) !important;
+}
+
+.send-btn:disabled {
+    background: transparent !important;
+    color: var(--text-disabled) !important;
+    opacity: 0.5;
+}
+
+/* File & Pasted Text Chips — Claude style */
+.file-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: var(--sarvam-bg-body, #f4f4f4) !important;
+    border: 1px solid var(--sarvam-border) !important;
+    border-radius: 12px !important;
+    margin-bottom: 8px;
+    max-width: 280px;
+    cursor: default;
+    transition: background 0.15s ease;
+}
+
+.file-chip:hover {
+    background: var(--sarvam-bg-elevated) !important;
+}
+
+.file-chip-icon {
+    font-size: 16px !important;
+    color: var(--sarvam-text-secondary) !important;
+    flex-shrink: 0;
+}
+
+.file-chip-name {
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--sarvam-text-main) !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 180px;
+}
+
+.file-chip-remove {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    border-radius: 50% !important;
+    background: var(--sarvam-bg-elevated) !important;
+    border: none !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: var(--sarvam-text-secondary) !important;
+    opacity: 0.7;
+    transition: opacity 0.15s, background 0.15s;
+    padding: 0 !important;
+    margin-left: 2px;
+}
+
+.file-chip-remove:hover {
+    opacity: 1;
+    background: rgba(255, 80, 80, 0.15) !important;
+    color: #e05050 !important;
+}
+
+/* Pasted text specific override */
+#pasted-text-preview {
+    border-left: 3px solid var(--accent) !important;
+    border-radius: 8px 12px 12px 8px !important;
+    background: color-mix(in srgb, var(--accent) 6%, var(--sarvam-bg-body)) !important;
+}
+
+/* Disclaimer text — centered below the input box */
+.chat-disclaimer {
+    width: 100%;
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    opacity: 0.7;
+    line-height: 1.4;
+}
