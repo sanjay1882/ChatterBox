@@ -3,7 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCredits } from '../../contexts/CreditsContext';
 import { streamChat, getSessions, getSession, deleteSession, generateImage, getGallery, getUserPreferences, saveUserPreferences, updateTheme as apiUpdateTheme, updateVoice as apiUpdateVoice, updateModel as apiUpdateModel } from '../../services/api';
-import { renderMarkdown, highlightAllCodeBlocks } from '../../utils/markdown';
+import { renderMarkdown, highlightAllCodeBlocks, linkify } from '../../utils/markdown';
 import { formatStreamedText } from '../../utils/formatStreamedText';
 
 import Sidebar from '../Layout/Sidebar';
@@ -93,8 +93,12 @@ const MarkdownContent = ({ html, className, style }) => {
 const AnimatedMessage = ({ html, message, isLoading }) => {
     // if html is supplied we trust that it already contains the proper
     // formatting (tables, think blocks, etc).  Otherwise fall back to
-    // renderMarkdown for backwards compatibility.
-    const inner = useMemo(() => html || renderMarkdown(message || ''), [html, message]);
+    // renderMarkdown for backwards compatibility. We also linkify both cases
+    // to catch plain URLs.
+    const inner = useMemo(() => {
+        const content = html || renderMarkdown(message || '');
+        return linkify(content);
+    }, [html, message]);
 
     return (
         <div className="animated-message-container" style={{ display: 'inline' }}>
@@ -371,6 +375,7 @@ export default function ChatApp({
 
     // ── Settings modal ──────────────────────────────────────────
     const [settingsOpen, setSettingsOpen] = useState(false);
+    const [resetConfirm, setResetConfirm] = useState({ open: false, section: '' });
     const [settingsTab, setSettingsTab] = useState('general');
 
     // ── Apps modal ──────────────────────────────────────────────
@@ -578,7 +583,9 @@ export default function ChatApp({
                             userCreativity: serverPrefs.creativityLevel || '',
                             userInterests: serverPrefs.interests || '',
                             userCustomRules: serverPrefs.customRules || '',
-                            userVoice: serverPrefs.voice || ''
+                            userVoice: serverPrefs.voice || '',
+                            theme: serverPrefs.theme || 'dark',
+                            mode: serverPrefs.mode || 'dark'
                         };
                         setSettings(mapped);
                         if (mapped.userDefaultModel && MODELS.find(m => m.value === mapped.userDefaultModel)) {
@@ -634,7 +641,9 @@ export default function ChatApp({
                     interests: toSave.userInterests,
                     customRules: toSave.userCustomRules,
                     voice: toSave.userVoice,
-                    heatwaveMode: toSave.heatwaveMode
+                    heatwaveMode: toSave.heatwaveMode,
+                    theme: toSave.theme,
+                    mode: toSave.mode
                 };
                 const activeToken = await getFreshToken();
                 await saveUserPreferences(user.email, activeToken, mapped);
@@ -1384,8 +1393,8 @@ export default function ChatApp({
 
         // Remove the existing AI response and all subsequent messages
         setMessages(p => p.slice(0, idx));
-        // Trigger send with the same user text
-        handleSend(userMsg.content);
+        // Trigger send with the same user text, but reuse the user message ID to prevent duplication
+        handleSend(userMsg.editableText || userMsg.rawContent || userMsg.content, { reuseMessageId: userMsg.id });
     };
 
     const handleStartEdit = (id, text) => {
@@ -1436,16 +1445,25 @@ export default function ChatApp({
 
 
     const handleDeleteSession = async (id) => {
+        let deletingToast;
         try {
-            showToast('Deleting chat...');
+            deletingToast = showToast('Deleting chat...', 'info');
             const activeToken = await getFreshToken();
             await deleteSession(user.email, id, activeToken);
             setSessions(p => p.filter(s => s._id !== id));
             if (currentSessionId === id) navigate('/chat');
-            showToast('Chat deleted successfully');
+            
+            // Dismiss the "Deleting..." toast
+            if (deletingToast) deletingToast.dismiss();
+
+            // Wait for the fade-out animation (500ms) before showing success
+            setTimeout(() => {
+                showToast('Chat deleted successfully', 'success');
+            }, 600);
         } catch (e) {
             console.error(e);
-            showToast('Failed to delete chat: ' + e.message);
+            if (deletingToast) deletingToast.dismiss();
+            showToast('Failed to delete chat: ' + e.message, 'error');
         }
         setDeleteModal({ open: false, id: null });
     };
@@ -1513,7 +1531,7 @@ export default function ChatApp({
                             <div className="chatbot" style={{ height: '100%', width: '100%', maxWidth: '100%', display: 'flex', flexDirection: 'column', borderRadius: 0, boxShadow: 'none', background: 'var(--sarvam-bg-surface, #FFFFFF)' }}>
                                 <header style={{ width: '100%', maxWidth: '100%', flexShrink: 0, margin: 0, padding: '0 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '56px' }}>
                                     <div className="left-header" style={{ display: 'flex', alignItems: 'center', paddingLeft: '10px', flex: 1, minWidth: 0 }}>
-                                        <i className='bx bx-sidebar-right bx-flip-horizontal' id="btn-header-toggle" onClick={() => setSidebarOpen(!sidebarOpen)} style={{ cursor: 'pointer' }} />
+                                        {/* Header toggle removed to avoid duplication */}
                                     </div>
                                     <div className="center-header" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 10 }}>
                                         <h2 style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -1569,12 +1587,7 @@ export default function ChatApp({
                             height: '56px'
                         }}>
                             <div className="left-header" style={{ display: 'flex', alignItems: 'center', paddingLeft: '10px', flex: 1, minWidth: 0 }}>
-                                <i 
-                                    className='bx bx-sidebar-right bx-flip-horizontal' 
-                                    id="btn-header-toggle" 
-                                    onClick={() => setSidebarOpen(true)} 
-                                    style={{ cursor: 'pointer', fontSize: '24px' }} 
-                                />
+                                {/* Header toggle removed to avoid duplication */}
                             </div>
                             <div className="center-header" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', textAlign: 'center', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', padding: '0 20px' }}>
                                 <h2 style={{ cursor: 'pointer', margin: 0, fontSize: '1.2rem' }} onClick={() => navigate('/chat')}>
@@ -1620,21 +1633,6 @@ export default function ChatApp({
                                                 className={`browser-toggle-btn ${showBrowserPanel ? 'active' : ''}`}
                                                 onClick={toggleBrowserPanel}
                                                 title={showBrowserPanel ? "Hide Research Panel" : "Show Research Panel"}
-                                                style={{
-                                                    background: showBrowserPanel ? 'var(--sarvam-accent, #6EE7B7)' : 'rgba(255,255,255,0.1)',
-                                                    color: showBrowserPanel ? '#000' : '#fff',
-                                                    border: 'none',
-                                                    padding: '6px 12px',
-                                                    borderRadius: '8px',
-                                                    marginLeft: '15px',
-                                                    cursor: 'pointer',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    gap: '6px',
-                                                    fontSize: '13px',
-                                                    fontWeight: '600',
-                                                    transition: 'all 0.2s ease'
-                                                }}
                                             >
                                                 <i className='bx bx-globe' />
                                                 <span className="hide-mobile">Browser</span>
@@ -2019,7 +2017,7 @@ export default function ChatApp({
                                                 disabled={isLoading}
                                                 style={{ opacity: isLoading ? 0.5 : 1 }}
                                             >
-                                                <i className='bx bxs-up-arrow' />
+                                                <i className='bx bxs-send' />
                                             </button>
                                         </div>
                                     </div>
@@ -2124,7 +2122,7 @@ export default function ChatApp({
                                                                 </button>
                                                             )}
                                                             <a className="browser-side-open-btn" href={browserPreview.previewUrl} target="_blank" rel="noreferrer">
-                                                                <i className='bx bx-link-external'></i>
+                                                                <i className='bx bx-link-external' style={{ color: '#fff' }}></i>
                                                                 <span>Open in new tab</span>
                                                             </a>
                                                         </div>
@@ -2325,15 +2323,7 @@ export default function ChatApp({
                                 </div>
                                 <div className="settings-body">
                                     {/* General Tab */}
-                                    {settingsOpen && (
-                                        <button 
-                                            className="reset-all-btn" 
-                                            title="Reset this section to default"
-                                            onClick={() => handleResetToDefault(settingsTab === 'general' ? 'general' : settingsTab === 'ai-behavior' ? 'ai' : 'voice')}
-                                        >
-                                            <i className='bx bx-rotate-left' /> Reset to Defaults
-                                        </button>
-                                    )}
+                                    {/* Content tabs follow */}
                                     {settingsTab === 'general' && (
                                         <div id="tab-general" className="settings-tab-content active">
                                             <form id="settings-form" onSubmit={handleSaveGeneral}>
@@ -2466,7 +2456,15 @@ export default function ChatApp({
                                                     </div>
                                                 </div>
 
-                                                <div className="settings-actions">
+                                                <div className="settings-actions" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '20px' }}>
+                                                    <button 
+                                                        type="button"
+                                                        className="reset-all-btn" 
+                                                        onClick={() => setResetConfirm({ open: true, section: 'general' })}
+                                                        style={{ margin: 0 }}
+                                                    >
+                                                        <i className='bx bx-rotate-left' /> Reset to Default
+                                                    </button>
                                                     <button type="submit" className="save-btn" disabled={isSaving}>
                                                         {isSaving ? 'Saving...' : 'Save Preferences'}
                                                     </button>
@@ -2543,7 +2541,15 @@ export default function ChatApp({
                                                     />
                                                 </div>
 
-                                                <div className="settings-actions">
+                                                <div className="settings-actions" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '20px' }}>
+                                                    <button 
+                                                        type="button"
+                                                        className="reset-all-btn" 
+                                                        onClick={() => setResetConfirm({ open: true, section: 'ai' })}
+                                                        style={{ margin: 0 }}
+                                                    >
+                                                        <i className='bx bx-rotate-left' /> Reset to Default
+                                                    </button>
                                                     <button type="submit" className="save-btn">Save AI Behavior</button>
                                                 </div>
                                             </form>
@@ -2564,15 +2570,30 @@ export default function ChatApp({
                                                 <p className="settings-hint">Select the voice you want to hear when using the "Speak" feature.</p>
                                             </div>
                                             <div className="form-group">
-                                                <button id="test-voice-btn" className="secondary-btn" onClick={() => {
-                                                    if (!settings.userVoice) return alert('Select a voice first.');
-                                                    const u = new SpeechSynthesisUtterance("Hello, I'm your AI assistant.");
-                                                    const voices = window.speechSynthesis.getVoices();
-                                                    u.voice = voices.find(v => v.name === settings.userVoice);
-                                                    window.speechSynthesis.speak(u);
-                                                }}><i className='bx bx-play' /> Test Voice</button>
+                                                <button 
+                                                    id="test-voice-btn" 
+                                                    className="secondary-btn" 
+                                                    style={{ padding: '10px 20px' }} // Increased padding
+                                                    onClick={() => {
+                                                        if (!settings.userVoice) return alert('Select a voice first.');
+                                                        const u = new SpeechSynthesisUtterance("Hello, I'm your AI assistant.");
+                                                        const voices = window.speechSynthesis.getVoices();
+                                                        u.voice = voices.find(v => v.name === settings.userVoice);
+                                                        window.speechSynthesis.speak(u);
+                                                    }}
+                                                >
+                                                    <i className='bx bx-play' /> Test Voice
+                                                </button>
                                             </div>
-                                            <div className="settings-actions">
+                                            <div className="settings-actions" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '20px' }}>
+                                                <button 
+                                                    type="button"
+                                                    className="reset-all-btn" 
+                                                    onClick={() => setResetConfirm({ open: true, section: 'voice' })}
+                                                    style={{ margin: 0 }}
+                                                >
+                                                    <i className='bx bx-rotate-left' /> Reset to Default
+                                                </button>
                                                 <button id="save-voice-btn" className="save-btn" type="button" onClick={handleSaveGeneral}>Save Voice Settings</button>
                                             </div>
                                         </div>
@@ -2584,36 +2605,71 @@ export default function ChatApp({
                 )
             }
 
+            {/* Reset Confirmation Prompt */}
+            {resetConfirm.open && (
+                <div className="modal-overlay show" style={{ zIndex: 10001 }}>
+                    <div className="confirm-modal show">
+                        <div className="confirm-modal-content">
+                            <div className="confirm-header">
+                                <i className='bx bx-refresh' style={{ color: 'var(--accent)' }} />
+                                <h3>Reset {resetConfirm.section === 'ai' ? 'AI Behavior' : resetConfirm.section.charAt(0).toUpperCase() + resetConfirm.section.slice(1)} Settings?</h3>
+                            </div>
+                            <div className="confirm-body">
+                                <p>Are you sure you want to reset all <strong>{resetConfirm.section === 'ai' ? 'AI Behavior' : resetConfirm.section}</strong> settings to their defaults?</p>
+                                <p>This action cannot be undone unless you Discard all changes later.</p>
+                            </div>
+                            <div className="confirm-footer" style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: '16px' }}>
+                                <button className="confirm-btn cancel-btn" onClick={() => setResetConfirm({ open: false, section: '' })} style={{ background: 'transparent', color: 'var(--sarvam-text-secondary)' }}>
+                                    Cancel
+                                </button>
+                                <button
+                                    className="confirm-btn discard-btn"
+                                    onClick={() => {
+                                        handleResetToDefault(resetConfirm.section);
+                                        setResetConfirm({ open: false, section: '' });
+                                    }}
+                                    style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444' }}
+                                >
+                                    Reset ({resetConfirm.section})
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Unsaved Changes Prompt */}
             {showUnsavedPrompt && (
-                <div className="modal-overlay">
-                    <div className="confirm-modal">
-                        <div className="confirm-header">
-                            <i className='bx bx-error-circle' />
-                            <h3>Unsaved Changes</h3>
-                        </div>
-                        <div className="confirm-body">
-                            <p style={{ fontWeight: 500, color: 'var(--sarvam-text-main)' }}>You have modified your preferences, but they have not been saved yet.</p>
-                            <p>If you leave this page without saving, all changes will be lost.</p>
-                        </div>
-                        <div className="confirm-footer" style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: '16px' }}>
-                            <button className="confirm-btn cancel-btn" onClick={() => setShowUnsavedPrompt(false)} style={{ background: 'transparent', color: 'var(--sarvam-text-secondary)' }}>
-                                Cancel
-                            </button>
-                            <button className="confirm-btn discard-btn" onClick={() => {
-                                setShowUnsavedPrompt(false);
-                                setSettingsOpen(false);
-                                setTempSettings(null);
-                                navigate('/chat');
-                            }} style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444' }}>
-                                Discard
-                            </button>
-                            <button className="confirm-btn save-preferences-btn" onClick={async () => {
-                                setShowUnsavedPrompt(false);
-                                await handleGlobalSave();
-                            }} style={{ background: 'var(--sarvam-text-main)', color: 'var(--sarvam-bg-body)' }}>
-                                Save Changes
-                            </button>
+                <div className="modal-overlay show" style={{ zIndex: 10001 }}>
+                    <div className="confirm-modal show">
+                        <div className="confirm-modal-content">
+                            <div className="confirm-header">
+                                <i className='bx bx-error-circle' />
+                                <h3>Unsaved Changes</h3>
+                            </div>
+                            <div className="confirm-body">
+                                <p style={{ fontWeight: 500, color: 'var(--sarvam-text-main)' }}>You have modified your preferences, but they have not been saved yet.</p>
+                                <p>If you leave this page without saving, all changes will be lost.</p>
+                            </div>
+                            <div className="confirm-footer" style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: '16px' }}>
+                                <button className="confirm-btn cancel-btn" onClick={() => setShowUnsavedPrompt(false)} style={{ background: 'transparent', color: 'var(--sarvam-text-secondary)' }}>
+                                    Cancel
+                                </button>
+                                <button className="confirm-btn discard-btn" onClick={() => {
+                                    setShowUnsavedPrompt(false);
+                                    setSettingsOpen(false);
+                                    setTempSettings(null);
+                                    navigate('/chat');
+                                }} style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444' }}>
+                                    Discard
+                                </button>
+                                <button className="confirm-btn save-preferences-btn" onClick={async () => {
+                                    setShowUnsavedPrompt(false);
+                                    await handleGlobalSave();
+                                }} style={{ background: 'var(--sarvam-text-main)', color: 'var(--sarvam-bg-body)' }}>
+                                    Save Changes
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

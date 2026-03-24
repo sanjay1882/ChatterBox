@@ -105,7 +105,7 @@
     width: 34px !important;
     height: 34px !important;
     border-radius: 50% !important; /* Circular like Gemini */
-    background: var(--accent) !important;
+    background: #111111 !important; /* Sleek black */
     color: #ffffff !important;
     border: none !important;
     display: flex;
@@ -114,9 +114,13 @@
     transition: transform 0.2s;
 }
 
+.send-btn i {
+    color: #ffffff !important;
+}
+
 .send-btn:hover:not(:disabled) {
     transform: scale(1.08);
-    background: var(--accent-light) !important;
+    background: #333333 !important; /* Subtle dark hover */
 }
 
 .send-btn:disabled {

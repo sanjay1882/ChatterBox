@@ -13,10 +13,19 @@ export default function showToast(message, type = 'success') {
 
     toast.classList.add('show');
 
-    setTimeout(() => {
+    const dismiss = () => {
         toast.classList.remove('show');
         setTimeout(() => {
             if (toast.parentNode) toast.parentNode.removeChild(toast);
         }, 500);
-    }, 4000);
-}
+    };
+
+    const timeoutId = setTimeout(dismiss, 4000);
+
+    return {
+        dismiss: () => {
+            clearTimeout(timeoutId);
+            dismiss();
+        }
+    };
+}

@@ -55,6 +55,10 @@ const UserPreferencesSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    mode: {
+        type: String,
+        default: 'dark'
+    },
     updatedAt: {
         type: Date,
         default: Date.now

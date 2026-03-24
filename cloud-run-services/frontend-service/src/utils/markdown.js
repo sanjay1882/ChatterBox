@@ -121,11 +121,42 @@ export function renderMarkdown(text, isStreaming = false) {
         '<a href="$2" target="_blank" rel="noopener noreferrer" class="md-link">$1</a>'
     );
 
+    // ── Special Tool/Browser Links (Themed Buttons) ──────────────────────────
+    responseText = responseText.replace(/Opened in Browser View:\s*(https?:\/\/[^\s<]+)/gi, (match, url) => {
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="url-button"><span>View Research Page</span><i class='bx bx-link-external'></i></a>`;
+    });
+
+    // ── Auto-linkify plain URLs ──────────────────────────────────────────────
+    // Avoid double-linking URLs that are already inside <a> tags or buttons
+    responseText = responseText.replace(/(?<!href=")(?<!">)(https?:\/\/[^\s<]+)/g, (url) => {
+        // Truncate display text for long URLs
+        const displayUrl = url.length > 50 ? url.substring(0, 47) + '...' : url;
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="url-button"><span>${displayUrl}</span><i class='bx bx-link-external'></i></a>`;
+    });
+
     // ── Paragraphs / line breaks ─────────────────────────────────────────────
     responseText = responseText.replace(/\n\n/g, '<br><br>');
     responseText = responseText.replace(/\n(?!<)/g, '<br>');
 
     return responseText;
+}
+
+/**
+ * Utility to linkify plain text or HTML that might contain plain URLs.
+ */
+export function linkify(text) {
+    if (!text) return '';
+    
+    // First, handle the special browser view pattern
+    let processed = text.replace(/Opened in Browser View:\s*(https?:\/\/[^\s<]+)/gi, (match, url) => {
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="url-button"><span>View Research Page</span><i class='bx bx-link-external'></i></a>`;
+    });
+
+    // Then, linkify remaining plain URLs and truncate display text
+    return processed.replace(/(?<!href=")(?<!">)(https?:\/\/[^\s<]+)/g, (url) => {
+        const displayUrl = url.length > 50 ? url.substring(0, 47) + '...' : url;
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="url-button"><span>${displayUrl}</span><i class='bx bx-link-external'></i></a>`;
+    });
 }
 
 /**

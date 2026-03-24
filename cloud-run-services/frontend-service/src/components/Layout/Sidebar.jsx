@@ -75,30 +75,25 @@ export default function Sidebar({
             style={sidebarOpen && window.innerWidth > 768 ? { width: `${sidebarWidth}px` } : {}}
         >
             <div className="logo-details">
-                {!sidebarOpen ? (
-                   <img 
-                       src="/assets/treevit-master-transparent-1024.png" 
-                       alt="Treevit" 
-                       className="sidebar-logo-img" 
-                       onClick={() => setSidebarOpen(true)}
-                       style={{ width: '30px', height: '30px', objectFit: 'contain', cursor: 'pointer' }}
-                   />
-                ) : (
-                    <>
-                        <img 
-                            src="/assets/treevit-master-transparent-1024.png" 
-                            alt="Treevit" 
-                            className="sidebar-logo-img" 
-                            style={{ width: '30px', height: '30px', objectFit: 'contain' }}
-                        />
-                    </>
+                {sidebarOpen && (
+                    <img 
+                        src="/assets/treevit-master-transparent-1024.png" 
+                        alt="Treevit" 
+                        className="sidebar-logo-img" 
+                        style={{ width: '30px', height: '30px', objectFit: 'contain', marginRight: '10px' }}
+                    />
                 )}
-                <i 
-                    className={`bx ${sidebarOpen ? 'bx-menu-alt-right' : 'bx-menu'}`} 
-                    id="btn" 
-                    onClick={() => setSidebarOpen(!sidebarOpen)} 
+                <div 
                     data-tooltip={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
-                />
+                    className="sidebar-toggle-wrapper"
+                    onClick={() => setSidebarOpen(!sidebarOpen)}
+                    style={{ display: 'flex' }}
+                >
+                    <i 
+                        className={sidebarOpen ? 'bx bx-menu-alt-right' : 'bx bx-sidebar-right bx-flip-horizontal'} 
+                        id="btn" 
+                    />
+                </div>
             </div>
 
             <ul className="nav-list">
@@ -212,30 +207,62 @@ export default function Sidebar({
                                 <>
                                     {sessionsLoading && filteredSessions.length === 0 ? (
                                         <ConversationSkeleton />
-                                    ) : (
-                                        filteredSessions.map(s => (
-                                            <li
-                                                key={s._id}
-                                                className={`history-item${(currentSessionId === s._id || sessionId === s._id) ? ' active' : ''}`}
-                                                onClick={() => { 
-                                                    const path = appMode && appMode !== 'chat' ? `/apps/${appMode}/${s._id}` : `/chat/${s._id}`;
-                                                    navigate(path);
-                                                    setCurrentSessionId(s._id); 
-                                                    if(window.innerWidth <= 768) setSidebarOpen(false); 
-                                                }}
-                                                data-tooltip={s.title || "Untitled Chat"}
-                                            >
-                                                <i className='bx bx-message-square-detail' />
-                                                <span className="history-item-title">
-                                                    {s.title || "Untitled Chat"}
-                                                </span>
-                                                <i
-                                                    className='bx bx-trash delete-chat-icon'
-                                                    onClick={e => { e.stopPropagation(); setDeleteModal({ open: true, id: s._id }); }}
-                                                />
-                                            </li>
-                                        ))
-                                    )}
+                                    ) : (() => {
+                                        const now = new Date();
+                                        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                                        const yesterday = new Date(today);
+                                        yesterday.setDate(yesterday.getDate() - 1);
+                                        const last7Days = new Date(today);
+                                        last7Days.setDate(last7Days.getDate() - 7);
+                                        const last30Days = new Date(today);
+                                        last30Days.setDate(last30Days.getDate() - 30);
+
+                                        const groups = [
+                                            { title: 'Today', sessions: [] },
+                                            { title: 'Yesterday', sessions: [] },
+                                            { title: 'Previous 7 Days', sessions: [] },
+                                            { title: 'Previous 30 Days', sessions: [] },
+                                            { title: 'Older', sessions: [] }
+                                        ];
+
+                                        filteredSessions.forEach(s => {
+                                            const date = new Date(s.updatedAt || s.createdAt || Date.now());
+                                            if (date >= today) groups[0].sessions.push(s);
+                                            else if (date >= yesterday) groups[1].sessions.push(s);
+                                            else if (date >= last7Days) groups[2].sessions.push(s);
+                                            else if (date >= last30Days) groups[3].sessions.push(s);
+                                            else groups[4].sessions.push(s);
+                                        });
+
+                                        return groups.map(group => group.sessions.length > 0 && (
+                                            <React.Fragment key={group.title}>
+                                                <div className="history-group-title">{group.title}</div>
+                                                {group.sessions.map(s => (
+                                                    <li
+                                                        key={s._id}
+                                                        className={`history-item${(currentSessionId === s._id || sessionId === s._id) ? ' active' : ''}`}
+                                                        onClick={() => { 
+                                                            const path = appMode && appMode !== 'chat' ? `/apps/${appMode}/${s._id}` : `/chat/${s._id}`;
+                                                            navigate(path);
+                                                            setCurrentSessionId(s._id); 
+                                                            if(window.innerWidth <= 768) setSidebarOpen(false); 
+                                                        }}
+                                                        data-tooltip={s.title || "Untitled Chat"}
+                                                    >
+                                                        <i className='bx bx-message-square-detail' />
+                                                        <span className="history-item-title">
+                                                            {s.title || "Untitled Chat"}
+                                                        </span>
+                                                        <i
+                                                            className='bx bx-trash delete-chat-icon'
+                                                            onClick={e => { e.stopPropagation(); setDeleteModal({ open: true, id: s._id }); }}
+                                                        />
+                                                    </li>
+                                                ))}
+                                            </React.Fragment>
+                                        ));
+                                    })()}
+
 
                                     {sessHasMore && (
                                         <li style={{ textAlign: 'center', padding: '8px 0' }}>

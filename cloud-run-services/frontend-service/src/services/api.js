@@ -223,10 +223,10 @@ export async function getUserPreferences(email, token) {
 export async function saveUserPreferences(email, token, prefs) {
     const headers = { 'Content-Type': 'application/json' };
     if (token) headers['Authorization'] = `Bearer ${token}`;
-    const res = await fetch(`${API_BASE_URL}/user/preferences/${email}`, {
+    const res = await fetch(`${API_BASE_URL}/user/preferences`, {
         method: 'POST',
         headers,
-        body: JSON.stringify(prefs),
+        body: JSON.stringify({ email, ...prefs }),
     });
     if (!res.ok) return null;
     return res.json();
