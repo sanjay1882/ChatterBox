@@ -60,6 +60,10 @@ export default function UpgradeModal() {
 
     // ── Razorpay (UPI / India) ───────────────────────────────────────
     const handleRazorpay = async () => {
+        if (!window.Razorpay) {
+            alert("Razorpay is temporarily disabled. Please use Stripe for payments.");
+            return;
+        }
         setLoadingRazorpay(true);
         setError('');
         try {
