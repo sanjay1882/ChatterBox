@@ -801,34 +801,38 @@ export const streamChat = async (req, res) => {
 
     const finalModel = orchestrationResult.model || selectedModel;
 
-    // Tool Execution System
+    const geminiParts = buildParts(userMessage, req.file);
+    let contextBlock = `[SYSTEM CONTEXT]\nCurrent Time (IST): ${nowIST()}\n`;
+
+    // Tool Execution System integration with Context
     if (orchestrationResult.type === 'tool_request') {
         const toolName = orchestrationResult.tool;
-        res.setHeader("Content-Type", "text/event-stream");
-        res.setHeader("Cache-Control", "no-cache");
-        res.setHeader("Connection", "keep-alive");
-
+        
         if (toolName === 'pdf_generator') {
             const downloadUrl = "#"; // Placeholder for actual PDF generation
+            res.setHeader("Content-Type", "text/event-stream");
+            res.setHeader("Cache-Control", "no-cache");
+            res.setHeader("Connection", "keep-alive");
             res.write(`data: ${JSON.stringify({ text: `I've generated the PDF report for you. \n\n[Download PDF Report](${downloadUrl})` })}\n\n`);
             res.write(`event: end\ndata: done\n\n`);
             return res.end();
         }
 
         if (toolName === 'image_generator') {
-            // Prepend system command for image generation
             contextBlock += `\n[SYSTEM ACTION: GENERATE_IMAGE]\nUser wants to generate an image. Use Imagen 4 if possible.\n`;
         }
 
         if (toolName === 'file_exporter') {
             const downloadUrl = "#";
+            res.setHeader("Content-Type", "text/event-stream");
+            res.setHeader("Cache-Control", "no-cache");
+            res.setHeader("Connection", "keep-alive");
             res.write(`data: ${JSON.stringify({ text: `The project has been exported successfully. \n\n[Download Exported Project](${downloadUrl})` })}\n\n`);
             res.write(`event: end\ndata: done\n\n`);
             return res.end();
         }
     }
 
-    const geminiParts = buildParts(userMessage, req.file);
     let responseText = "";
 
     res.setHeader("Content-Type", "text/event-stream");
@@ -946,7 +950,8 @@ export const streamChat = async (req, res) => {
         const history = [...initialPrompt, ...dbHistory];
 
         // Combine all RAG, Search, and Time data into a single block prepended to the user's current message
-        let contextBlock = `[SYSTEM CONTEXT]\nCurrent Time (IST): ${nowIST()}\n`;
+        // [MODIFIED] contextBlock already initialized with time and tools above
+        // contextBlock = `[SYSTEM CONTEXT]\nCurrent Time (IST): ${nowIST()}\n`;
 
         const relevantContext = await findRelevantContext(userEmail, userMessage);
         if (relevantContext.length > 0) {
@@ -1285,7 +1290,7 @@ export const chatCompletion = async (req, res) => {
         res.json({ text: response.text() });
     } catch (error) {
         console.error("Completion error:", error);
-        res.status(200).send({ text: "I've found your search results â” you can see them in the side panel. Take a look whenever you're ready!" });
+        res.status(200).send({ text: "I've found your search results — you can see them in the side panel. Take a look whenever you're ready!" });
     }
 };
 

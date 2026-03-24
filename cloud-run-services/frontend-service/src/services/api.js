@@ -1,8 +1,6 @@
-const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || (import.meta.env.DEV ? '/api' : 'http://127.0.0.1:3000'); // old logic below
-    // ? import.meta.env.VITE_BACKEND_URL
-    // : (import.meta.env.DEV ? '/api' : 'http://localhost:3000');
+const API_BASE_URL = import.meta.env.DEV ? '/api' : (import.meta.env.VITE_BACKEND_URL || 'http://127.0.0.1:3000');
 
-// â”€â”€ Stream Chat â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Stream Chat ─────────────────────────────────────────────────────────────
 export async function streamChat({ formData, token, onChunk, onSessionId, onEnd, onError, onSources }) {
     try {
         const headers = {};
@@ -92,7 +90,7 @@ export async function streamChat({ formData, token, onChunk, onSessionId, onEnd,
     }
 }
 
-// â”€â”€ Get Sessions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Get Sessions ─────────────────────────────────────────────────────────────
 export async function getSessions(email, token, page = 1) {
     const headers = { 'Content-Type': 'application/json' };
     if (token) headers['Authorization'] = `Bearer ${token}`;
@@ -102,7 +100,7 @@ export async function getSessions(email, token, page = 1) {
     return res.json();
 }
 
-// â”€â”€ Get Single Session â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Get Single Session ────────────────────────────────────────────────────────
 export async function getSession(email, sessionId, token) {
     const headers = {};
     if (token) headers['Authorization'] = `Bearer ${token}`;
@@ -112,7 +110,7 @@ export async function getSession(email, sessionId, token) {
     return res.json();
 }
 
-// â”€â”€ Delete Session â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Delete Session ────────────────────────────────────────────────────────────
 export async function deleteSession(email, sessionId, token) {
     const headers = { 'Content-Type': 'application/json' };
     if (token) headers['Authorization'] = `Bearer ${token}`;
@@ -125,7 +123,7 @@ export async function deleteSession(email, sessionId, token) {
     return res.json();
 }
 
-// â”€â”€ Share Session â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Share Session ─────────────────────────────────────────────────────────────
 export async function toggleSessionShare(email, sessionId, token) {
     const headers = { 'Content-Type': 'application/json' };
     if (token) headers['Authorization'] = `Bearer ${token}`;
@@ -138,14 +136,14 @@ export async function toggleSessionShare(email, sessionId, token) {
     return res.json();
 }
 
-// â”€â”€ Get Public Session â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Get Public Session ────────────────────────────────────────────────────────
 export async function getPublicSession(sessionId) {
     const res = await fetch(`${API_BASE_URL}/session/public/${sessionId}`);
     if (!res.ok) throw new Error('Failed to fetch public session or session not shared');
     return res.json();
 }
 
-// â”€â”€ Excel Agent â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Excel Agent ───────────────────────────────────────────────────────────────
 export async function excelAgentStream({ message, sheetData, token, email, onChunk, onData, onJobQueued }) {
     try {
         const headers = { 'Content-Type': 'application/json' };
@@ -213,7 +211,7 @@ export async function excelAgentStream({ message, sheetData, token, email, onChu
     }
 }
 
-// â”€â”€ User Preferences â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── User Preferences ──────────────────────────────────────────────────────────
 export async function getUserPreferences(email, token) {
     const headers = {};
     if (token) headers['Authorization'] = `Bearer ${token}`;
@@ -256,7 +254,7 @@ export async function getGallery(email, token) {
     return res.json();
 }
 
-// â”€â”€ Word Agent â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Word Agent ───────────────────────────────────────────────────────────────
 export async function wordAgentStream({ message, docContent, fileName, token, email, onChunk, onData }) {
     try {
         const headers = { 'Content-Type': 'application/json' };
@@ -431,7 +429,7 @@ export async function browserAutomationTask({ token, taskType, url = '', options
     return json;
 }
 
-// â”€â”€ Settings â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Settings ──────────────────────────────────────────────────────────────────
 export async function updateTheme(token, theme) {
     const headers = { 'Content-Type': 'application/json' };
     if (token) headers['Authorization'] = `Bearer ${token}`;

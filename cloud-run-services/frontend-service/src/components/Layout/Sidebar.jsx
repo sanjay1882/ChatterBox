@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { AGENTS } from '../../config/agents';
+import { AGENTS } from '../Chat/Agents';
 
 // Skeleton shimmer for conversation loading
 function ConversationSkeleton() {
@@ -42,6 +42,8 @@ export default function Sidebar({
     onOpenLegal,
     galleryCount = 0,
     onOpenGallery,
+    navigate,
+    location,
 }) {
     const isResizing = React.useRef(false);
 
@@ -74,11 +76,21 @@ export default function Sidebar({
         >
             <div className="logo-details">
                 {!sidebarOpen ? (
-                   <i className='bx bx-doughnut-chart' onClick={() => setSidebarOpen(true)} style={{ cursor: 'pointer' }} data-tooltip="Treevit" />
+                   <img 
+                       src="/assets/treevit-master-transparent-1024.png" 
+                       alt="Treevit" 
+                       className="sidebar-logo-img" 
+                       onClick={() => setSidebarOpen(true)}
+                       style={{ width: '30px', height: '30px', objectFit: 'contain', cursor: 'pointer' }}
+                   />
                 ) : (
                     <>
-                        <i className='bx bx-doughnut-chart' />
-                        
+                        <img 
+                            src="/assets/treevit-master-transparent-1024.png" 
+                            alt="Treevit" 
+                            className="sidebar-logo-img" 
+                            style={{ width: '30px', height: '30px', objectFit: 'contain' }}
+                        />
                     </>
                 )}
                 <i 
@@ -95,7 +107,7 @@ export default function Sidebar({
                     <li>
                         <div className="sidebar-search-container">
                             <div className="sidebar-search">
-                            
+                                <i className='bx bx-search' />
                                 <input
                                     type="text"
                                     placeholder="Search..."
@@ -110,7 +122,7 @@ export default function Sidebar({
 
                 {/* New Chat */}
                 <li className="Newchat-Btn">
-                    <a href="#" onClick={e => { e.preventDefault(); startNewChat(); }} data-tooltip="New Chat">
+                    <a href="#" onClick={e => { e.preventDefault(); navigate('/chat'); startNewChat(); }} data-tooltip="New Chat">
                         <i className='bx bx-plus' />
                         <span className="links_name">New Chat</span>
                     </a>
@@ -140,7 +152,7 @@ export default function Sidebar({
                 <li>
                     <a href="#" id="apps-btn" onClick={e => {
                         e.preventDefault();
-                        setAppsOpen(true);
+                        navigate('/apps');
                         if(window.innerWidth <= 768) setSidebarOpen(false);
                     }} data-tooltip="Apps Explorer">
                         <i className='bx bx-grid-alt' />
@@ -155,7 +167,12 @@ export default function Sidebar({
                             <li key={agent.id}>
                                 <a
                                     href="#"
-                                    onClick={e => { e.preventDefault(); setAppMode(agent.id); if(window.innerWidth <= 768) setSidebarOpen(false); }}
+                                    onClick={e => { 
+                                        e.preventDefault(); 
+                                        navigate(`/apps/${agent.id}`);
+                                        setAppMode(agent.id); 
+                                        if(window.innerWidth <= 768) setSidebarOpen(false); 
+                                    }}
                                     className={appMode === agent.id ? 'active-agent' : ''}
                                     style={{ background: agent.color + '15', color: agent.color }}
                                     data-tooltip={agent.name}
@@ -200,7 +217,12 @@ export default function Sidebar({
                                             <li
                                                 key={s._id}
                                                 className={`history-item${(currentSessionId === s._id || sessionId === s._id) ? ' active' : ''}`}
-                                                onClick={() => { setCurrentSessionId(s._id); if(window.innerWidth <= 768) setSidebarOpen(false); }}
+                                                onClick={() => { 
+                                                    const path = appMode && appMode !== 'chat' ? `/apps/${appMode}/${s._id}` : `/chat/${s._id}`;
+                                                    navigate(path);
+                                                    setCurrentSessionId(s._id); 
+                                                    if(window.innerWidth <= 768) setSidebarOpen(false); 
+                                                }}
                                                 data-tooltip={s.title || "Untitled Chat"}
                                             >
                                                 <i className='bx bx-message-square-detail' />
@@ -241,7 +263,11 @@ export default function Sidebar({
 
             <div className="sidebar-footer">
                 <div className="sidebar-footer-item">
-                    <a href="#" id="settings-btn" data-tooltip="Settings" onClick={e => { e.preventDefault(); if(window.innerWidth <= 768) setSidebarOpen(false); setSettingsOpen(true); }}>
+                    <a href="#" id="settings-btn" data-tooltip="Settings" onClick={e => { 
+                        e.preventDefault(); 
+                        navigate('/settings');
+                        if(window.innerWidth <= 768) setSidebarOpen(false); 
+                    }}>
                         <i className='bx bx-cog' />
                         <span className="links_name">Settings</span>
                     </a>
@@ -250,7 +276,7 @@ export default function Sidebar({
             
                 {sidebarOpen && (
                     <div className="sidebar-legal-links">
-                        <Link to="/privacy">Privacy</Link>
+                        <Link to="/privacy-policy">Privacy</Link>
                         <span className="dot">·</span>
                         <Link to="/terms-of-service">Terms</Link>
                     </div>

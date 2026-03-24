@@ -3,7 +3,7 @@ import { useAuth } from './AuthContext';
 
 const CreditsContext = createContext(null);
 
-const BACKEND = import.meta.env.VITE_BACKEND_URL || (import.meta.env.DEV ? '/api' : 'http://127.0.0.1:3000');
+const BACKEND = import.meta.env.DEV ? '/api' : (import.meta.env.VITE_BACKEND_URL || 'http://127.0.0.1:3000');
 
 export function CreditsProvider({ children }) {
     const { user, token, loading: authLoading } = useAuth();

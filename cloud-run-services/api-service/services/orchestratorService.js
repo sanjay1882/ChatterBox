@@ -11,10 +11,6 @@ const MODELS = {
 
 /**
  * Detects if the user message is a system control command.
- * Uses an LLM for robust interpretation of natural language.
- */
-/**
- * Detects if the user message is a system control command.
  * Uses Regex for common commands (speed) and LLM for complex NL intent.
  */
 async function detectSystemIntent(text) {
@@ -42,7 +38,7 @@ async function detectSystemIntent(text) {
     if (/(clear|reset|wipe)\s+(chat|history)/i.test(raw)) return { action: "manage_session", payload: { type: "clear_chat" } };
     
     // Model Selection
-    const modelMatch = raw.match(/change\s+(model|ai)\s+to\s+(gemini\s+2\.5|gemini\s+2|llama|qwen|kimi|gpt)/i);
+    const modelMatch = raw.match(/change\s+(model|ai)\s+to\s+(gemini\s+2\.5|gemini\s+2\.0|gemini\s+2|llama|qwen|kimi|gpt)/i);
     if (modelMatch) {
         const target = modelMatch[2].toLowerCase();
         let value = 'gemini-2.0-flash';
@@ -67,8 +63,12 @@ async function detectSystemIntent(text) {
         - navigation: {"target": "settings" | "gallery" | "privacy" | "help"}
         - voice_control: {"enabled": boolean}
 
-        IF the message is an app command, return ONLY the JSON.
-        IF it is a normal chat or question, return exactly "NONE".
+        If the user wants to change the AI model, use "update_settings" with field "userDefaultModel".
+        Valid models: "gemini-2.0-flash", "gemini-2.5-flash", "llama-3.3-70b-versatile", "qwen/qwen3-32b", "moonshotai/kimi-k2-instruct-0905", "openai/gpt-oss-120b".
+
+        REQUIRED OUTPUT FORMAT:
+        - If it's a system command: Return ONLY a JSON object like {"action": "...", "payload": {...}}. No extra text.
+        - If it's normal chat: Return exactly "NONE".
 
         User: "make it dark" -> {"action": "update_theme", "payload": {"theme": "dark"}}
         User: "stop speaking" -> {"action": "voice_control", "payload": {"enabled": false}}
@@ -102,7 +102,8 @@ export const detectIntentAndRoute = async (userMessage, selectedModel = "gemini-
     
     // 1. Check for System Intent (App Commands)
     // We use LLM for this now as requested for robust natural language interpretation
-    const systemIntent = await detectSystemIntent(raw);
+    // Pass original userMessage to preserve nuance for LLM
+    const systemIntent = await detectSystemIntent(userMessage);
     if (systemIntent) {
         return { type: 'app_command', command: systemIntent };
     }
@@ -128,9 +129,9 @@ function detectAppCommand(text) {
 }
 
 function detectToolRequest(text) {
-    if (/create (a )?pdf/i.test(text)) return "pdf_generator";
-    if (/generate (an )?image/i.test(text)) return "image_generator";
-    if (/export (the )?file|export project/i.test(text)) return "file_exporter";
+    if (/(create|generate|make|convert\s+to|save\s+as)\s+(a\s+)?pdf/i.test(text) || /pdf\s+report/i.test(text)) return "pdf_generator";
+    if (/(generate|create|make|draw|paint|visualize)\s+(an\s+)?image/i.test(text)) return "image_generator";
+    if (/(export|download)\s+(the\s+)?(file|project|source\s+code)/i.test(text) || /zip\s+project/i.test(text)) return "file_exporter";
     return null;
 }
 

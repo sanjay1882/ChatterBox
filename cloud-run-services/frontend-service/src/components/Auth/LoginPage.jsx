@@ -20,10 +20,12 @@ const GoogleSVG = () => (
 
 const Logo = () => (
     <div className="auth-logo">
-        <svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-            <rect width="40" height="40" rx="10" fill="#141414" />
-            <path d="M12 20L17 25L28 14" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
+        <img 
+            src="/assets/treevit-master-transparent-1024.png" 
+            alt="Treevit" 
+            className="auth-logo-img" 
+            style={{ width: '48px', height: '48px', objectFit: 'contain' }}
+        />
         <span>Treevit</span>
     </div>
 );

@@ -31,6 +31,30 @@ const UserPreferencesSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
+    defaultModel: {
+        type: String,
+        default: 'gemini-2.0-flash'
+    },
+    writingStyle: {
+        type: String,
+        default: ''
+    },
+    creativityLevel: {
+        type: String,
+        default: ''
+    },
+    interests: {
+        type: String,
+        default: ''
+    },
+    customRules: {
+        type: String,
+        default: ''
+    },
+    heatwaveMode: {
+        type: Boolean,
+        default: false
+    },
     updatedAt: {
         type: Date,
         default: Date.now

@@ -8,7 +8,7 @@ import { formatStreamedText } from '../../utils/formatStreamedText';
 
 import Sidebar from '../Layout/Sidebar';
 import './GeminiInput.css';
-import { AGENTS } from '../../config/agents';
+import { AGENTS } from './Agents';
 import showToast from '../../utils/toast';
 import '../../utils/windowHandlers';
 import TreevitLoader from './TreevitLoader';
@@ -64,7 +64,7 @@ const extractFrontendFromText = (text) => {
     };
 };
 
-const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || (import.meta.env.DEV ? '/api' : 'http://127.0.0.1:3000');
+const API_BASE_URL = import.meta.env.DEV ? '/api' : (import.meta.env.VITE_BACKEND_URL || 'http://127.0.0.1:3000');
 
 
 
@@ -85,7 +85,7 @@ const MarkdownContent = ({ html, className, style }) => {
     );
 };
 
-// AnimatedMessage no longer animates character-by-character â€“ the
+// AnimatedMessage no longer animates character-by-character – the
 // streaming logic in handleSend now updates the message.html field using the
 // same algorithm used by the vanilla frontend, so here we merely render the
 // already-formatted HTML (or fall back to simple markdown). Keeping the
@@ -111,7 +111,7 @@ const AnimatedMessage = ({ html, message, isLoading }) => {
 // same modifier used by original chat so animation speed matches exactly
 const STREAMING_SPEED_MODIFIER = 500;
 
-// â”€â”€ Typewriter animation for header text â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Typewriter animation for header text ────────────────────────────────
 const TypewriterText = ({ text, speed = 42 }) => {
     const [displayed, setDisplayed] = useState('');
     const [showCursor, setShowCursor] = useState(true);
@@ -142,12 +142,12 @@ const TypewriterText = ({ text, speed = 42 }) => {
 };
 
 const SUGGESTIONS = [
-    { id: 'sugg', icon: 'bx-code-block', title: 'Debug My Code', text: "Here's a bug I'm stuck on â€” can you find the issue and explain what went wrong?", accent: 'linear-gradient(135deg, #6366f1, #818cf8)' },
+    { id: 'sugg', icon: 'bx-code-block', title: 'Debug My Code', text: "Here's a bug I'm stuck on — can you find the issue and explain what went wrong?", accent: 'linear-gradient(135deg, #6366f1, #818cf8)' },
     { id: 'sugg2', icon: 'bx-pen', title: 'Polish My Writing', text: 'Rewrite this paragraph to sound more professional and concise, while keeping the tone friendly.', accent: 'linear-gradient(135deg, #10b981, #34d399)' },
     { id: 'sugg3', icon: 'bx-bar-chart-alt-2', title: 'Explain This Data', text: 'Analyze these numbers and tell me the key trends, outliers, and what actions I should take.', accent: 'linear-gradient(135deg, #f59e0b, #fbbf24)' },
-    { id: 'sugg4', icon: 'bx-brain', title: 'Brainstorm Ideas', text: 'Give me 10 creative, unconventional ideas for my project â€” think outside the box.', accent: 'linear-gradient(135deg, #ec4899, #f472b6)' },
+    { id: 'sugg4', icon: 'bx-brain', title: 'Brainstorm Ideas', text: 'Give me 10 creative, unconventional ideas for my project — think outside the box.', accent: 'linear-gradient(135deg, #ec4899, #f472b6)' },
     { id: 'sugg5', icon: 'bx-book-open', title: 'Summarize This', text: 'Summarize this article or document into 5 bullet points I can read in 30 seconds.', accent: 'linear-gradient(135deg, #3b82f6, #60a5fa)' },
-    { id: 'sugg6', icon: 'bx-message-square-dots', title: 'Write My Email', text: 'Draft a professional follow-up email after a meeting â€” firm but polite, keep it short.', accent: 'linear-gradient(135deg, #8b5cf6, #a78bfa)' },
+    { id: 'sugg6', icon: 'bx-message-square-dots', title: 'Write My Email', text: 'Draft a professional follow-up email after a meeting — firm but polite, keep it short.', accent: 'linear-gradient(135deg, #8b5cf6, #a78bfa)' },
 ];
 
 
@@ -171,18 +171,18 @@ const MODELS = [
 ];
 
 const LANGUAGES = [
-    { code: 'hi', name: 'Hindi', flag: 'ðŸ‡®ðŸ‡³' },
-    { code: 'ta', name: 'Tamil', flag: 'ðŸ‡®ðŸ‡³' },
-    { code: 'te', name: 'Telugu', flag: 'ðŸ‡®ðŸ‡³' },
-    { code: 'fr', name: 'French', flag: 'ðŸ‡«ðŸ‡·' },
-    { code: 'es', name: 'Spanish', flag: 'ðŸ‡ªðŸ‡¸' },
-    { code: 'de', name: 'German', flag: 'ðŸ‡©ðŸ‡ª' },
-    { code: 'ja', name: 'Japanese', flag: 'ðŸ‡¯ðŸ‡µ' },
-    { code: 'ko', name: 'Korean', flag: 'ðŸ‡°ðŸ‡·' },
-    { code: 'zh', name: 'Chinese', flag: 'ðŸ‡¨ðŸ‡³' },
-    { code: 'ru', name: 'Russian', flag: 'ðŸ‡·ðŸ‡º' },
-    { code: 'ar', name: 'Arabic', flag: 'ðŸ‡¸ðŸ‡¦' },
-    { code: 'pt', name: 'Portuguese', flag: 'ðŸ‡µðŸ‡¹' }
+    { code: 'hi', name: 'Hindi', flag: '🇮🇳' },
+    { code: 'ta', name: 'Tamil', flag: '🇮🇳' },
+    { code: 'te', name: 'Telugu', flag: '🇮🇳' },
+    { code: 'fr', name: 'French', flag: '🇫🇷' },
+    { code: 'es', name: 'Spanish', flag: '🇪🇸' },
+    { code: 'de', name: 'German', flag: '🇩🇪' },
+    { code: 'ja', name: 'Japanese', flag: '🇯🇵' },
+    { code: 'ko', name: 'Korean', flag: '🇰🇷' },
+    { code: 'zh', name: 'Chinese', flag: '🇨🇳' },
+    { code: 'ru', name: 'Russian', flag: '🇷🇺' },
+    { code: 'ar', name: 'Arabic', flag: '🇸🇦' },
+    { code: 'pt', name: 'Portuguese', flag: '🇵🇹' }
 ];
 
 const escapeHtml = (value = '') => value
@@ -269,7 +269,12 @@ const CustomSelect = ({ id, value, onChange, options, placeholder }) => {
     );
 };
 
-export default function ChatApp({ initialAppsOpen = false, initialSettingsOpen = false }) {
+export default function ChatApp({ 
+    initialAppsOpen = false, 
+    initialSettingsOpen = false, 
+    initialLegalOpen = null,
+    upgradeSuccess = false
+}) {
     const { sessionId, agentId, shareId } = useParams();
     const navigate = useNavigate();
     const location = useLocation();
@@ -382,12 +387,14 @@ export default function ChatApp({ initialAppsOpen = false, initialSettingsOpen =
     const [isListening, setIsListening] = useState(false);
     const [liveTranscript, setLiveTranscript] = useState('');
     const [availableVoices, setAvailableVoices] = useState([]);
-    const [settings, setSettings] = useState({
+    const DEFAULT_SETTINGS = {
         userGender: '', userAge: '', userLanguage: '', userCulture: '',
         userDefaultModel: 'gemini-2.0-flash', userWritingStyle: '', userCreativity: '',
         userInterests: '', userCustomRules: '', userVoice: '',
         heatwaveMode: false
-    });
+    };
+
+    const [settings, setSettings] = useState(DEFAULT_SETTINGS);
 
     // ── Message Actions State ──────────────────────────
     const [editingMessageId, setEditingMessageId] = useState(null);
@@ -429,7 +436,8 @@ export default function ChatApp({ initialAppsOpen = false, initialSettingsOpen =
         setShowEmbeddedPreview(false);
         if (openPreviewSetRef.current) openPreviewSetRef.current = false;
         setSidebarOpen(false);
-    }, []);
+        navigate('/chat');
+    }, [navigate]);
 
     useEffect(() => {
         if (currentSessionId && sessions.length > 0) {
@@ -463,7 +471,9 @@ export default function ChatApp({ initialAppsOpen = false, initialSettingsOpen =
     }, [sessionId, agentId, shareId, location.pathname, startNewChat]);
 
     useEffect(() => {
-        if (initialAppsOpen) setAppsOpen(true);
+        // Synchronize modal states with routing props
+        setAppsOpen(!!initialAppsOpen);
+        
         if (initialSettingsOpen) {
             setSettingsOpen(true);
             setTempSettings({
@@ -471,8 +481,17 @@ export default function ChatApp({ initialAppsOpen = false, initialSettingsOpen =
                 theme: theme,
                 mode: mode
             });
+        } else {
+            setSettingsOpen(false);
         }
-    }, [initialAppsOpen, initialSettingsOpen, settings, theme, mode]);
+
+        if (initialLegalOpen) {
+            setLegalOpen(true);
+            setLegalTab(initialLegalOpen === 'terms' ? 'terms' : 'privacy');
+        } else {
+            setLegalOpen(false);
+        }
+    }, [initialAppsOpen, initialSettingsOpen, initialLegalOpen, settings, theme, mode]);
 
     useEffect(() => {
         // dark = default (no class), light = data-theme="light"
@@ -491,7 +510,7 @@ export default function ChatApp({ initialAppsOpen = false, initialSettingsOpen =
 
 
 
-    // â”€â”€ Load Voices â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Load Voices ────────────────────────────────────────────
     useEffect(() => {
         const loadVoices = () => {
             const voices = window.speechSynthesis.getVoices();
@@ -537,7 +556,7 @@ export default function ChatApp({ initialAppsOpen = false, initialSettingsOpen =
     };
 
 
-    // â”€â”€ Global Handlers for Code Blocks & Image Download â”€â”€â”€â”€â”€
+    // ── Global Handlers for Code Blocks & Image Download ─────
 
 
     // load stored preferences once on mount or when user changes
@@ -680,6 +699,32 @@ export default function ChatApp({ initialAppsOpen = false, initialSettingsOpen =
         }
     };
 
+    const handleResetToDefault = (section) => {
+        if (!tempSettings) return;
+        
+        const resetMap = {
+            general: ['userGender', 'userAge', 'userLanguage', 'userCulture'],
+            ai: ['userDefaultModel', 'userWritingStyle', 'userCreativity', 'userInterests', 'userCustomRules', 'heatwaveMode'],
+            voice: ['userVoice']
+        };
+
+        const fieldsToReset = resetMap[section] || [];
+        const updated = { ...tempSettings };
+        
+        fieldsToReset.forEach(field => {
+            updated[field] = DEFAULT_SETTINGS[field];
+        });
+
+        // Special case for theme/mode if needed, though they aren't in DEFAULT_SETTINGS yet
+        if (section === 'general') {
+            updated.theme = 'sarvam';
+            updated.mode = 'dark';
+        }
+
+        setTempSettings(updated);
+        showToast(`Reset ${section} settings to defaults`, 'info');
+    };
+
     const handleSaveGeneral = async (e) => {
         if (e) e.preventDefault();
         await handleGlobalSave();
@@ -717,7 +762,7 @@ export default function ChatApp({ initialAppsOpen = false, initialSettingsOpen =
         };
     }, [settingsOpen, appsOpen, deleteModal.open]);
 
-    // â”€â”€ Refs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Refs ───────────────────────────────────────────────────
     const recognitionRef = useRef(null);
     const chatboxRef = useRef(null);
     const textareaRef = useRef(null);
@@ -726,7 +771,7 @@ export default function ChatApp({ initialAppsOpen = false, initialSettingsOpen =
     const ignoreNextSessionLoadRef = useRef(false);
     const openPreviewSetRef = useRef(false);
 
-    // â”€â”€ Scroll lock ref: true when user has scrolled up â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Scroll lock ref: true when user has scrolled up ────────
     // Using a ref (not state) so it updates instantly without re-render
     const userScrolledUpRef = useRef(false);
     const [showScrollBtn, setShowScrollBtn] = useState(false);
@@ -744,9 +789,9 @@ export default function ChatApp({ initialAppsOpen = false, initialSettingsOpen =
         box.addEventListener('scroll', onScroll, { passive: true });
         return () => box.removeEventListener('scroll', onScroll);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []); // mount once â€” chatboxRef is stable
+    }, []); // mount once — chatboxRef is stable
 
-    // â”€â”€ Auto resize textarea â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Auto resize textarea ───────────────────────────────────
     useEffect(() => {
         const ta = textareaRef.current;
         if (!ta) return;
@@ -754,10 +799,10 @@ export default function ChatApp({ initialAppsOpen = false, initialSettingsOpen =
         ta.style.height = Math.min(ta.scrollHeight, 200) + 'px';
     }, [inputText]);
 
-    // â”€â”€ After messages update: only run syntax highlight, NO auto-scroll
+    // ── After messages update: only run syntax highlight, NO auto-scroll
     // Scrolling is handled directly in the streaming RAF loop with userScrolledUpRef guard
 
-    // â”€â”€ Load gallery images from DB on mount â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Load gallery images from DB on mount ──────────────────
     useEffect(() => {
         const loadGallery = async () => {
             if (!user || isGuest) return;
@@ -780,7 +825,7 @@ export default function ChatApp({ initialAppsOpen = false, initialSettingsOpen =
         loadGallery();
     }, [user?.email, getFreshToken, isGuest]);
 
-    // â”€â”€ Load sessions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Load sessions ──────────────────────────────────────────
     const loadSessions = useCallback(async (page = 1, append = false) => {
         if (!user || isGuest || isReadOnly) return;
         setSessionsLoading(true);
@@ -799,7 +844,7 @@ export default function ChatApp({ initialAppsOpen = false, initialSettingsOpen =
 
     useEffect(() => { loadSessions(1); }, [loadSessions]);
 
-    // â”€â”€ Load session messages â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Load session messages ──────────────────────────────────
     const loadSessionMessages = useCallback(async (id) => {
         setIsLoading(true);
         setMessages([]);
@@ -830,7 +875,7 @@ export default function ChatApp({ initialAppsOpen = false, initialSettingsOpen =
                         }
                         const shortPrompt = promptText.length > 80 ? promptText.slice(0, 80) + '\u2026' : promptText;
 
-                        html = `<div class="generated-image-card"><div class="gen-image-wrap"><img class="generated-image" src="${imgSrc}" alt="${promptText.replace(/"/g, '&quot;')}" onclick="window.previewGeneratedImage(this)" title="Click to preview full size" /><div class="gen-image-overlay"><button class="gen-img-btn gen-preview-btn" onclick="window.previewGeneratedImage(this.closest('.generated-image-card').querySelector('.generated-image'))"><i class="bx bx-fullscreen"></i> Preview</button><button class="gen-img-btn gen-download-btn" onclick="window.downloadGeneratedImage(this)"><i class="bx bx-download"></i> Download</button></div></div><p class="gen-image-caption"><i class="bx bx-image-alt"></i> Here's your image for <em>"${shortPrompt}"</em> â€” click to preview or download above.</p></div>`;
+                        html = `<div class="generated-image-card"><div class="gen-image-wrap"><img class="generated-image" src="${imgSrc}" alt="${promptText.replace(/"/g, '&quot;')}" onclick="window.previewGeneratedImage(this)" title="Click to preview full size" /><div class="gen-image-overlay"><button class="gen-img-btn gen-preview-btn" onclick="window.previewGeneratedImage(this.closest('.generated-image-card').querySelector('.generated-image'))"><i class="bx bx-fullscreen"></i> Preview</button><button class="gen-img-btn gen-download-btn" onclick="window.downloadGeneratedImage(this)"><i class="bx bx-download"></i> Download</button></div></div><p class="gen-image-caption"><i class="bx bx-image-alt"></i> Here's your image for <em>"${shortPrompt}"</em> — click to preview or download above.</p></div>`;
                         rawText = promptText;
                     } else {
                         rawText = m.parts?.[0]?.text || '';
@@ -897,14 +942,14 @@ export default function ChatApp({ initialAppsOpen = false, initialSettingsOpen =
         }
     }, [currentSessionId, loadSessionMessages]);
 
-    // â”€â”€ Send message â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Send message ───────────────────────────────────────────
     const handleSend = useCallback(async (overrideText, options = {}) => {
         const text = overrideText ?? inputText.trim();
         const { reuseMessageId = null } = options;
         if (!text && !selectedFile && !pastedContent) return;
         if (isLoading) return;
 
-        // â”€â”€ Feature gate: image generation credits â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── Feature gate: image generation credits ──────────────
         if (isImageGen && !checkImageGeneration()) {
             // checkImageGeneration() opens the upgrade modal automatically
             return;
@@ -1135,8 +1180,8 @@ export default function ChatApp({ initialAppsOpen = false, initialSettingsOpen =
                             case 'navigation':
                                 if (payload.target === 'gallery') setGalleryOpen(true);
                                 if (payload.target === 'settings') {
-                                    setSettingsOpen(true);
                                     setTempSettings({ ...settings, theme, mode });
+                                    setSettingsOpen(true);
                                 }
                                 if (payload.target === 'privacy') navigate('/privacy');
                                 if (payload.target === 'help') showToast('Help center coming soon!');
@@ -1201,7 +1246,7 @@ export default function ChatApp({ initialAppsOpen = false, initialSettingsOpen =
                 onError: (err) => {
                     isStreaming = false;
                     setIsLoading(false);
-                    fullText = `âš ï¸ Error: ${err} `;
+                    fullText = `⚠️ Error: ${err} `;
                     setMessages(p => p.map(m =>
                         m.id === aiMsgId ? { ...m, content: fullText, html: fullText, loading: false } : m
                     ));
@@ -1211,12 +1256,12 @@ export default function ChatApp({ initialAppsOpen = false, initialSettingsOpen =
             console.error('Chat error:', e);
             setIsLoading(false);
             setMessages(p => p.map(m =>
-                m.id === aiMsgId ? { ...m, html: `âŒ ${e.message} `, loading: false } : m
+                m.id === aiMsgId ? { ...m, html: `❌ ${e.message} `, loading: false } : m
             ));
         }
     }, [inputText, selectedFile, pastedContent, isLoading, selectedModel, webSearch, isTemporary, isImageGen, currentSessionId, user, isGuest, loadSessions, getFreshToken]);
 
-    // â”€â”€ Helper Actions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Helper Actions ────────────────────────────────────────
     const handleCopy = (id, text) => {
         const cleanText = text.replace(/<[^>]*>?/gm, '');
         navigator.clipboard.writeText(cleanText).then(() => {
@@ -1433,14 +1478,16 @@ export default function ChatApp({ initialAppsOpen = false, initialSettingsOpen =
                 sessionId={sessionId}
                 currentSessionId={currentSessionId}
                 setCurrentSessionId={setCurrentSessionId}
+                navigate={navigate}
+                location={location}
                 setDeleteModal={setDeleteModal}
                 sessHasMore={sessHasMore}
                 sessionsLoading={sessionsLoading}
                 loadSessions={loadSessions}
                 sessPage={sessPage}
                 setSettingsOpen={() => {
-                    setSettingsOpen(true);
                     setTempSettings({ ...settings, theme, mode });
+                    setSettingsOpen(true);
                 }}
                 setAppsOpen={setAppsOpen}
                 galleryCount={galleryImages.length}
@@ -1471,11 +1518,7 @@ export default function ChatApp({ initialAppsOpen = false, initialSettingsOpen =
                                     <div className="center-header" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 10 }}>
                                         <h2 style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                                             {agent.logo ? (
-                                                <img 
-                                                    src={agent.logo} 
-                                                    alt={agent.name} 
-                                                    style={{ width: '24px', height: '24px', objectFit: 'contain' }} 
-                                                />
+                                                <img src={agent.logo} alt={agent.name} style={{ width: '22px', height: '22px', objectFit: 'contain' }} />
                                             ) : (
                                                 <i className={`bx ${agent.icon}`} style={{ color: agent.color || 'var(--accent)' }} />
                                             )}
@@ -1545,7 +1588,7 @@ export default function ChatApp({ initialAppsOpen = false, initialSettingsOpen =
                                         <button
                                             id="temp-chat-btn"
                                             className={`temp-chat-btn${isTemporary ? ' active' : ''}`}
-                                            title={isTemporary ? 'Temporary chat ON â€” messages won\'t be saved. Click to disable.' : 'Enable temporary chat â€” messages won\'t be saved'}
+                                            title={isTemporary ? 'Temporary chat ON — messages won\'t be saved. Click to disable.' : 'Enable temporary chat — messages won\'t be saved'}
                                             onClick={() => {
                                                 const turningOn = !isTemporary;
                                                 setIsTemporary(turningOn);
@@ -1554,9 +1597,9 @@ export default function ChatApp({ initialAppsOpen = false, initialSettingsOpen =
                                                     if (messages.length > 0 || currentSessionId) {
                                                         startNewChat();
                                                     }
-                                                    showToast('Temporary chat enabled â€” messages won\'t be saved');
+                                                    showToast('Temporary chat enabled — messages won\'t be saved');
                                                 } else {
-                                                    showToast('Temporary chat disabled â€” messages will be saved');
+                                                    showToast('Temporary chat disabled — messages will be saved');
                                                 }
                                             }}
                                         >
@@ -1648,8 +1691,8 @@ export default function ChatApp({ initialAppsOpen = false, initialSettingsOpen =
                                     <div key={msg.id} className="chat incoming" id={msg.id}>
                                         {msg.loading && !msg.html ? (
                                             msg.imageGen ? (
-                                                /* â”€â”€ Image generation loading animation â”€â”€ */
-                                                <div className="premium-image-loader">
+                                                /* ── Image generation loading animation ── */
+                                                <div className="premium-image-loader" style={{ margin: '0 auto' }}>
                                                     <div className="img-gen-shimmer" />
                                                     <div className="img-gen-loader-text">
                                                         <i className="bx bx-image-alt img-gen-icon" />
@@ -1660,7 +1703,7 @@ export default function ChatApp({ initialAppsOpen = false, initialSettingsOpen =
                                                     </div>
                                                 </div>
                                             ) : (
-                                                <div className="chat-spinner" style={{ padding: '8px 20px', display: 'flex', alignItems: 'center' }}>
+                                                <div className="chat-spinner" style={{ padding: '8px 20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                                  <TreevitLoader/>
                                                 </div>
                                             )
@@ -1688,8 +1731,8 @@ export default function ChatApp({ initialAppsOpen = false, initialSettingsOpen =
                                                 )}
                                             </>
                                         )}
-                                        {!msg.loading && msg.content && !msg.content.includes("âŒ Image Gen") && (
-                                            <div className="chat-actions" style={{ display: 'flex' }}>
+                                        {!msg.loading && msg.content && !msg.content.includes("❌ Image Gen") && (
+                                            <div className="chat-actions" style={{ display: 'flex', justifyContent: 'center' }}>
                                                 <button
                                                     className={`action-btn copy-btn ${copiedMessageId === msg.id ? 'copied' : ''}`}
                                                     title="Copy"
@@ -1812,21 +1855,21 @@ export default function ChatApp({ initialAppsOpen = false, initialSettingsOpen =
                             </div>
                         )}
 
-                        {/* â”€â”€ Scroll-to-bottom FAB â”€â”€ */}
-                        <button
-                            className={`scroll-to-bottom-btn${showScrollBtn ? ' visible' : ''}`}
-                            title="Scroll to bottom"
-                            onClick={() => {
-                                const box = chatboxRef.current;
-                                if (box) box.scrollTo({ top: box.scrollHeight, behavior: 'smooth' });
-                            }}
-                        >
-                            <i className="bx bx-chevron-down" />
-                        </button>
-
-                        {/* â”€â”€ Chat Input â”€â”€ */}
+                        {/* ── Chat Input ── */}
                         {!isReadOnly && (
                             <div className="input-area">
+                                {/* ── Scroll-to-bottom FAB (Moved inside input-area for relative positioning) ── */}
+                                <button
+                                    className={`scroll-to-bottom-btn${showScrollBtn ? ' visible' : ''}`}
+                                    title="Scroll to bottom"
+                                    onClick={() => {
+                                        const box = chatboxRef.current;
+                                        if (box) box.scrollTo({ top: box.scrollHeight, behavior: 'smooth' });
+                                    }}
+                                >
+                                    <i className="bx bx-chevron-down" />
+                                </button>
+
                                 <div className="input-box" id="chat-input" style={{ position: 'relative' }}>
                                     
                                     <div className="previews-container" style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -1883,9 +1926,9 @@ export default function ChatApp({ initialAppsOpen = false, initialSettingsOpen =
                                             {/* Actions menu */}
                                             {showActionsMenu && (
                                                 <div className="input-actions-menu show" id="input-actions-menu" style={{ position: 'absolute', bottom: '100%', left: 0, marginBottom: '8px', zIndex: 100 }}>
-                                                    <div className="menu-item list-item">
-                                                        <label htmlFor="file-upload" className="menu-icon-btn" title="Upload File" style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                                                            <i className="bx bx-md bx-paperclip" />
+                                                    <div className="menu-item">
+                                                        <label htmlFor="file-upload" className="menu-icon-btn" title="Upload File" style={{ cursor: 'pointer' }}>
+                                                            <i className="bx bx-paperclip" />
                                                             <span>Upload File</span>
                                                         </label>
                                                         <input
@@ -1907,28 +1950,28 @@ export default function ChatApp({ initialAppsOpen = false, initialSettingsOpen =
                                                             }}
                                                         />
                                                     </div>
-                                                    <div className="menu-item list-item">
+                                                    <div className="menu-item">
                                                         <div
                                                             className={`menu-icon-btn${webSearch ? ' active' : ''}`}
                                                             id="web-search"
                                                             title="Google Web Search"
                                                             onClick={() => { setWebSearch(p => !p); setShowActionsMenu(false); }}
-                                                            style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}
+                                                            style={{ cursor: 'pointer' }}
                                                         >
-                                                            <i className='bx bx-md bxl-google' />
+                                                            <i className='bx bxl-google' />
                                                             <span>Google Search</span>
                                                         </div>
                                                     </div>
 
-                                                    <div className="menu-item list-item">
+                                                    <div className="menu-item">
                                                         <div
                                                             className={`menu-icon-btn${isImageGen ? ' active' : ''}`}
                                                             id="generate-image-btn"
                                                             title="Generate Image"
                                                             onClick={() => { setIsImageGen(p => !p); setShowActionsMenu(false); }}
-                                                            style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}
+                                                            style={{ cursor: 'pointer' }}
                                                         >
-                                                            <i className='bx bx-md bx-image-add' />
+                                                            <i className='bx bx-image-add' />
                                                             <span>Generate Image</span>
                                                         </div>
                                                     </div>
@@ -2192,12 +2235,12 @@ export default function ChatApp({ initialAppsOpen = false, initialSettingsOpen =
                 </div>
             )}
 
-            {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+            {/* ══════════════════════════════════════════
           GALLERY MODAL
-      â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
+      ══════════════════════════════════════════ */}
             {galleryOpen && (
-                <div className="gallery-modal" onClick={(e) => { if (e.target === e.currentTarget) setGalleryOpen(false); }}>
-                    <div className="gallery-modal-content">
+                <div className="gallery-modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) setGalleryOpen(false); }}>
+                    <div className="gallery-modal">
                         <div className="gallery-modal-header">
                             <div className="gallery-title">
                                 <i className='bx bx-images' />
@@ -2245,7 +2288,7 @@ export default function ChatApp({ initialAppsOpen = false, initialSettingsOpen =
                                                     </button>
                                                 </div>
                                             </div>
-                                            <p className="gallery-item-prompt">{img.prompt.length > 60 ? img.prompt.slice(0, 60) + 'â€¦' : img.prompt}</p>
+                                            <p className="gallery-item-prompt">{img.prompt.length > 60 ? img.prompt.slice(0, 60) + '…' : img.prompt}</p>
                                         </div>
                                     ))}
                                 </div>
@@ -2255,9 +2298,9 @@ export default function ChatApp({ initialAppsOpen = false, initialSettingsOpen =
                 </div>
             )}
 
-            {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-          SETTINGS MODAL â€” exact original structure
-      â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
+            {/* ══════════════════════════════════════════
+          SETTINGS MODAL — exact original structure
+      ══════════════════════════════════════════ */}
             {
                 settingsOpen && (
                     <div id="settings-modal" className="settings-modal show">
@@ -2282,6 +2325,15 @@ export default function ChatApp({ initialAppsOpen = false, initialSettingsOpen =
                                 </div>
                                 <div className="settings-body">
                                     {/* General Tab */}
+                                    {settingsOpen && (
+                                        <button 
+                                            className="reset-all-btn" 
+                                            title="Reset this section to default"
+                                            onClick={() => handleResetToDefault(settingsTab === 'general' ? 'general' : settingsTab === 'ai-behavior' ? 'ai' : 'voice')}
+                                        >
+                                            <i className='bx bx-rotate-left' /> Reset to Defaults
+                                        </button>
+                                    )}
                                     {settingsTab === 'general' && (
                                         <div id="tab-general" className="settings-tab-content active">
                                             <form id="settings-form" onSubmit={handleSaveGeneral}>
@@ -2310,7 +2362,7 @@ export default function ChatApp({ initialAppsOpen = false, initialSettingsOpen =
                                                         placeholder="Select Age Group"
                                                         options={[
                                                             { value: '', label: 'Select Age Group' },
-                                                            { value: 'child', label: 'Child (â‰¤12)' },
+                                                            { value: 'child', label: 'Child (≤12)' },
                                                             { value: 'teen', label: 'Teen / Gen-Z (13-22)' },
                                                             { value: 'adult', label: 'Adult (23-45)' },
                                                             { value: 'older', label: 'Older Adult (46+)' },
@@ -2595,7 +2647,7 @@ export default function ChatApp({ initialAppsOpen = false, initialSettingsOpen =
                                     ))}
                                 </div>
                                 <div className="settings-body">
-                                   
+                                    {/* show hint while selecting or loading */}
                                     {!appsSelected && (
                                         <div style={{ padding: '20px', color: 'var(--sarvam-text-secondary)', fontSize: '16px' }}>Choose an app from the left panel</div>
                                     )}
@@ -2603,7 +2655,7 @@ export default function ChatApp({ initialAppsOpen = false, initialSettingsOpen =
                                         const agent = AGENTS.find(a => a.id === appsSelected);
                                         return (
                                             <div style={{ display: 'flex', flexDirection: 'column', height: '100%', maxWidth: '800px', margin: '0 auto', padding: '20px 40px' }}>
-                                            
+                                                {/* Header Profile Section */}
                                                 <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start', marginBottom: '32px' }}>
                                                     <div style={{
                                                         width: '100px', height: '100px', borderRadius: '24px',
@@ -2643,7 +2695,7 @@ export default function ChatApp({ initialAppsOpen = false, initialSettingsOpen =
                                                                 <i className='bx bx-play-circle' style={{ fontSize: '20px' }}></i>
                                                                 Launch App
                                                             </button>
-                                                            {(appsSelected === 'googledrive' || appsSelected === 'gmail') && (
+                                                            {agent.requiresGoogle && (
                                                                 <button
                                                                     onClick={() => {
                                                                         if (googleConnected) {
@@ -2682,7 +2734,7 @@ export default function ChatApp({ initialAppsOpen = false, initialSettingsOpen =
 
                                                 <hr style={{ border: 'none', borderTop: '1px solid var(--sarvam-border)', margin: '0 0 32px 0' }} />
 
-                                                {/* Details Section â€” driven entirely by agent.about in agents.jsx */}
+                                                {/* Details Section — driven entirely by agent.about in agents.jsx */}
                                                 {agent.about && (
                                                     <div>
                                                         <h3 style={{ color: 'var(--sarvam-text-main)', fontSize: '18px', marginBottom: '16px', fontWeight: 600 }}>About this App</h3>
@@ -2728,8 +2780,13 @@ export default function ChatApp({ initialAppsOpen = false, initialSettingsOpen =
                                                                                     width: '36px', height: '36px', borderRadius: '10px',
                                                                                     background: accentBg, border: `1px solid ${accentBorder}`,
                                                                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                                                    overflow: 'hidden'
                                                                                 }}>
-                                                                                    <i className={`bx ${f.icon}`} style={{ fontSize: '18px', color: agent.color || 'var(--accent)' }} />
+                                                                                    {f.icon?.startsWith('http') ? (
+                                                                                        <img src={f.icon} alt={f.title} style={{ width: '20px', height: '20px', objectFit: 'contain' }} />
+                                                                                    ) : (
+                                                                                        <i className={`bx ${f.icon}`} style={{ fontSize: '18px', color: agent.color || 'var(--accent)' }} />
+                                                                                    )}
                                                                                 </div>
                                                                                 <div style={{ fontWeight: 600, fontSize: '13.5px', color: 'var(--sarvam-text-main)' }}>{f.title}</div>
                                                                                 <div style={{ fontSize: '12.5px', color: 'var(--sarvam-text-secondary)', lineHeight: 1.55 }}>{f.desc}</div>
@@ -2763,8 +2820,8 @@ export default function ChatApp({ initialAppsOpen = false, initialSettingsOpen =
             }
             {/* Legal Modal */}
             {legalOpen && (
-                <div className="gallery-modal" onClick={(e) => { if (e.target === e.currentTarget) setLegalOpen(false); }} style={{ zIndex: 6000 }}>
-                    <div className="gallery-modal-content" style={{ maxWidth: '800px', height: '80vh', display: 'flex', flexDirection: 'column' }}>
+                <div className="gallery-modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) setLegalOpen(false); }} style={{ zIndex: 6000 }}>
+                    <div className="gallery-modal" style={{ maxWidth: '800px', height: '80vh', display: 'flex', flexDirection: 'column' }}>
                         <div className="gallery-modal-header" style={{ flexShrink: 0 }}>
                             <div className="gallery-title" style={{ display: 'flex', gap: '20px' }}>
                                 <button 
@@ -2782,7 +2839,7 @@ export default function ChatApp({ initialAppsOpen = false, initialSettingsOpen =
                                     Terms of Service
                                 </button>
                             </div>
-                            <button className="gallery-close-btn" onClick={() => setLegalOpen(false)}>
+                            <button className="gallery-close-btn" onClick={() => { setLegalOpen(false); navigate('/chat'); }}>
                                 <i className='bx bx-x' />
                             </button>
                         </div>

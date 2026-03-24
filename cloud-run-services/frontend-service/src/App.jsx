@@ -88,14 +88,18 @@ function InnerApp() {
       <Route path="/shared/:shareId" element={<ChatApp />} />
 
       {/* Protected Application Routes */}
-      <Route path="/" element={<ProtectedRoute user={user}><ChatApp upgradeSuccess={upgradeStatus === 'success'} /><UpgradeModal /></ProtectedRoute>} />
-      <Route path="/chat/:sessionId?" element={<ProtectedRoute user={user}><ChatApp /><UpgradeModal /></ProtectedRoute>} />
-      <Route path="/apps/:agentId/:sessionId?" element={<ProtectedRoute user={user}><ChatApp /><UpgradeModal /></ProtectedRoute>} />
+      <Route path="/" element={<Navigate to="/chat" replace />} />
+      <Route path="/chat/:sessionId?" element={<ProtectedRoute user={user}><ChatApp upgradeSuccess={upgradeStatus === 'success'} /><UpgradeModal /></ProtectedRoute>} />
+      <Route path="/apps" element={<Navigate to="/apps/excel" replace />} />
+      <Route path="/apps/:agentId/:sessionId?" element={<ProtectedRoute user={user}><ChatApp initialAppsOpen={true} /><UpgradeModal /></ProtectedRoute>} />
       <Route path="/settings" element={<ProtectedRoute user={user}><ChatApp initialSettingsOpen={true} /><UpgradeModal /></ProtectedRoute>} />
       
-      {/* Legal Routes */}
-      <Route path="/privacy" element={<PrivacyPolicy />} />
-      <Route path="/terms-of-service" element={<TermsOfService />} />
+      {/* Legal Routes in Container */}
+      <Route path="/privacy" element={<ProtectedRoute user={user}><ChatApp initialLegalOpen="privacy" /><UpgradeModal /></ProtectedRoute>} />
+      <Route path="/privacy-policy" element={<ProtectedRoute user={user}><ChatApp initialLegalOpen="privacy" /><UpgradeModal /></ProtectedRoute>} />
+      <Route path="/terms" element={<ProtectedRoute user={user}><ChatApp initialLegalOpen="terms" /><UpgradeModal /></ProtectedRoute>} />
+      <Route path="/terms-of-service" element={<ProtectedRoute user={user}><ChatApp initialLegalOpen="terms" /><UpgradeModal /></ProtectedRoute>} />
+      <Route path="/terms-of-use" element={<ProtectedRoute user={user}><ChatApp initialLegalOpen="terms" /><UpgradeModal /></ProtectedRoute>} />
       
       {/* Redirect everything else to home or login */}
       <Route path="*" element={<Navigate to={user ? "/" : "/login"} replace />} />

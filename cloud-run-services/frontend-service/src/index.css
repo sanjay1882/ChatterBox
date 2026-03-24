@@ -205,19 +205,22 @@ header {
   color: var(--text-primary) !important;
 }
 
-html,
-body {
-  height: 100%;
-  width: 100%;
+html, body {
+  height: 100% !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important; /* Force only inner scrollbars */
 }
 
 #root {
   height: 100%;
   width: 100%;
-  overflow: hidden;
+  overflow: hidden !important;
 }
+
 #root:has(.auth-root) {
-  overflow: auto;
+  overflow: auto !important;
   height: 100vh;
   width: 100vw;
   min-height: 100%;
@@ -226,6 +229,7 @@ body {
   justify-content: center;
   background: var(--bg-base);
 }
+
 body {
   font-family: var(--font);
   background: var(--bg-base);
@@ -728,7 +732,8 @@ textarea::placeholder {
 }
 
 .chat.incoming {
-  justify-content: flex-start !important;
+  justify-content: center !important;
+  text-align: center !important;
 }
 
 .chat.outgoing {
@@ -901,17 +906,17 @@ font-size:16px;
 
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=Instrument+Serif:ital@0;1&display=swap');
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   AUTH / LOGIN STYLES  â€” scoped to .auth-root
+/* ═══════════════════════════════════════════════════════════
+   AUTH / LOGIN STYLES  — scoped to .auth-root
    All rules here are prefixed so they don't clash with the
    app's global index.css (which sets dark bg, overflow:hidden,
    and its own .btn-primary / .divider / input rules).
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+   ═══════════════════════════════════════════════════════════ */
 
-/* â”€â”€ Root wrapper: reset body-level overrides â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Root wrapper: reset body-level overrides ─────────── */
 .auth-root {
   min-height: 100dvh;
-  width: 100vw;          /* â† was 100%, change to 100vw */
+  width: 100vw;          /* ← was 100%, change to 100vw */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -920,12 +925,12 @@ font-size:16px;
   font-family: 'DM Sans', system-ui, sans-serif;
   color: #141414;
   overflow-y: auto !important;
-  position: fixed;       /* â† add this */
-  inset: 0;              /* â† add this (top/right/bottom/left: 0) */
-  z-index: 999;          /* â† add this so it sits above the app shell */
+  position: fixed;       /* ← add this */
+  inset: 0;              /* ← add this (top/right/bottom/left: 0) */
+  z-index: 999;          /* ← add this so it sits above the app shell */
 }
 
-/* â”€â”€ Page wrapper â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Page wrapper ─────────────────────────────────────── */
 .auth-root .auth-page {
   width: 100%;
   max-width: 390px;
@@ -938,7 +943,7 @@ font-size:16px;
   display: flex;
 }
 
-/* â”€â”€ Logo â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Logo ─────────────────────────────────────────────── */
 .auth-root .auth-logo {
   display: flex;
   align-items: center;
@@ -954,7 +959,7 @@ font-size:16px;
   color: #141414;
 }
 
-/* â”€â”€ Headings â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Headings ─────────────────────────────────────────── */
 .auth-root .auth-title {
   font-family: 'Instrument Serif', Georgia, serif;
   font-size: 28px;
@@ -973,7 +978,7 @@ font-size:16px;
   margin-bottom: 24px;
 }
 
-/* â”€â”€ Form â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Form ─────────────────────────────────────────────── */
 .auth-root .auth-form {
   width: 100%;
   display: flex;
@@ -1029,7 +1034,7 @@ font-size:16px;
   width: 100%;
 }
 
-/* â”€â”€ Primary button â€” override index.css accent color â”€â”€â”€ */
+/* ── Primary button — override index.css accent color ─── */
 .auth-root .btn-primary {
   width: 100%;
   padding: 13px !important;
@@ -1057,7 +1062,7 @@ font-size:16px;
   opacity: 0.9;
 }
 
-/* â”€â”€ Divider â€” override index.css .divider (height:1px) â”€ */
+/* ── Divider — override index.css .divider (height:1px) ─ */
 .auth-root .divider {
   display: flex !important;
   align-items: center;
@@ -1080,7 +1085,7 @@ font-size:16px;
   background: #EDEAE5;
 }
 
-/* â”€â”€ Social buttons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Social buttons ───────────────────────────────────── */
 .auth-root .social-btns {
   width: 100%;
   display: flex;
@@ -1116,7 +1121,7 @@ font-size:16px;
   color: #555;
 }
 
-/* â”€â”€ Switch row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Switch row ───────────────────────────────────────── */
 .auth-root .auth-switch {
   margin-top: 20px;
   font-size: 13.5px;
@@ -1142,7 +1147,7 @@ font-size:16px;
   color: #3B3B98;
 }
 
-/* â”€â”€ Message div â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Message div ──────────────────────────────────────── */
 .auth-root .messageDiv {
   width: 100%;
   padding: 10px 14px;
@@ -1162,7 +1167,7 @@ font-size:16px;
   display: block;
 }
 
-/* â”€â”€ Focus ring â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Focus ring ───────────────────────────────────────── */
 .auth-root .btn-primary:focus,
 .auth-root .field input:focus,
 .auth-root .btn-social:focus,
@@ -1171,7 +1176,7 @@ font-size:16px;
   outline-offset: 2px;
 }
 
-/* â”€â”€ Loading state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Loading state ────────────────────────────────────── */
 .auth-root .btn-primary.loading {
   position: relative;
   color: transparent !important;
@@ -1198,7 +1203,7 @@ font-size:16px;
   }
 }
 
-/* â”€â”€ Responsive â€” Tablet (â‰¤ 600px) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Responsive — Tablet (≤ 600px) ───────────────────── */
 @media (max-width: 600px) {
   .auth-root {
     align-items: flex-start;
@@ -1214,7 +1219,7 @@ font-size:16px;
   }
 }
 
-/* â”€â”€ Responsive â€” Mobile (â‰¤ 480px) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Responsive — Mobile (≤ 480px) ───────────────────── */
 @media (max-width: 480px) {
   .auth-root {
     padding: 28px 16px;
@@ -1249,7 +1254,7 @@ font-size:16px;
   }
 }
 
-/* â”€â”€ Responsive â€” Small mobile (â‰¤ 380px) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Responsive — Small mobile (≤ 380px) ─────────────── */
 @media (max-width: 380px) {
   .auth-root {
     padding: 24px 14px;
@@ -1275,7 +1280,7 @@ font-size:16px;
 
 /* === Merged from sarvam-theme.css === */
 
-/* sarvam-theme.css â€” Sarvam AI Dashboard Theme Override */
+/* sarvam-theme.css — Sarvam AI Dashboard Theme Override */
 @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
 
 /* ============================================================
@@ -1624,7 +1629,7 @@ h4,
     color: var(--sarvam-text-tertiary) !important;
 }
 
-/* Input bar icon buttons â€” use sarvam vars so they auto-adapt */
+/* Input bar icon buttons — use sarvam vars so they auto-adapt */
 .icon-btn,
 .mic-btn {
     color: var(--sarvam-text-secondary) !important;
@@ -1651,17 +1656,17 @@ h4,
 }
 
 
-/* Send button â€” icon color must contrast with the button background.
+/* Send button — icon color must contrast with the button background.
    In Dark mode: button bg = white (#F0F0F0 text used as bg via index.css),
    icon must be DARK to be visible.
    In Light mode: button bg = dark (#1A1A1A), icon must be WHITE. */
 #send-button {
-    /* Dark mode: white bg button â†’ dark icon */
+    /* Dark mode: white bg button ←’ dark icon */
     color: #1C1C1E !important;
 }
 
 body.white-mode #send-button {
-    /* Light mode: dark bg button â†’ white icon */
+    /* Light mode: dark bg button ←’ white icon */
     color: #FFFFFF !important;
 }
 
@@ -1690,17 +1695,51 @@ body.white-mode #send-button {
     background: var(--sarvam-bg-surface) !important;
     border: 1px solid var(--sarvam-border) !important;
     border-radius: 16px !important;
-    box-shadow: var(--sarvam-shadow-lg) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
+    padding: 8px !important;
+    min-width: 180px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 4px !important;
+    animation: menu-slide-up 0.2s ease-out !important;
+}
+
+@keyframes menu-slide-up {
+    0% {
+        opacity: 0;
+        transform: translateY(10px) scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.menu-item {
+    padding: 10px 14px !important;
+    border-radius: 10px !important;
+    transition: all 0.2s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
 }
 
 .menu-item span,
 .menu-icon-btn span,
 .menu-item i {
     color: var(--sarvam-text-main) !important;
+    font-size: 14px !important;
+}
+
+.menu-item i {
+    font-size: 18px !important;
+    width: 20px !important;
+    text-align: center !important;
 }
 
 .menu-item:hover {
     background: var(--sarvam-bg-elevated) !important;
+    transform: translateX(4px);
 }
 
 /* Model selector */
@@ -1785,7 +1824,7 @@ body.white-mode #send-button {
     color: #fff !important;
 }
 
-/* Bold text in responses â€” remove gradient fill */
+/* Bold text in responses — remove gradient fill */
 .chat-content p b,
 .chatbox .incoming .chat-content b,
 .chatbox p b {
@@ -1809,7 +1848,7 @@ body.white-mode #send-button {
 }
 
 /* ============================================================
-   CODE BLOCKS â€” Gemini / Dracula palette (always dark, both modes)
+   CODE BLOCKS — Gemini / Dracula palette (always dark, both modes)
    .code-block-wrapper and .code-pre handle all dark styling.
    Token colors are defined in original-index.css .hljs-* rules.
    ============================================================ */
@@ -1838,13 +1877,13 @@ body.white-mode #send-button {
 .code-block-wrapper code {
     background: transparent !important;
     color: #F8F8F2 !important;
-    /* Dracula base text â€” brighter than Catppuccin #cdd6f4 */
+    /* Dracula base text — brighter than Catppuccin #cdd6f4 */
     font-size: 0.875rem !important;
     line-height: 1.8 !important;
 }
 
 
-/* â”€â”€ Temp Chat Button (Sarvam theme) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Temp Chat Button (Sarvam theme) ─────────────────── */
 .temp-chat-btn {
     border-color: var(--sarvam-border) !important;
     color: var(--sarvam-text-secondary) !important;
@@ -1869,27 +1908,33 @@ body.white-mode #send-button {
    ACTION BUTTONS (under AI message)
    ============================================================ */
 .action-btn {
-    background: var(--sarvam-bg-elevated) !important;
-    border: 1px solid var(--sarvam-border) !important;
-    color: var(--sarvam-text-secondary) !important;
+    background: var(--bg-surface) !important;
+    border: 1px solid var(--border-md) !important;
+    color: var(--text-secondary) !important;
     border-radius: 8px !important;
     transition: all 0.2s ease !important;
+    width: 32px !important;
+    height: 32px !important;
+    padding: 6px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
 
 .action-btn i {
-    color: var(--sarvam-text-secondary) !important;
+    color: var(--text-secondary) !important;
 }
 
 .action-btn:hover {
-    background: var(--sarvam-border) !important;
-    color: var(--sarvam-text-main) !important;
-    border-color: var(--sarvam-border) !important;
-    box-shadow: none !important;
+    background: var(--bg-hover) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border-hi) !important;
+    box-shadow: var(--shadow-sm) !important;
     transform: translateY(-1px) !important;
 }
 
 .action-btn:hover i {
-    color: var(--sarvam-text-main) !important;
+    color: var(--text-primary) !important;
 }
 
 .action-btn.copied {
@@ -1904,18 +1949,19 @@ body.white-mode #send-button {
 
 /* User message action buttons */
 .user-chat-actions .action-btn {
-    background: rgba(0, 0, 0, 0.04) !important;
-    border: 1px solid rgba(0, 0, 0, 0.09) !important;
-    color: rgba(0, 0, 0, 0.45) !important;
+    background: var(--bg-hover) !important;
+    border: 1px solid var(--border) !important;
+    color: var(--text-secondary) !important;
 }
 
 .user-chat-actions .action-btn i {
-    color: rgba(0, 0, 0, 0.45) !important;
+    color: var(--text-secondary) !important;
 }
 
 .user-chat-actions .action-btn:hover {
-    background: rgba(0, 0, 0, 0.08) !important;
-    color: var(--sarvam-text-main) !important;
+    background: var(--bg-surface) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border-md) !important;
 }
 
 /* ============================================================
@@ -2019,12 +2065,49 @@ body.white-mode #send-button {
    TOAST NOTIFICATIONS
    ============================================================ */
 .toast {
-    background: var(--sarvam-bg-surface) !important;
-    color: var(--sarvam-text-main) !important;
-    border: 1px solid var(--sarvam-border) !important;
-    box-shadow: var(--sarvam-shadow-lg) !important;
-    backdrop-filter: none !important;
+    position: fixed;
+    top: 20px;
+    right: -350px;
+    padding: 12px 24px;
+    background: var(--sarvam-bg-surface, #fff);
+    color: var(--sarvam-text-main, #1a1a1a);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    z-index: 9999;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid var(--sarvam-border, #eee);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    opacity: 0;
+    pointer-events: none;
+    white-space: nowrap;
 }
+
+.toast.show {
+    right: 20px;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+
+.toast.error {
+    border-left: 4px solid #ff4d4d;
+    background: #fffafa;
+}
+
+.toast.success {
+    border-left: 4px solid #00c853;
+    background: #f7fff9;
+}
+
+.toast.info {
+    border-left: 4px solid #2196f3;
+    background: #f5faff;
+}
+
 
 /* ============================================================
    FOLLOW UP LINKS
@@ -2129,7 +2212,8 @@ body.white-mode #send-button {
     border: 1px solid var(--sarvam-border) !important;
     border-radius: 16px !important;
     box-shadow: 0 24px 64px rgba(0,0,0,0.45) !important;
-    width: 720px !important;
+    width: 780px !important;
+    min-width: 780px !important;
     max-width: 96vw !important;
     max-height: 88vh !important;
     overflow: hidden;
@@ -2158,7 +2242,34 @@ body.white-mode #send-button {
     align-items: center;
     justify-content: space-between;
     flex-shrink: 0;
+    position: relative;
 }
+
+.reset-all-btn {
+    position: absolute;
+    right: 60px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent !important;
+    border: 1px solid var(--sarvam-border) !important;
+    color: var(--sarvam-text-secondary) !important;
+    padding: 4px 10px !important;
+    border-radius: 6px !important;
+    font-size: 11px !important;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s ease;
+    z-index: 1;
+}
+
+.reset-all-btn:hover {
+    background: var(--sarvam-bg-surface) !important;
+    color: var(--sarvam-text-main) !important;
+    border-color: var(--sarvam-text-secondary) !important;
+}
+
 
 .settings-header h3,
 .settings-header > h3 {
@@ -2479,7 +2590,7 @@ body.white-mode #send-button {
 
 
 
-/* â”€â”€ Theme Picker / Mode Segment Base Styles â”€â”€ */
+/* ── Theme Picker / Mode Segment Base Styles ── */
 .theme-picker {
     display: flex;
     gap: 14px;
@@ -2819,7 +2930,7 @@ body.white-mode {
     color: var(--sarvam-text-main) !important;
 }
 
-/* Loading/generating state â€” no card background while spinner is shown */
+/* Loading/generating state — no card background while spinner is shown */
 .chatbox .incoming .chat-content:has(#Loading_out_Icon),
 .white-mode .chatbox .incoming .chat-content:has(#Loading_out_Icon) {
     background: transparent !important;
@@ -3058,11 +3169,11 @@ body.white-mode {
 
 /* === Merged from CanvaAgent.css === */
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   CanvaAgent.css  â€” Complete with all new features
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+/* ═══════════════════════════════════════════════════════════════════════════
+   CanvaAgent.css  — Complete with all new features
+   ═══════════════════════════════════════════════════════════════════════════ */
 
-/* â”€â”€ Tokens â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Tokens ─────────────────────────────────────────────────────────────────── */
 :root {
   --ca-bg:           #0d0d14;
   --ca-surface:      #141420;
@@ -3090,7 +3201,7 @@ body.white-mode {
   --transition:      0.15s ease;
 }
 
-/* â”€â”€ Root Layout â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Root Layout ──────────────────────────────────────────────────────────── */
 .canva-agent {
   display: flex;
   width: 100%;
@@ -3104,7 +3215,7 @@ body.white-mode {
 
 .canva-agent.is-resizing { user-select: none; cursor: col-resize; }
 
-/* â”€â”€ Chat Panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Chat Panel ───────────────────────────────────────────────────────────── */
 .canva-chat-panel {
   display: flex;
   flex-direction: column;
@@ -3152,7 +3263,7 @@ body.white-mode {
   color: var(--ca-text-muted);
 }
 
-/* â”€â”€ Messages â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Messages ────────────────────────────────────────────────────────────── */
 .canva-messages {
   flex: 1;
   overflow-y: auto;
@@ -3169,7 +3280,7 @@ body.white-mode {
 
 .canva-message-wrapper { width: 100%; }
 
-/* â”€â”€ Chat Input â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Chat Input ──────────────────────────────────────────────────────────── */
 .canva-chat-input-area {
   border-top: 1px solid var(--ca-border);
   padding: 10px 12px;
@@ -3253,7 +3364,7 @@ body.white-mode {
 .canva-send-btn:active { transform: scale(0.96); }
 .canva-send-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
-/* â”€â”€ Panel Resizer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Panel Resizer ───────────────────────────────────────────────────────── */
 .canva-resizer {
   width: 4px;
   background: var(--ca-border);
@@ -3277,7 +3388,7 @@ body.white-mode {
   border-radius: 2px;
 }
 
-/* â”€â”€ Canvas Area â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Canvas Area ─────────────────────────────────────────────────────────── */
 .canva-canvas {
   display: flex;
   flex-direction: column;
@@ -3287,7 +3398,7 @@ body.white-mode {
   background: var(--ca-bg);
 }
 
-/* â”€â”€ Toolbar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Toolbar ─────────────────────────────────────────────────────────────── */
 .canva-toolbar {
   display: flex;
   align-items: center;
@@ -3328,6 +3439,8 @@ body.white-mode {
   color: var(--ca-text);
   background: transparent;
 }
+
+
 
 .canva-toolbar-btn i { font-size: 15px; }
 
@@ -3397,7 +3510,7 @@ body.white-mode {
   font-variant-numeric: tabular-nums;
 }
 
-/* â”€â”€ Properties Bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Properties Bar ──────────────────────────────────────────────────────── */
 .canva-properties-bar {
   display: flex;
   align-items: center;
@@ -3516,7 +3629,7 @@ body.white-mode {
   font-variant-numeric: tabular-nums;
 }
 
-/* â”€â”€ Editor Area â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Editor Area ─────────────────────────────────────────────────────────── */
 .canva-editor-area {
   flex: 1;
   display: flex;
@@ -3544,7 +3657,7 @@ body.white-mode {
 .canva-page-wrapper::-webkit-scrollbar-track { background: transparent; }
 .canva-page-wrapper::-webkit-scrollbar-thumb { background: var(--ca-border2); border-radius: 4px; }
 
-/* â”€â”€ Slide â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Slide ───────────────────────────────────────────────────────────────── */
 .canva-slide {
   border-radius: var(--ca-radius);
   box-shadow: 0 8px 40px rgba(0,0,0,0.7), 0 0 0 1px var(--ca-border2);
@@ -3552,7 +3665,7 @@ body.white-mode {
   flex-shrink: 0;
 }
 
-/* â”€â”€ Snap Grid Overlay  (NEW) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Snap Grid Overlay  (NEW) ─────────────────────────────────────────────── */
 .canva-snap-grid {
   position: absolute;
   inset: 0;
@@ -3563,7 +3676,7 @@ body.white-mode {
   z-index: 0;
 }
 
-/* â”€â”€ Elements â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Elements ────────────────────────────────────────────────────────────── */
 .canva-element {
   position: absolute;
   box-sizing: border-box;
@@ -3579,7 +3692,7 @@ body.white-mode {
 .canva-element.text-el   { overflow: visible; }
 .canva-element.image-el img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-/* â”€â”€ Resize handles â€” all 4 corners  (NEW) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Resize handles — all 4 corners  (NEW) ───────────────────────────────── */
 .canva-resize-handle {
   position: absolute;
   width: 10px;
@@ -3598,7 +3711,7 @@ body.white-mode {
 .canva-resize-handle.ne { top:    -5px; right: -5px; cursor: ne-resize; }
 .canva-resize-handle.sw { bottom: -5px; left:  -5px; cursor: sw-resize; }
 
-/* â”€â”€ Status Bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Status Bar ──────────────────────────────────────────────────────────── */
 .canva-status-bar {
   height: var(--ca-status-h);
   display: flex;
@@ -3624,7 +3737,7 @@ body.white-mode {
 
 .canva-status-bar .ai-stat { color: var(--ca-accent2); }
 
-/* â”€â”€ Slides Panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Slides Panel ────────────────────────────────────────────────────────── */
 .canva-slides-panel {
   width: var(--ca-panel-w);
   background: var(--ca-surface);
@@ -3654,7 +3767,7 @@ body.white-mode {
 
 .canva-slides-label i { font-size: 13px; }
 
-/* â”€â”€ Slide Thumbnail â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Slide Thumbnail ─────────────────────────────────────────────────────── */
 .canva-slide-thumb {
   position: relative;
   margin: 4px 8px;
@@ -3734,7 +3847,7 @@ body.white-mode {
 
 .canva-add-slide-btn:hover { border-color: var(--ca-accent); color: var(--ca-accent2); background: var(--ca-accent-glow); }
 
-/* â”€â”€ Layers Panel  (NEW) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Layers Panel  (NEW) ─────────────────────────────────────────────────── */
 .canva-layers-panel {
   width: var(--ca-layers-w);
   background: var(--ca-surface);
@@ -3802,7 +3915,7 @@ body.white-mode {
 
 .canva-layer-actions button:hover { background: var(--ca-surface3); color: var(--ca-text); }
 
-/* â”€â”€ Empty State â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Empty State ─────────────────────────────────────────────────────────── */
 .canva-empty-zone {
   flex: 1;
   display: flex;
@@ -3844,7 +3957,7 @@ body.white-mode {
   line-height: 1.6;
 }
 
-/* â”€â”€ Template Grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Template Grid ───────────────────────────────────────────────────────── */
 .canva-template-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -3879,7 +3992,7 @@ body.white-mode {
 
 .canva-template-card:active { transform: scale(0.98); }
 
-/* â”€â”€ Mobile Tabs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Mobile Tabs ─────────────────────────────────────────────────────────── */
 .canva-mobile-tabs {
   display: flex;
   border-bottom: 1px solid var(--ca-border);
@@ -3914,7 +4027,7 @@ body.white-mode {
 .canva-mobile-tab.active { color: var(--ca-accent2); border-bottom-color: var(--ca-accent); }
 .canva-mobile-tab i { font-size: 16px; }
 
-/* â”€â”€ Mobile adjustments â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Mobile adjustments ──────────────────────────────────────────────────── */
 .canva-agent.is-mobile {
   flex-direction: column;
   padding-top: 44px;
@@ -3923,7 +4036,7 @@ body.white-mode {
 .canva-agent.is-mobile .canva-chat-panel,
 .canva-agent.is-mobile .canva-canvas { height: 100%; }
 
-/* â”€â”€ Animations â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Animations ──────────────────────────────────────────────────────────── */
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
@@ -3938,7 +4051,7 @@ body.white-mode {
 .canva-message-wrapper { animation: fadeInUp 0.18s ease; }
 .canva-layer-item       { animation: fadeInUp 0.12s ease; }
 
-/* â”€â”€ Keyboard shortcut tooltip â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Keyboard shortcut tooltip ───────────────────────────────────────────── */
 .canva-toolbar-btn[title]:hover::after {
   content: attr(title);
   position: absolute;
@@ -3958,7 +4071,7 @@ body.white-mode {
 
 .canva-toolbar-btn { position: relative; }
 
-/* â”€â”€ Scrollbar global â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Scrollbar global ────────────────────────────────────────────────────── */
 .canva-agent *::-webkit-scrollbar       { width: 4px; height: 4px; }
 .canva-agent *::-webkit-scrollbar-track { background: transparent; }
 .canva-agent *::-webkit-scrollbar-thumb { background: var(--ca-border2); border-radius: 4px; }
@@ -4302,6 +4415,65 @@ body.white-mode {
     border: 1px solid rgba(124, 106, 247, 0.2);
 }
 
+/* Enhanced Markdown Elements (Tables, Lists, Code, etc.) */
+.chat-content table {
+    width: auto !important;
+    max-width: 100% !important;
+    border-collapse: collapse !important;
+    margin: 20px 0 !important;
+    font-size: 14px !important;
+    border-radius: 8px !important;
+    overflow: hidden !important;
+    border: 1px solid var(--border-hi) !important;
+    background: var(--bg-surface) !important;
+}
+
+.chat-content thead {
+    background: var(--bg-elevated) !important;
+    border-bottom: 2px solid var(--border-hi) !important;
+}
+
+.chat-content th {
+    padding: 12px 16px !important;
+    text-align: left !important;
+    font-weight: 700 !important;
+    color: var(--text-primary) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    font-size: 12px !important;
+}
+
+.chat-content td {
+    padding: 10px 16px !important;
+    border-bottom: 1px solid var(--border) !important;
+    color: var(--text-secondary) !important;
+    vertical-align: middle !important;
+}
+
+.chat-content tr:last-child td {
+    border-bottom: none !important;
+}
+
+.chat-content tr:nth-child(even) {
+    background: var(--bg-hover) !important;
+}
+
+.chat-content ul, 
+.chat-content ol {
+    margin: 16px 0 !important;
+    padding-left: 28px !important;
+}
+
+.chat-content li {
+    margin-bottom: 8px !important;
+    line-height: 1.7 !important;
+}
+
+.chat-content p {
+    margin-bottom: 16px !important;
+    margin-top: 0 !important;
+}
+
 /* Ensure all markdown elements in chat-content are left-aligned */
 .chat-content,
 .chat-content p,
@@ -4317,7 +4489,6 @@ body.white-mode {
 .chat-content table,
 .chat-content pre {
     text-align: left !important;
-    width: 100% !important;
 }
 
 /* Gap between paragraphs inside AI responses */
@@ -4445,7 +4616,7 @@ pre {
     margin: 8px 0;
 }
 
-/* â”€â”€ Code Block Truncation & Expansion (Gemini Theme) â”€â”€ */
+/* ── Code Block Truncation & Expansion (Gemini Theme) ── */
 .code-block-wrapper {
     position: relative;
     margin: 16px 0;
@@ -4577,7 +4748,7 @@ pre {
 }
 
 .think-block-details summary::before {
-    content: 'â–¶';
+    content: '▶';
     font-size: 0.8em;
     display: inline-block;
     transition: transform 0.2s ease;
@@ -4655,12 +4826,13 @@ pre {
     border-color: var(--border-md);
 }
 
-/* â”€â”€ Chat Input â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Chat Input ──────────────────────────────────────────── */
 .input-area {
     padding: 12px 16px 16px;
     flex-shrink: 0;
     display: flex;
-    justify-content: flex-end; /* Align input area content to the right */
+    justify-content: center; /* Center the input-box */
+    position: relative;     /* Anchor for scroll-to-bottom button */
 }
 
 .input-box {
@@ -4962,7 +5134,7 @@ pre {
     align-self: flex-start;
 }
 
-/* â”€â”€ Outgoing message: limit width on desktop â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Outgoing message: limit width on desktop ───────────── */
 .chat.outgoing .chat-content {
     max-width: 100%;
     word-break: break-word;
@@ -5053,7 +5225,7 @@ pre {
 }
 
 .edit-wrapper {
-    width: min(560px, 62vw);
+    width: min(800px, 85vw);
     background: var(--bg-elevated);
     border: 1px solid var(--accent);
     border-radius: 22px;
@@ -5224,9 +5396,9 @@ pre {
     background: rgba(255, 255, 255, 0.2);
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ══════════════════════════════════════════════
    REDUCED HEADER HEIGHT
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+   ══════════════════════════════════════════════ */
 .chatbot header {
     min-height: 48px !important;
     padding: 0 12px !important;
@@ -5237,9 +5409,9 @@ pre {
     font-size: 1.05rem !important;
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   CHATBOX â€” fills remaining height, input at bottom
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+/* ══════════════════════════════════════════════
+   CHATBOX — fills remaining height, input at bottom
+   ══════════════════════════════════════════════ */
 .chatbot {
     display: flex !important;
     height: 100% !important;
@@ -5249,6 +5421,7 @@ pre {
 .chatbot .chatbox {
     flex: 1 1 0 !important;
     overflow-y: auto !important;
+    overflow-x: hidden !important; /* Total stability: prevent horizontal scrollbar */
     min-height: 0 !important;
     padding-bottom: 12px !important;
 }
@@ -5259,12 +5432,13 @@ pre {
     padding-top: 8px !important;
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ══════════════════════════════════════════════
    SCROLL-TO-BOTTOM FLOATING BUTTON
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+   ══════════════════════════════════════════════ */
 .scroll-to-bottom-btn {
-    position: fixed;
-    bottom: 190px;
+    position: absolute;    /* Changed from fixed */
+    bottom: 100%;          /* Float above parent (.input-area) */
+    margin-bottom: 20px;   /* Gap from input */
     left: 50%;
     transform: translateX(-50%) translateY(8px);
     z-index: 500;
@@ -5297,9 +5471,9 @@ pre {
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22);
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ══════════════════════════════════════════════
    TYPEWRITER HEADER ANIMATION
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+   ══════════════════════════════════════════════ */
 .typewriter-cursor {
     display: inline-block;
     width: 2px;
@@ -5323,9 +5497,9 @@ pre {
     }
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ══════════════════════════════════════════════
    PREMIUM IMAGE GENERATION LOADING ANIMATION
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+   ══════════════════════════════════════════════ */
 .premium-image-loader {
     width: 340px;
     max-width: 90vw;
@@ -5425,9 +5599,9 @@ pre {
     }
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ══════════════════════════════════════════════
    GENERATED IMAGE CARD
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+   ══════════════════════════════════════════════ */
 .generated-image-card {
     width: fit-content;
     max-width: 55%;
@@ -5528,9 +5702,9 @@ pre {
     margin-top: 1px;
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ══════════════════════════════════════════════
    IMAGE GALLERY MODAL
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+   ══════════════════════════════════════════════ */
 .gallery-modal-overlay {
     position: fixed;
     inset: 0;
@@ -5718,17 +5892,20 @@ pre {
     }
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   CHAT MESSAGE LAYOUT â€” ChatGPT / Claude Style
-   â”€ Single centered content column  (max-width: 680px)
-   â”€ User  (outgoing) â†’ subtle pill bubble, pushed right
-   â”€ AI    (incoming) â†’ plain text, left-aligned, 0px left indent
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+/* ══════════════════════════════════════════════════════════════
+   CHAT MESSAGE LAYOUT — ChatGPT / Claude Style
+   ─ Single centered content column  (max-width: 680px)
+   ─ User  (outgoing) ←’ subtle pill bubble, pushed right
+   ─ AI    (incoming) ←’ plain text, left-aligned, 0px left indent
+   ══════════════════════════════════════════════════════════════ */
 
-/* â”€â”€ Every message row: constrained to 680px and centered via margin â”€â”€ */
-/* NOTE: Do NOT add align-items:center to .chatbox â€” it breaks overflow/scroll */
+/* ── Every message row: constrained to 850px and centered via margin ── */
+/* NOTE: Do NOT add align-items:center to .chatbox — it breaks overflow/scroll */
 .chatbox .chat {
     width: 100% !important;
+    max-width: 850px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
     display: flex !important;
     align-items: flex-start !important;
     box-sizing: border-box !important;
@@ -5736,10 +5913,10 @@ pre {
 }
 
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════════════════
    AI RESPONSE (incoming)
    Left-aligned, no bubble, full column width
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+═══════════════════════════════════════════════════════ */
 .chatbox .chat.incoming {
     justify-content: flex-start !important;
     flex-direction: column !important;
@@ -5750,14 +5927,14 @@ pre {
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
-    padding: 0 !important;
+    padding: 0 0 0 28px !important; /* Added left padding as requested */
     border-radius: 0 !important;
     max-height: none !important;
     overflow: visible !important;
-    width: 55% !important; /* DEFAULT WIDTH: 55% */
+    width: 100% !important; /* Take full width of centered container */
     color: var(--sarvam-text-main, var(--text-primary)) !important;
-    font-size: 15px !important;
-    line-height: 1.75 !important;
+    font-size: 15.5px !important; /* Slightly larger for better readability */
+    line-height: 1.8 !important;   /* Slightly more breathing room */
     transition: width 0.3s ease;
 }
 
@@ -5776,10 +5953,10 @@ pre {
     padding: 0 !important;
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════════════════
    USER MESSAGE (outgoing)
    Right-aligned pill bubble within the same column
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+═══════════════════════════════════════════════════════ */
 .chatbox .chat.outgoing {
     justify-content: flex-end !important;
     flex-direction: row !important;
@@ -5815,7 +5992,7 @@ pre {
     width: 100% !important;
 }
 
-/* â”€â”€ The user bubble â”€â”€ */
+/* ── The user bubble ── */
 .chatbox .chat.outgoing .user-plain-content,
 .chatbox .chat.outgoing .user-rich-content {
     width: fit-content !important;
@@ -5845,7 +6022,7 @@ pre {
     padding: 15px !important;
 }
 
-/* Rich content / stack / pasted previews â€” keep their own styles,
+/* Rich content / stack / pasted previews — keep their own styles,
    just remove any extra background from the wrapper */
 .chatbox .chat.outgoing .chat-content.user-rich-content,
 .chatbox .chat.outgoing .user-message-stack,
@@ -5865,9 +6042,9 @@ pre {
     pointer-events: auto !important;
 }
 
-/* â”€â”€ Inline edit mode â”€â”€ */
+/* ── Inline edit mode ── */
 .chatbox .chat.outgoing .inline-edit-container {
-    width: auto !important;
+    width: 100% !important;
     max-width: 100% !important;
     display: flex !important;
     justify-content: flex-end !important;
@@ -5883,28 +6060,53 @@ pre {
 }
 
 .chatbox .chat.outgoing .edit-wrapper {
-    width: min(480px, 100%) !important;
+    width: min(650px, 90%) !important;
     background: var(--bg-elevated) !important;
-    border: 1px solid var(--accent) !important;
+    border: 1px solid var(--border-hi) !important;
     border-radius: 22px !important;
     padding: 10px 12px !important;
     box-shadow: 0 18px 36px rgba(0, 0, 0, 0.14) !important;
 }
 
+.chatbox .chat.outgoing .edit-wrapper:focus-within {
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 0 3px var(--accent-glow) !important;
+}
+
 .chatbox .chat.outgoing .edit-textarea {
     overflow: hidden !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+.chatbox .chat.outgoing .edit-textarea:focus {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* ══════════════════════════════════════════════
    LIGHT-MODE bubble tint
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+   ══════════════════════════════════════════════ */
 [data-theme="light"] .chatbox .chat.outgoing .user-plain-content,
 [data-theme="light"] .chatbox .chat.outgoing .user-rich-content {
-    background: rgba(0, 0, 0, 0.05) !important;
-    border-color: rgba(0, 0, 0, 0.08) !important;
+    background: linear-gradient(135deg, #f8fafc, #eff6ff) !important; /* Premium light blue tint */
+    color: #000000 !important;                                      /* Black text for high readability */
+    border: 1px solid rgba(0, 0, 0, 0.05) !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03) !important;
 }
 
-/* â”€â”€ Mobile â”€â”€ */
+[data-theme="light"] .user-chat-actions .action-btn {
+    color: rgba(0, 0, 0, 0.4) !important;
+}
+
+[data-theme="light"] .user-chat-actions .action-btn:hover {
+    color: #000 !important;
+    background: rgba(0, 0, 0, 0.05) !important;
+}
+
+/* ── Mobile ── */
 @media (max-width: 768px) {
     .chatbox .chat {
         padding: 4px 12px !important;
@@ -6386,9 +6588,9 @@ pre {
 
 /* === Merged from Canvas.css === */
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════════════════════
    CANVAS WORKSPACE & DEVELOPER ENVIRONMENT
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+   ═══════════════════════════════════════════════════════════ */
 
 /* Layout container for Chat and Canvas */
 .chatbot-content-area {
@@ -6682,7 +6884,7 @@ pre {
 
 /* === Merged from ExcelAgent.css === */
 
-/* â”€â”€ Excel Agent Layout â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Excel Agent Layout ──────────────────────────────────── */
 .excel-agent {
     display: flex;
     flex-direction: row;
@@ -6696,7 +6898,7 @@ pre {
     font-family: var(--sarvam-font-body), sans-serif;
 }
 
-/* â”€â”€ Chat Panel (left) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Chat Panel (left) ───────────────────────────────────── */
 .excel-chat-panel {
     display: flex;
     flex-direction: column;
@@ -6716,7 +6918,7 @@ pre {
     /* Prevent canvas interaction during resize */
 }
 
-/* â”€â”€ Resizer â”€â”€ */
+/* ── Resizer ── */
 .excel-resizer {
     width: 6px;
     height: 100%;
@@ -6784,7 +6986,7 @@ pre {
     margin: 4px 0 0;
 }
 
-/* â”€â”€ Messages Container â”€â”€ */
+/* ── Messages Container ── */
 .excel-messages {
     flex: 1;
     overflow-y: auto;
@@ -6826,7 +7028,7 @@ pre {
     margin-top: -4px;
 }
 
-/* â”€â”€ Chat Input Area â”€â”€ */
+/* ── Chat Input Area ── */
 .excel-chat-input-area {
     padding: 16px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -6925,7 +7127,7 @@ pre {
     box-shadow: none;
 }
 
-/* â”€â”€ Right Panel: Canvas â”€â”€ */
+/* ── Right Panel: Canvas ── */
 .excel-canvas {
     flex: 1;
     display: flex;
@@ -6936,7 +7138,7 @@ pre {
     min-width: 0;
 }
 
-/* â”€â”€ Multi-File List â”€â”€ */
+/* ── Multi-File List ── */
 .excel-files-list {
     display: flex;
     flex-direction: row;
@@ -7191,7 +7393,7 @@ pre {
     transform: none !important;
 }
 
-/* â”€â”€ Upload Zone (empty state) â”€â”€ */
+/* ── Upload Zone (empty state) ── */
 .excel-upload-zone {
     flex: 1;
     display: flex;
@@ -7258,7 +7460,7 @@ pre {
     color: rgba(255, 255, 255, 0.6);
 }
 
-/* â”€â”€ Spreadsheet Layout â”€â”€ */
+/* ── Spreadsheet Layout ── */
 .spreadsheet-wrapper {
     flex: 1;
     overflow: auto;
@@ -7367,7 +7569,7 @@ pre {
     outline: none;
 }
 
-/* â”€â”€ Status Bar â”€â”€ */
+/* ── Status Bar ── */
 .excel-status-bar {
     height: 38px;
     padding: 0 20px;
@@ -7581,7 +7783,7 @@ body.white-mode .excel-send-btn:not(:disabled) {
     box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
 }
 
-/* â”€â”€ Mobile Responsive Layout â”€â”€ */
+/* ── Mobile Responsive Layout ── */
 @media screen and (max-width: 768px) {
     .excel-agent.is-mobile {
         flex-direction: column;
@@ -7692,7 +7894,7 @@ body.white-mode .excel-send-btn:not(:disabled) {
 
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap');
 
-/* â”€â”€ Root Variables â”€â”€ */
+/* ── Root Variables ── */
 .ga-root {
     --ga-bg:            var(--bg-base);
     --ga-surface:       var(--bg-surface);
@@ -7716,7 +7918,7 @@ body.white-mode .excel-send-btn:not(:disabled) {
     --ga-shadow-accent: 0 4px 14px rgba(234,67,53,0.2);
 }
 
-/* â”€â”€ Layout Root â”€â”€ */
+/* ── Layout Root ── */
 .ga-root {
     display: flex;
     height: 100%;
@@ -7728,9 +7930,9 @@ body.white-mode .excel-send-btn:not(:disabled) {
     overflow: hidden;
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════
    SIDEBAR
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+═══════════════════════════════ */
 .ga-sidebar {
     width: var(--ga-sidebar-w);
     min-width: var(--ga-sidebar-w);
@@ -7900,16 +8102,16 @@ body.white-mode .excel-send-btn:not(:disabled) {
     margin: 0.25rem 0.25rem;
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════
    OVERLAY (mobile)
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+═══════════════════════════════ */
 .ga-overlay {
     display: none;
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════
    MAIN COLUMN
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+═══════════════════════════════ */
 .ga-main {
     flex: 1;
     display: flex;
@@ -7919,7 +8121,7 @@ body.white-mode .excel-send-btn:not(:disabled) {
     background: var(--ga-bg);
 }
 
-/* â”€â”€ Topbar â”€â”€ */
+/* ── Topbar ── */
 .ga-topbar {
     display: flex;
     align-items: center;
@@ -7952,7 +8154,7 @@ body.white-mode .excel-send-btn:not(:disabled) {
     letter-spacing: -0.01em;
 }
 
-/* â”€â”€ Icon Buttons â”€â”€ */
+/* ── Icon Buttons ── */
 .ga-icon-btn {
     background: none;
     border: 1px solid var(--ga-border);
@@ -7973,7 +8175,7 @@ body.white-mode .excel-send-btn:not(:disabled) {
 .ga-icon-btn:disabled { opacity: 0.3; cursor: default; }
 .ga-icon-btn.active { background: var(--ga-accent-soft); border-color: var(--ga-accent-border); color: var(--ga-accent); }
 
-/* â”€â”€ Status badge â”€â”€ */
+/* ── Status badge ── */
 .ga-status-badge {
     display: flex;
     align-items: center;
@@ -8004,7 +8206,7 @@ body.white-mode .excel-send-btn:not(:disabled) {
     50% { opacity: 0.6; }
 }
 
-/* â”€â”€ Canvas button â”€â”€ */
+/* ── Canvas button ── */
 .ga-canvas-toggle-btn {
     display: flex;
     align-items: center;
@@ -8027,7 +8229,7 @@ body.white-mode .excel-send-btn:not(:disabled) {
 .ga-canvas-toggle-btn.open { background: var(--ga-accent); }
 .ga-canvas-toggle-btn.open:hover { background: var(--ga-accent-hover); }
 
-/* â”€â”€ Separator â”€â”€ */
+/* ── Separator ── */
 .ga-topbar-sep {
     width: 1px;
     height: 20px;
@@ -8035,9 +8237,9 @@ body.white-mode .excel-send-btn:not(:disabled) {
     margin: 0 0.25rem;
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════
    MESSAGES
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+═══════════════════════════════ */
 .ga-messages {
     flex: 1;
     overflow-y: auto;
@@ -8052,7 +8254,7 @@ body.white-mode .excel-send-btn:not(:disabled) {
 .ga-messages::-webkit-scrollbar-track { background: transparent; }
 .ga-messages::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
 
-/* â”€â”€ Typing indicator â”€â”€ */
+/* ── Typing indicator ── */
 .ga-typing-wrap {
     display: flex;
     align-items: center;
@@ -8100,9 +8302,9 @@ body.white-mode .excel-send-btn:not(:disabled) {
     40% { transform: translateY(-5px); background: var(--ga-accent); }
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════
    INPUT AREA
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+═══════════════════════════════ */
 .ga-input-area {
     padding: 0.875rem 1.25rem 1.125rem;
     background: var(--ga-surface);
@@ -8228,9 +8430,9 @@ body.white-mode .excel-send-btn:not(:disabled) {
     to { transform: rotate(360deg); }
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════
    CANVAS PANEL
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+═══════════════════════════════ */
 .ga-canvas {
     width: 0;
     overflow: hidden;
@@ -8379,9 +8581,9 @@ body.white-mode .excel-send-btn:not(:disabled) {
     margin: 0;
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════
    RESPONSIVE
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+═══════════════════════════════ */
 @media (max-width: 900px) {
     .ga-canvas.open {
         width: 280px;
@@ -8484,7 +8686,7 @@ body.white-mode .excel-send-btn:not(:disabled) {
     --gda-sh-accent:  var(--accent-glow);
 }
 
-/* â”€â”€â”€ Root â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─── Root ─────────────────────────── */
 .gda-root {
     display: flex;
     height: 100%;
@@ -8496,7 +8698,7 @@ body.white-mode .excel-send-btn:not(:disabled) {
     overflow: hidden;
 }
 
-/* â”€â”€â”€ Sidebar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─── Sidebar ───────────────────────── */
 .gda-sidebar {
     width: var(--gda-sidebar-w);
     min-width: var(--gda-sidebar-w);
@@ -8641,12 +8843,12 @@ body.white-mode .excel-send-btn:not(:disabled) {
 }
 .gda-sb-quota-detail { font-size: 0.69rem; color: var(--gda-t3); padding: 0 0.25rem; }
 
-/* â”€â”€â”€ Overlay â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─── Overlay ───────────────────────── */
 .gda-overlay {
     display: none;
 }
 
-/* â”€â”€â”€ Main â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─── Main ──────────────────────────── */
 .gda-main {
     flex: 1;
     display: flex;
@@ -8654,7 +8856,7 @@ body.white-mode .excel-send-btn:not(:disabled) {
     min-width: 0;
 }
 
-/* â”€â”€â”€ Topbar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─── Topbar ─────────────────────────── */
 .gda-topbar {
     display: flex;
     align-items: center;
@@ -8746,14 +8948,14 @@ body.white-mode .excel-send-btn:not(:disabled) {
 .gda-explorer-btn.open { background: var(--gda-accent); }
 .gda-explorer-btn.open:hover { background: var(--gda-accent-h); }
 
-/* â”€â”€â”€ Body â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─── Body ──────────────────────────── */
 .gda-body {
     flex: 1;
     display: flex;
     overflow: hidden;
 }
 
-/* â”€â”€â”€ Chat â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─── Chat ──────────────────────────── */
 .gda-chat {
     flex: 1;
     display: flex;
@@ -8810,7 +9012,7 @@ body.white-mode .excel-send-btn:not(:disabled) {
     40% { transform: translateY(-5px); background: var(--gda-accent); }
 }
 
-/* â”€â”€â”€ Input â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─── Input ─────────────────────────── */
 .gda-input-wrap {
     padding: 0.75rem 1.125rem 1rem;
     background: var(--gda-surface);
@@ -8914,7 +9116,7 @@ body.white-mode .excel-send-btn:not(:disabled) {
     line-height: 1.4;
 }
 
-/* â”€â”€â”€ Explorer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─── Explorer ───────────────────────── */
 .gda-explorer {
     width: var(--gda-explorer-w);
     flex-shrink: 0;
@@ -9119,7 +9321,7 @@ body.white-mode .excel-send-btn:not(:disabled) {
 .gda-det-btn:hover { background: var(--gda-bg); color: var(--gda-t1); }
 .gda-det-btn.danger:hover { background: var(--gda-danger-s); border-color: #fca5a5; color: var(--gda-danger); }
 
-/* â”€â”€â”€ Context menu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─── Context menu ───────────────────── */
 .gda-menu-wrap {
     position: absolute;
     bottom: 0; left: 0; right: 0;
@@ -9169,7 +9371,7 @@ body.white-mode .excel-send-btn:not(:disabled) {
 .gda-menu-item.danger { color: var(--gda-danger); }
 .gda-menu-item.danger:hover { background: var(--gda-danger-s); }
 
-/* â”€â”€â”€ Toasts â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─── Toasts ─────────────────────────── */
 .gda-toasts {
     position: absolute;
     bottom: 1.25rem; left: 50%;
@@ -9204,7 +9406,7 @@ body.white-mode .excel-send-btn:not(:disabled) {
 }
 .gda-toast button:hover { opacity: 1; }
 
-/* â”€â”€â”€ Responsive â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─── Responsive ─────────────────────── */
 @media (max-width: 1024px) {
     .gda-explorer { width: 270px; }
 }
@@ -9250,14 +9452,14 @@ body.white-mode .excel-send-btn:not(:disabled) {
 
 /* === Merged from Layout.css === */
 
-/* â”€â”€ Claude-Inspired Sidebar Theme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Claude-Inspired Sidebar Theme ──────────────────────── */
 :root {
     --sidebar-width: 230px;
     --sidebar-width-collapsed: 60px;
     --transition-speed: 0.2s;
     --transition-curve: cubic-bezier(0.16, 1, 0.3, 1);
 
-    /* â”€â”€ DARK MODE (default) â€” Claude palette â”€â”€ */
+    /* ── DARK MODE (default) — Claude palette ── */
     --sb-bg: var(--bg-surface);           /* Claude's sidebar: near-black, NOT #1C1C1E blue-tinted */
     --sb-bg-hover: var(--bg-hover);
     --sb-bg-search: var(--bg-overlay);
@@ -9272,7 +9474,7 @@ body.white-mode .excel-send-btn:not(:disabled) {
     --sb-font-size: 13.5px;
 }
 
-/* â”€â”€ LIGHT MODE â”€â”€ */
+/* ── LIGHT MODE ── */
 [data-theme="light"], body.white-mode {
     --sb-bg: var(--bg-surface);           /* Claude light: warm off-white */
     --sb-bg-hover: var(--bg-hover);
@@ -9283,7 +9485,7 @@ body.white-mode .excel-send-btn:not(:disabled) {
     --sb-bg-mobile: var(--bg-surface);
 }
 
-/* â”€â”€ Custom Tooltips (for Collapsed Sidebar) â”€â”€ */
+/* ── Custom Tooltips (for Collapsed Sidebar) ── */
 .sidebar.collapsed [data-tooltip] {
     position: relative;
 }
@@ -9343,7 +9545,7 @@ body.white-mode .sidebar.collapsed [data-tooltip]::after {
     opacity: 1;
 }
 
-/* â”€â”€ App Shell Layout â”€â”€ */
+/* ── App Shell Layout ── */
 .app-main-layout {
     display: flex;
     width: 100vw;
@@ -9352,7 +9554,7 @@ body.white-mode .sidebar.collapsed [data-tooltip]::after {
     background: var(--bg-base);
 }
 
-/* â”€â”€ Sidebar â”€â”€ */
+/* ── Sidebar ── */
 .sidebar {
     position: relative !important;
     width: var(--sidebar-width) !important;
@@ -9376,7 +9578,7 @@ body.white-mode .sidebar.collapsed [data-tooltip]::after {
     visibility: visible !important;
 }
 
-/* â”€â”€ Resizer â”€â”€ */
+/* ── Resizer ── */
 .sidebar-resizer {
     position: absolute;
     top: 0;
@@ -9392,7 +9594,7 @@ body.white-mode .sidebar.collapsed [data-tooltip]::after {
     background: var(--accent, rgba(255,255,255,0.15));
 }
 
-/* â”€â”€ Logo Header â”€â”€ */
+/* ── Logo Header ── */
 .logo-details {
     height: 52px;
     display: flex;
@@ -9452,10 +9654,11 @@ body.white-mode .sidebar.collapsed [data-tooltip]::after {
     }
 }
 
-/* â”€â”€ Search â”€â”€ */
+/* ── Search ── */
 .sidebar-search-container {
-    padding: 6px 10px;
+    padding: 12px 14px;
     flex-shrink: 0;
+    border-bottom: 1px solid var(--sarvam-border, rgba(0,0,0,0.06));
 }
 
 .sidebar.collapsed .sidebar-search-container {
@@ -9467,13 +9670,40 @@ body.white-mode .sidebar.collapsed [data-tooltip]::after {
 .sidebar-search {
     display: flex;
     align-items: center;
+    background: var(--sarvam-bg-subtle, rgba(0,0,0,0.03)) !important;
+    border: 1px solid var(--sarvam-border, rgba(0,0,0,0.12)) !important;
+    border-radius: 10px !important;
+    padding: 6px 10px !important;
+    height: 38px !important;
+    transition: all 0.2s ease !important;
+    box-shadow: none !important;
+    gap: 8px;
+}
+
+.sidebar-search i {
+    font-size: 18px;
+    color: var(--sarvam-text-muted, rgba(0,0,0,0.4));
+    flex-shrink: 0;
+}
+
+.sidebar-search input {
+    width: 100%;
     background: transparent !important;
     border: none !important;
-    border-radius: 0 !important;
-    padding: 0 10px;
-    height: 34px;
-    box-shadow: none !important;
-    transition: border-color 0.15s ease;
+    outline: none !important;
+    color: var(--sarvam-text-main, #1a1a1a);
+    font-size: 13.5px;
+    padding: 0 !important;
+}
+
+.sidebar-search:focus-within {
+    border-color: var(--sarvam-accent, #7C6AF7) !important;
+    background: var(--sarvam-bg-surface, #fff) !important;
+    box-shadow: 0 0 0 2px rgba(124, 106, 247, 0.1) !important;
+}
+
+.sidebar-search:focus-within i {
+    color: var(--sarvam-accent, #7C6AF7) !important;
 }
 
 .sidebar.collapsed .sidebar-search {
@@ -9519,7 +9749,7 @@ body.white-mode .sidebar.collapsed [data-tooltip]::after {
     border-color: rgba(0, 0, 0, 0.18);
 }
 
-/* â”€â”€ Nav List â”€â”€ */
+/* ── Nav List ── */
 .nav-list {
     flex: 1;
     overflow-y: auto;
@@ -9606,14 +9836,14 @@ body.white-mode .sidebar.collapsed [data-tooltip]::after {
     opacity: 0;
 }
 
-/* â”€â”€ Divider â”€â”€ */
+/* ── Divider ── */
 .sidebar-divider {
     height: 1px;
     background: var(--sb-border);
     margin: 6px 8px;
 }
 
-/* â”€â”€ History â”€â”€ */
+/* ── History ── */
 .history-container {
     margin-top: 2px;
     flex: 1;
@@ -9693,7 +9923,7 @@ body.white-mode .sidebar.collapsed [data-tooltip]::after {
     color: #e57373 !important;
 }
 
-/* â”€â”€ Skeleton loader â”€â”€ */
+/* ── Skeleton loader ── */
 .conv-skeleton-list {
     padding: 4px 0;
 }
@@ -9719,7 +9949,7 @@ body.white-mode .sidebar.collapsed [data-tooltip]::after {
     50% { opacity: 0.9; }
 }
 
-/* â”€â”€ Footer â”€â”€ */
+/* ── Footer ── */
 .sidebar-footer {
     padding: 6px 8px 8px;
     border-top: 1px solid var(--sb-border);
@@ -9765,7 +9995,7 @@ body.white-mode .sidebar.collapsed [data-tooltip]::after {
     justify-content: center;
 }
 
-/* â”€â”€ Legal links â”€â”€ */
+/* ── Legal links ── */
 .sidebar-legal-links {
     display: flex;
     align-items: center;
@@ -9793,7 +10023,7 @@ body.white-mode .sidebar.collapsed [data-tooltip]::after {
     opacity: 0.4;
 }
 
-/* â”€â”€ Profile Section â”€â”€ */
+/* ── Profile Section ── */
 .profile-section {
     padding: 2px 2px 0;
 }
@@ -9876,7 +10106,7 @@ body.white-mode .sidebar.collapsed [data-tooltip]::after {
     color: #e57373;
 }
 
-/* â”€â”€ Main Layout â”€â”€ */
+/* ── Main Layout ── */
 .show-chatbot {
     flex: 1;
     display: flex;
@@ -9907,7 +10137,7 @@ body.white-mode .sidebar.collapsed [data-tooltip]::after {
     max-width: 100%; /* Full width so scrollbar appears on immediate right */
 }
 
-/* â”€â”€ Gallery badge â”€â”€ */
+/* ── Gallery badge ── */
 .gallery-badge {
     display: inline-flex;
     align-items: center;
@@ -9927,7 +10157,7 @@ body.white-mode .sidebar.collapsed [data-tooltip]::after {
     background: rgba(0, 0, 0, 0.08);
 }
 
-/* â”€â”€ Load more spinner â”€â”€ */
+/* ── Load more spinner ── */
 .conv-load-more-spinner {
     display: flex;
     justify-content: center;
@@ -9952,7 +10182,7 @@ body.white-mode .sidebar.collapsed [data-tooltip]::after {
     40% { transform: scale(1); opacity: 1; }
 }
 
-/* â”€â”€ Mobile Drawer â”€â”€ */
+/* ── Mobile Drawer ── */
 @media screen and (max-width: 768px) {
     .sidebar {
         position: fixed !important;
@@ -10006,9 +10236,9 @@ body.white-mode .sidebar.collapsed [data-tooltip]::after {
 
 /* === Merged from UpgradeModal.css === */
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   UPGRADE MODAL â€” Matches Treevit/Chatterbox Dark Theme
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+/* ═══════════════════════════════════════════════════════════
+   UPGRADE MODAL — Matches Treevit/Chatterbox Dark Theme
+   ═══════════════════════════════════════════════════════════ */
 
 .upgrade-overlay {
     position: fixed;
@@ -10034,7 +10264,7 @@ body.white-mode .sidebar.collapsed [data-tooltip]::after {
     }
 }
 
-/* â”€â”€ Modal card â€” compact, everything fits without scroll â”€â”€ */
+/* ── Modal card — compact, everything fits without scroll ── */
 .upgrade-modal {
     position: relative;
     width: 100%;
@@ -10062,7 +10292,7 @@ body.white-mode .sidebar.collapsed [data-tooltip]::after {
     }
 }
 
-/* Shimmer top border â€” uses app's purple */
+/* Shimmer top border — uses app's purple */
 .upgrade-modal::before {
     content: '';
     position: absolute;
@@ -10074,7 +10304,7 @@ body.white-mode .sidebar.collapsed [data-tooltip]::after {
     border-radius: 2px;
 }
 
-/* â”€â”€ Close â”€â”€ */
+/* ── Close ── */
 .upgrade-close {
     position: absolute;
     top: 14px;
@@ -10098,7 +10328,7 @@ body.white-mode .sidebar.collapsed [data-tooltip]::after {
     color: #fff;
 }
 
-/* â”€â”€ Header â”€â”€ */
+/* ── Header ── */
 .upgrade-header {
     display: flex;
     align-items: center;
@@ -10142,7 +10372,7 @@ body.white-mode .sidebar.collapsed [data-tooltip]::after {
     line-height: 1.45;
 }
 
-/* â”€â”€ Billing Toggle â”€â”€ */
+/* ── Billing Toggle ── */
 .billing-toggle {
     display: flex;
     gap: 6px;
@@ -10187,7 +10417,7 @@ body.white-mode .sidebar.collapsed [data-tooltip]::after {
     letter-spacing: 0.03em;
 }
 
-/* â”€â”€ Price row â”€â”€ */
+/* ── Price row ── */
 .upgrade-price-row {
     display: flex;
     align-items: center;
@@ -10219,7 +10449,7 @@ body.white-mode .sidebar.collapsed [data-tooltip]::after {
     color: rgba(255, 255, 255, 0.28);
 }
 
-/* â”€â”€ Features grid â”€â”€ */
+/* ── Features grid ── */
 .upgrade-features {
     display: grid;
     grid-template-columns: 1fr 1px 1fr;
@@ -10279,7 +10509,7 @@ body.white-mode .sidebar.collapsed [data-tooltip]::after {
     width: 1px;
 }
 
-/* â”€â”€ Error â”€â”€ */
+/* ── Error ── */
 .upgrade-error {
     color: #f87171;
     font-size: 0.82rem;
@@ -10291,7 +10521,7 @@ body.white-mode .sidebar.collapsed [data-tooltip]::after {
     gap: 5px;
 }
 
-/* â”€â”€ Buttons â”€â”€ */
+/* ── Buttons ── */
 .upgrade-actions {
     display: flex;
     flex-direction: column;
@@ -10322,7 +10552,7 @@ body.white-mode .sidebar.collapsed [data-tooltip]::after {
     transform: none !important;
 }
 
-/* Primary â€” UPI / Razorpay (India) â€” uses app's purple gradient */
+/* Primary — UPI / Razorpay (India) — uses app's purple gradient */
 .razorpay-btn {
     background: linear-gradient(135deg, #673ab7 0%, #512da8 100%);
     color: #fff;
@@ -10335,7 +10565,7 @@ body.white-mode .sidebar.collapsed [data-tooltip]::after {
     box-shadow: 0 10px 28px rgba(103, 58, 183, 0.5);
 }
 
-/* Secondary â€” Stripe (International) */
+/* Secondary — Stripe (International) */
 .stripe-btn {
     background: rgba(255, 255, 255, 0.05);
     color: rgba(255, 255, 255, 0.75);
@@ -10348,7 +10578,7 @@ body.white-mode .sidebar.collapsed [data-tooltip]::after {
     transform: translateY(-1px);
 }
 
-/* â”€â”€ Footer â”€â”€ */
+/* ── Footer ── */
 .upgrade-footer {
     text-align: center;
     font-size: 0.72rem;
@@ -10357,7 +10587,7 @@ body.white-mode .sidebar.collapsed [data-tooltip]::after {
     letter-spacing: 0.02em;
 }
 
-/* â”€â”€ White Mode â”€â”€ */
+/* ── White Mode ── */
 body.white-mode .upgrade-modal {
     background: #ffffff;
     border-color: rgba(103, 58, 183, 0.25);
@@ -10457,7 +10687,7 @@ body.white-mode .upgrade-footer {
     color: rgba(0, 0, 0, 0.22);
 }
 
-/* â”€â”€ Mobile â”€â”€ */
+/* ── Mobile ── */
 @media (max-width: 520px) {
     .upgrade-modal {
         padding: 22px 16px 18px;
@@ -10489,7 +10719,7 @@ body.white-mode .upgrade-footer {
 
 /* === Merged from WordAgent.css === */
 
-/* â”€â”€ Word Agent Layout â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Word Agent Layout ──────────────────────────────────── */
 /*    Accent: Word Blue  #2b579a / #3b82f6 / #93c5fd        */
 /*    Structure mirrors ExcelAgent.css 1-to-1               */
 
@@ -10516,7 +10746,7 @@ body.white-mode .upgrade-footer {
     }
 }
 
-/* â”€â”€ Chat Panel (left) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Chat Panel (left) ───────────────────────────────────── */
 .word-chat-panel {
     display: flex;
     flex-direction: column;
@@ -10534,7 +10764,7 @@ body.white-mode .upgrade-footer {
     pointer-events: none;
 }
 
-/* â”€â”€ Resizer â”€â”€ */
+/* ── Resizer ── */
 .word-resizer {
     width: 6px;
     height: 100%;
@@ -10567,7 +10797,7 @@ body.white-mode .upgrade-footer {
     background: #fff;
 }
 
-/* â”€â”€ Chat Header â”€â”€ */
+/* ── Chat Header ── */
 .word-chat-header {
     padding: 20px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -10602,7 +10832,7 @@ body.white-mode .upgrade-footer {
     margin: 4px 0 0;
 }
 
-/* â”€â”€ Messages â”€â”€ */
+/* ── Messages ── */
 .word-messages {
     flex: 1;
     overflow-y: auto;
@@ -10644,7 +10874,7 @@ body.white-mode .upgrade-footer {
     margin-top: -4px;
 }
 
-/* â”€â”€ AI Avatar & Bubble overrides for Word Theme â”€â”€ */
+/* ── AI Avatar & Bubble overrides for Word Theme ── */
 .word-message-wrapper .ai-avatar {
     background: linear-gradient(135deg, #2563eb, #3b82f6);
 }
@@ -10659,7 +10889,7 @@ body.white-mode .word-message-wrapper .ai-bubble {
     /* Lighter blue for white mode */
 }
 
-/* â”€â”€ Chat Input Area â”€â”€ */
+/* ── Chat Input Area ── */
 .word-chat-input-area {
     padding: 16px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -10727,7 +10957,7 @@ body.white-mode .word-message-wrapper .ai-bubble {
     color: rgba(255, 255, 255, 0.4);
 }
 
-/* Send button â€” Word blue instead of Excel green */
+/* Send button — Word blue instead of Excel green */
 .word-send-btn {
     width: 38px;
     height: 38px;
@@ -10759,7 +10989,7 @@ body.white-mode .word-message-wrapper .ai-bubble {
     box-shadow: none;
 }
 
-/* â”€â”€ Right Panel: Canvas â”€â”€ */
+/* ── Right Panel: Canvas ── */
 .word-canvas {
     flex: 1;
     display: flex;
@@ -10770,7 +11000,7 @@ body.white-mode .word-message-wrapper .ai-bubble {
     min-width: 0;
 }
 
-/* â”€â”€ Toolbar â”€â”€ */
+/* ── Toolbar ── */
 .word-toolbar {
     height: 60px;
     display: flex;
@@ -10803,7 +11033,7 @@ body.white-mode .word-message-wrapper .ai-bubble {
     flex-shrink: 0;
 }
 
-/* â”€â”€ File Tabs â”€â”€ */
+/* ── File Tabs ── */
 .word-files-list {
     display: flex;
     flex-direction: row;
@@ -10874,7 +11104,7 @@ body.white-mode .word-message-wrapper .ai-bubble {
     transform: scale(1.1);
 }
 
-/* â”€â”€ View Mode Toggle â”€â”€ */
+/* ── View Mode Toggle ── */
 .word-view-toggle {
     display: flex;
     height: 34px;
@@ -10885,7 +11115,7 @@ body.white-mode .word-message-wrapper .ai-bubble {
     gap: 2px;
 }
 
-/* â”€â”€ History Controls â”€â”€ */
+/* ── History Controls ── */
 .history-controls {
     display: flex;
     gap: 4px;
@@ -10894,7 +11124,7 @@ body.white-mode .word-message-wrapper .ai-bubble {
     border-right: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* â”€â”€ Toolbar Buttons â”€â”€ */
+/* ── Toolbar Buttons ── */
 .word-toolbar-btn {
     height: 34px;
     padding: 0 14px;
@@ -10931,7 +11161,7 @@ body.white-mode .word-message-wrapper .ai-bubble {
     border-color: rgba(255, 255, 255, 0.2);
 }
 
-/* Download â€” Word blue accent instead of Excel green */
+/* Download — Word blue accent instead of Excel green */
 .word-toolbar-btn.success {
     background: #2563eb;
     color: #fff;
@@ -10965,7 +11195,7 @@ body.white-mode .word-message-wrapper .ai-bubble {
     color: #fff;
 }
 
-/* Active state â€” blue tint instead of green */
+/* Active state — blue tint instead of green */
 .word-toolbar-btn.ghost.active {
     background: rgba(37, 99, 235, 0.15);
     color: #93c5fd;
@@ -10978,7 +11208,7 @@ body.white-mode .word-message-wrapper .ai-bubble {
     transform: none !important;
 }
 
-/* â”€â”€ Upload Zone â”€â”€ */
+/* ── Upload Zone ── */
 .word-upload-zone {
     flex: 1;
     display: flex;
@@ -11077,7 +11307,7 @@ body.white-mode .word-message-wrapper .ai-bubble {
 
 
 
-/* â”€â”€ Doc Paper â€” signature Word look â”€â”€ */
+/* ── Doc Paper — signature Word look ── */
 .word-doc-paper {
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(59, 130, 246, 0.15);
@@ -11170,7 +11400,7 @@ body.white-mode .word-message-wrapper .ai-bubble {
     margin: 4px 0;
 }
 
-/* â”€â”€ AI highlight â€” blue instead of green â”€â”€ */
+/* ── AI highlight — blue instead of green ── */
 .word-doc-paper .ql-editor .ai-highlight {
     background: rgba(37, 99, 235, 0.12);
     border-left: 3px solid #3b82f6;
@@ -11189,7 +11419,7 @@ body.white-mode .word-message-wrapper .ai-bubble {
     }
 }
 
-/* â”€â”€ Status Bar â”€â”€ */
+/* ── Status Bar ── */
 .word-status-bar {
     height: 38px;
     padding: 0 20px;
@@ -11229,7 +11459,7 @@ body.white-mode .word-message-wrapper .ai-bubble {
     color: rgba(255, 255, 255, 0.4);
 }
 
-/* â”€â”€ Typing dots â€” blue â”€â”€ */
+/* ── Typing dots — blue ── */
 .word-typing-dots {
     display: flex;
     gap: 4px;
@@ -11268,7 +11498,7 @@ body.white-mode .word-message-wrapper .ai-bubble {
     }
 }
 
-/* â”€â”€ Spinner â”€â”€ */
+/* ── Spinner ── */
 .spin {
     animation: spinAnim 0.8s linear infinite;
 }
@@ -11279,9 +11509,9 @@ body.white-mode .word-message-wrapper .ai-bubble {
     }
 }
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+/* ────────────────────────────────────────────────────────────
    WHITE MODE OVERRIDES  (mirrors ExcelAgent white-mode block)
-   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+   ──────────────────────────────────────────────────────────── */
 body.white-mode .word-chat-header {
     border-color: rgba(0, 0, 0, 0.1);
 }
@@ -11544,7 +11774,7 @@ body.white-mode .word-messages::-webkit-scrollbar-thumb {
     background: rgba(0, 0, 0, 0.1);
 }
 
-/* â”€â”€ Mobile â”€â”€ */
+/* ── Mobile ── */
 @media screen and (max-width: 768px) {
     .word-agent.is-mobile {
         flex-direction: column;
@@ -12715,6 +12945,7 @@ pre {
 .chatbot .chatbox {
     flex: 1 1 0 !important;
     overflow-y: auto !important;
+    overflow-x: hidden !important; /* Total stability: prevent horizontal scrollbar */
     min-height: 0 !important;
     padding-bottom: 12px !important;
 }
@@ -13175,7 +13406,7 @@ pre {
     display: flex;
     height: 100vh;
     width: 100vw;
-    overflow: hidden;
+    overflow: hidden !important; /* Ensure the shell itself doesn't scroll */
     background: var(--bg-base);
 }
 
@@ -13584,20 +13815,19 @@ pre {
 
 /* ── Claude-Style Conversation Layout ── */
 /* Claude uses a fixed ~48px horizontal padding and a ~740px readable content column. */
+/* ── Unified Chatbox Layout ── */
 .chatbox {
-    padding-left: clamp(24px, 6vw, 200px) !important;
-    padding-right: clamp(24px, 6vw, 200px) !important;
-    padding-top: 24px !important;
-    padding-bottom: 32px !important;
-    overflow-y: auto !important;
+    width: 100% !important;
     height: 100% !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
     box-sizing: border-box !important;
     scroll-behavior: smooth;
+    padding-bottom: 32px !important;
 }
 
 .chat-input-container {
-    padding-left: clamp(24px, 6vw, 200px) !important;
-    padding-right: clamp(24px, 6vw, 200px) !important;
+    width: 100% !important;
     box-sizing: border-box !important;
 }
 
@@ -13612,3 +13842,18 @@ pre {
 .chat.outgoing .outgoing-shell {
     max-width: 740px !important;
 }
+
+/* Logo Images */
+.sidebar-logo-img {
+    transition: transform 0.3s ease;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+
+.sidebar-logo-img:hover {
+    transform: scale(1.1);
+}
+
+.auth-logo-img {
+    margin-bottom: 20px;
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.15));
+}

@@ -455,6 +455,10 @@ pre {
     margin-top: 4px;
 }
 
+.message-row:hover .message-actions {
+    opacity: 1;
+}
+
 .message-action-btn {
     width: 26px;
     height: 26px;
@@ -860,16 +864,22 @@ pre {
 
 /* Inline Edit Styles */
 .inline-edit-container {
-    width: 70%;
-    margin: auto;
-
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    margin-left: auto;
 }
 
 .edit-wrapper {
     background: var(--bg-elevated);
-    border: 1px solid var(--accent);
+    border: 1px solid var(--border-hi);
     border-radius: var(--radius-md);
     padding: 8px;
+}
+
+.edit-wrapper:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px var(--accent-glow);
 }
 
 .edit-textarea {
@@ -878,10 +888,17 @@ pre {
     background: transparent;
     border: none;
     outline: none;
+    box-shadow: none !important;
     color: var(--text-primary);
     font-family: inherit;
     font-size: 14px;
     resize: vertical;
+}
+
+.edit-textarea:focus {
+    outline: none !important;
+    box-shadow: none !important;
+    border: none !important;
 }
 
 .edit-btn-group {

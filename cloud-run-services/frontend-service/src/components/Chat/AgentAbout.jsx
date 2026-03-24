@@ -30,8 +30,13 @@ const AgentAbout = ({ agent, onLaunch }) => {
                     width: '100px', height: '100px', borderRadius: '24px',
                     background: accentBg, border: `1px solid ${accentBorder}`,
                     display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                    overflow: 'hidden'
                 }}>
-                    <i className={`bx ${icon}`} style={{ fontSize: '56px', color: accentColor }} />
+                    {agent.logo ? (
+                        <img src={agent.logo} alt={name} style={{ width: '60%', height: '60%', objectFit: 'contain' }} />
+                    ) : (
+                        <i className={`bx ${icon}`} style={{ fontSize: '56px', color: accentColor }} />
+                    )}
                 </div>
 
                 {/* Title + description + launch */}
@@ -115,8 +120,13 @@ const AgentAbout = ({ agent, onLaunch }) => {
                                     width: '36px', height: '36px', borderRadius: '10px',
                                     background: accentBg, display: 'flex',
                                     alignItems: 'center', justifyContent: 'center',
+                                    overflow: 'hidden'
                                 }}>
-                                    <i className={`bx ${f.icon}`} style={{ fontSize: '18px', color: accentColor }} />
+                                    {f.icon?.startsWith('http') ? (
+                                        <img src={f.icon} alt={f.title} style={{ width: '20px', height: '20px', objectFit: 'contain' }} />
+                                    ) : (
+                                        <i className={`bx ${f.icon}`} style={{ fontSize: '18px', color: accentColor }} />
+                                    )}
                                 </div>
                                 <div style={{ fontWeight: 600, fontSize: '13.5px', color: 'var(--sarvam-text-main)' }}>
                                     {f.title}

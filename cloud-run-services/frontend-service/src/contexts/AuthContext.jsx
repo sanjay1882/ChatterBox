@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState, useCallback } from 'react';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from '../firebase';
 
@@ -35,7 +35,7 @@ export function AuthProvider({ children }) {
         return unsub;
     }, []);
 
-    const logout = async () => {
+    const logout = useCallback(async () => {
         await signOut(auth);
         localStorage.removeItem('fb_token');
         localStorage.removeItem('guest_mode');
@@ -44,24 +44,24 @@ export function AuthProvider({ children }) {
         setToken(null);
         setGoogleAccessToken(null);
         setIsGuest(false);
-    };
+    }, []);
 
-    const continueAsGuest = () => {
+    const continueAsGuest = useCallback(() => {
         localStorage.setItem('guest_mode', 'true');
         setIsGuest(true);
         setUser({ displayName: 'Guest', email: 'guest@treevit.local', photoURL: null });
         setLoading(false);
-    };
+    }, []);
 
-    const getFreshToken = async () => {
+    const getFreshToken = useCallback(async () => {
         if (auth.currentUser) {
-            const newToken = await auth.currentUser.getIdToken(true);
+            const newToken = await auth.currentUser.getIdToken(false);
             setToken(newToken);
             localStorage.setItem('fb_token', newToken);
             return newToken;
         }
-        return token;
-    };
+        return null; // fallback when not logged in
+    }, []);
 
     useEffect(() => {
         const interval = setInterval(async () => {

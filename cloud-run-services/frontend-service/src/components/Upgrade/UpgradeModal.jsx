@@ -3,7 +3,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useCredits } from '../../contexts/CreditsContext';
 
 
-const BACKEND = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
+const BACKEND = import.meta.env.DEV ? '/api' : (import.meta.env.VITE_BACKEND_URL || 'http://127.0.0.1:3000');
 
 const REASON_COPY = {
     image: {
