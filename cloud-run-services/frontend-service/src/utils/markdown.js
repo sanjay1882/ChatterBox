@@ -1,5 +1,6 @@
 // Markdown renderer matching the original formatResponse() function in index.js
 // Also calls hljs.highlightElement() for syntax highlighting (highlight.js loaded via CDN in index.html)
+import { normalizeLang } from './langNormalizer.js';
 
 function escapeHtml(str) {
     return str
@@ -16,16 +17,19 @@ function escapeHtml(str) {
 export function renderMarkdown(text, isStreaming = false) {
     if (!text) return '';
 
-    let responseText = text;
+    // Remove internal system instructions from the UI
+    let responseText = text.replace(/\[SYSTEM INSTRUCTION:[\s\S]*?\]/gi, '');
+    const placeholders = [];
 
-    // ── Think blocks ──────────────────────────────────────────────────────────
+    // 1. ── Extract Think blocks into placeholders ─────────────────────────────────
     responseText = responseText.replace(/<think>([\s\S]*?)<\/think>/g, (match, content) => {
-        return `<div class="think-block-wrapper"><details class="think-block-details"><summary>💭 Thought</summary><div class="think-block-content">${escapeHtml(content)}</div></details></div>`;
+        placeholders.push(`<div class="think-block-wrapper"><details class="think-block-details"><summary>💭 Thought</summary><div class="think-block-content">${escapeHtml(content)}</div></details></div>`);
+        return `__PH_BLOCK_${placeholders.length - 1}__`;
     });
 
-    // ── Code blocks ──────────────────────────────────────────────────────────
+    // 2. ── Extract Code blocks into placeholders ─────────────────────────────────
     responseText = responseText.replace(/```(\w+)?\n?([\s\S]*?)```/g, (_, lang, code) => {
-        const langLabel = lang || '';
+        const langLabel = normalizeLang(lang);
         const trimCode = code.trim();
         let codeToFormat = trimCode;
 
@@ -43,8 +47,10 @@ export function renderMarkdown(text, isStreaming = false) {
 
         try {
             if (window.hljs) {
-                if (langLabel && window.hljs.getLanguage(langLabel)) {
+                if (langLabel && langLabel !== 'plaintext' && window.hljs.getLanguage(langLabel)) {
                     formattedCode = window.hljs.highlight(codeToFormat, { language: langLabel, ignoreIllegals: true }).value;
+                } else if (langLabel === 'plaintext') {
+                    // Skip auto-detection for plaintext — just use escaped HTML
                 } else {
                     formattedCode = window.hljs.highlightAuto(codeToFormat).value;
                 }
@@ -56,7 +62,7 @@ export function renderMarkdown(text, isStreaming = false) {
         const lineCount = (codeToFormat.match(/\n/g) || []).length + 1;
         const showExpand = lineCount > 18 && !isStreaming;
 
-        return `
+        const html = `
         <div class="code-block-wrapper ${showExpand ? 'has-expansion' : ''}" data-lang="${langLabel}">
             <div class="code-header">
                 <span class="code-lang-label">${langLabel}</span>
@@ -70,12 +76,19 @@ export function renderMarkdown(text, isStreaming = false) {
                 <pre class="code-pre"><code class="language-${langLabel} hljs">${formattedCode}</code></pre>
             </div>
         </div>`.trim();
+        
+        placeholders.push(html);
+        return `__PH_BLOCK_${placeholders.length - 1}__`;
     });
 
-    // ── Inline code ──────────────────────────────────────────────────────────
-    responseText = responseText.replace(/`([^`\n]+)`/g, '<code class="inline-code">$1</code>');
+    // 3. ── Inline code ──────────────────────────────────────────────────────────
+    // Replace inline code with placeholders to protect them from further formatting
+    responseText = responseText.replace(/`([^`\n]+)`/g, (match, code) => {
+        placeholders.push(`<code class="inline-code">${escapeHtml(code)}</code>`);
+        return `__PH_BLOCK_${placeholders.length - 1}__`;
+    });
 
-    // ── Bold + italic combos ─────────────────────────────────────────────────
+    // 4. ── Other Markdown Formatting ──────────────────────────────────────────
     responseText = responseText.replace(/\*\*\*(.+?)\*\*\*/gs, '<strong><em>$1</em></strong>');
     responseText = responseText.replace(/\*\*(.+?)\*\*/gs, '<strong>$1</strong>');
     responseText = responseText.replace(/\*(.+?)\*/gs, '<em>$1</em>');
@@ -152,38 +165,56 @@ export function renderMarkdown(text, isStreaming = false) {
     });
 
     // ── Auto-linkify plain URLs ──────────────────────────────────────────────
-    // Avoid double-linking URLs that are already inside <a> tags or buttons
-    // Also ignore URLs that are likely part of an attribute (preceded by =")
+    // Protected by placeholders, so this only runs on "normal" text
     responseText = responseText.replace(/(?<!href=")(?<!=")(?<!">)(https?:\/\/[^\s<]+)/g, (url) => {
         // Truncate display text for long URLs
         const displayUrl = url.length > 50 ? url.substring(0, 47) + '...' : url;
         return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="url-button"><span>${displayUrl}</span><i class='bx bx-link-external'></i></a>`;
     });
 
-    // ── Paragraphs / line breaks ─────────────────────────────────────────────
+    // 5. ── Paragraphs / line breaks ─────────────────────────────────────────────
     responseText = responseText.replace(/\n\n/g, '<br><br>');
     responseText = responseText.replace(/\n(?!<)/g, '<br>');
+
+    // 6. ── Restore placeholders ─────────────────────────────────────────────
+    placeholders.forEach((html, i) => {
+        responseText = responseText.replace(`__PH_BLOCK_${i}__`, html);
+    });
 
     return responseText;
 }
 
 /**
  * Utility to linkify plain text or HTML that might contain plain URLs.
+ * It protects existing HTML tags and code blocks from being corrupted.
  */
 export function linkify(text) {
     if (!text) return '';
     
-    // First, handle the special browser view pattern
-    let processed = text.replace(/Opened in Browser View:\s*(https?:\/\/[^\s<]+)/gi, (match, url) => {
+    const placeholders = [];
+    // Protect HTML tags and code/pre blocks
+    let processed = text.replace(/(<code[\s\S]*?<\/code>|<pre[\s\S]*?<\/pre>|<a[\s\S]*?<\/a>|<button[\s\S]*?<\/button>|<[^>]+>)/gi, (match) => {
+        placeholders.push(match);
+        return `__LK_PH_${placeholders.length - 1}__`;
+    });
+
+    // Handle the special browser view pattern
+    processed = processed.replace(/Opened in Browser View:\s*(https?:\/\/[^\s<]+)/gi, (match, url) => {
         return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="url-button"><span>View Research Page</span><i class='bx bx-link-external'></i></a>`;
     });
 
-    // Then, linkify remaining plain URLs and truncate display text
-    // Exclude URLs preceded by href=" , =" (attributes), or ">" (already linked)
-    return processed.replace(/(?<!href=")(?<!=")(?<!">)(https?:\/\/[^\s<]+)/g, (url) => {
+    // Linkify remaining plain URLs
+    processed = processed.replace(/(?<!href=")(?<!=")(?<!">)(https?:\/\/[^\s<]+)/g, (url) => {
         const displayUrl = url.length > 50 ? url.substring(0, 47) + '...' : url;
         return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="url-button"><span>${displayUrl}</span><i class='bx bx-link-external'></i></a>`;
     });
+
+    // Restore placeholders
+    placeholders.forEach((html, i) => {
+        processed = processed.replace(`__LK_PH_${i}__`, html);
+    });
+
+    return processed;
 }
 
 /**
@@ -195,6 +226,12 @@ export function highlightAllCodeBlocks(container) {
     const hljs = window.hljs;
     if (!hljs) return;
     container.querySelectorAll('pre code:not(.hljs)').forEach(block => {
+        // Normalize language class before highlighting
+        const langMatch = block.className.match(/language-(\S+)/);
+        if (langMatch) {
+            const normalized = normalizeLang(langMatch[1]);
+            block.className = block.className.replace(/language-\S+/, `language-${normalized}`);
+        }
         hljs.highlightElement(block);
     });
 }

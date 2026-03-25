@@ -1,15 +1,28 @@
-// Copied and slightly adapted from the original non‑React frontend (frontend/chat/index.js)
-// This version returns a string of HTML for the entire text passed in.  It handles
-// think blocks, code fences (including incomplete streaming fences), tables, inline
-// markdown, math, etc.  The React components can call this on every frame without
-// needing a streaming-specific API.
+import { normalizeLang } from './langNormalizer.js';
+
+// Persistent state for interactive UI across re-renders (e.g., when scrolling)
+if (typeof window !== 'undefined' && !window._revealedProjects) {
+    window._revealedProjects = new Set();
+}
+
+const getStableId = (str) => {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        hash = ((hash << 5) - hash) + str.charCodeAt(i);
+        hash |= 0;
+    }
+    return Math.abs(hash).toString(36).substr(0, 8);
+};
 
 export function formatStreamedText(text) {
     if (!text) return '';
 
+    // Remove internal system instructions from the UI
+    let processedText = text.replace(/\[SYSTEM INSTRUCTION:[\s\S]*?\]/gi, '');
+
     // Think block extraction
     const thinkBlocks = [];
-    let processedText = text.replace(/<think>([\s\S]*?)<\/think>/g, (match, content) => {
+    processedText = processedText.replace(/<think>([\s\S]*?)<\/think>/g, (match, content) => {
         thinkBlocks.push(content);
         return `__THINK_BLOCK_${thinkBlocks.length - 1}__`;
     });
@@ -217,13 +230,104 @@ export function formatStreamedText(text) {
     html = html.replace(/__CODE_BLOCK_(\d+)__/g, (_m, idx) => {
         const block = codeBlocks[parseInt(idx, 10)];
         if (!block) return _m;
-        const langLabel = block.lang || 'plaintext';
-        let langClass = block.lang ? `language-${block.lang}` : 'language-plaintext';
+        const langLabel = normalizeLang(block.lang);
+        let langClass = `language-${langLabel}`;
         let formattedCode = escapeHTML(block.code);
 
-        // Note: Highlighting is handled globally by highlightAllCodeBlocks or prism
-        return `<div class="code-block-wrapper" data-lang="${block.lang || 'txt'}"><div class="code-header"><span class="code-lang-label">${langLabel}</span><div class="code-header-actions"><button class="copy-code-btn" onclick="window.copyCodeBlock(this)"><i class='bx bx-copy'></i> Copy</button><button class="download-code-btn" onclick="window.downloadCodeBlock(this)"><i class='bx bx-download'></i> Download</button></div></div><pre class="code-pre"><code class="${langClass}">${formattedCode}</code></pre></div>`;
+        // Inline syntax highlighting — bake colors into the HTML string
+        // so they persist through React re-renders (fixes colors vanishing after streaming)
+        try {
+            if (typeof window !== 'undefined' && window.hljs) {
+                if (langLabel && langLabel !== 'plaintext' && window.hljs.getLanguage(langLabel)) {
+                    formattedCode = window.hljs.highlight(block.code, { language: langLabel, ignoreIllegals: true }).value;
+                } else if (langLabel !== 'plaintext') {
+                    formattedCode = window.hljs.highlightAuto(block.code).value;
+                }
+            }
+        } catch (_) {
+            // Fallback: keep escaped code, zero errors
+        }
+
+        // Intercept Quiz JSON to render a beautiful UI instead of raw code
+        let isQuiz = false;
+        let quizTitle = "Interactive Quiz Generated";
+        if (langLabel.toLowerCase() === 'json' || !langLabel) {
+            if (/\"type\"\s*:\s*\"quiz\"/i.test(block.code) || /\"questions\"\s*:/i.test(block.code)) {
+                isQuiz = true;
+                const titleMatch = block.code.match(/\"title\"\s*:\s*\"([^\"]+)\"/i);
+                if (titleMatch) quizTitle = titleMatch[1];
+            }
+        }
+
+        if (isQuiz) {
+            const quizContainerId = `quiz-json-${idx}`;
+            // Return a themed button-like banner with source data OUTSIDE for compactness
+            return `
+            <div class="interactive-quiz-banner generating-pulse" onclick="window._triggerCanvasQuiz(document.getElementById('${quizContainerId}').textContent)">
+                <div class="quiz-banner-icon">
+                    <i class="bx bx-brain glow-icon"></i>
+                </div>
+                <div class="quiz-banner-text">
+                    <span class="quiz-banner-title">${escapeHTML(quizTitle)}</span>
+                    <span class="quiz-banner-action">Open Interactive Quiz <i class='bx bx-right-arrow-alt'></i></span>
+                </div>
+            </div>
+            <details class="chat-quiz-details secondary-action">
+                <summary>View AI Source Data <i class='bx bx-chevron-down'></i></summary>
+                <div class="code-block-wrapper" data-lang="json">
+                    <pre class="code-pre"><code class="language-json hljs" id="${quizContainerId}">${formattedCode}</code></pre>
+                </div>
+            </details>`;
+        }
+
+        // Intercept Frontend Code (HTML/CSS/JS) to render an interactive workspace banner
+        // (Individual banners removed here; handled at the message level below)
+
+        return `<div class="code-block-wrapper" data-lang="${block.lang || 'txt'}"><div class="code-header"><span class="code-lang-label">${langLabel}</span><div class="code-header-actions"><button class="copy-code-btn" onclick="window.copyCodeBlock(this)"><i class='bx bx-copy'></i> Copy</button><button class="download-code-btn" onclick="window.downloadCodeBlock(this)"><i class='bx bx-download'></i> Download</button></div></div><pre class="code-pre"><code class="${langClass} hljs">${formattedCode}</code></pre></div>`;
     });
+
+    // Final Post-Processing for Project Decision Card
+    const frontendLangs = ['html', 'css', 'javascript', 'js', 'jsx', 'react', 'typescript', 'ts'];
+    const hasFrontend = codeBlocks.some(b => b.lang && frontendLangs.includes(b.lang.toLowerCase()));
+
+    if (hasFrontend) {
+        const messageId = getStableId(text);
+        const isRevealed = window._revealedProjects?.has(messageId);
+        const decisionCardHtml = `
+        <div class="project-decision-card generating-pulse" style="display:${isRevealed ? 'none' : 'flex'}">
+            <div class="decision-header">
+                <div class="decision-icon">
+                    <i class="bx bx-code-alt"></i>
+                </div>
+                <div class="decision-title-area">
+                    <span class="decision-label">Interactive Workspace Ready</span>
+                    <span class="decision-sublabel">I've generated a web project for you. How would you like to proceed?</span>
+                </div>
+            </div>
+            <div class="decision-actions">
+                <button class="decision-btn secondary" onclick="if(window._revealedProjects) window._revealedProjects.add('${messageId}'); const card = this.closest('.project-decision-card'); card.style.display='none'; const ra = this.closest('.animated-message-container').querySelector('.project-code-reveal-area'); ra.style.display='block';">
+                    <i class='bx bx-code-curly'></i> Show Source
+                </button>
+                <button class="decision-btn primary" onclick="if(window._revealedProjects) window._revealedProjects.add('${messageId}'); const card = this.closest('.project-decision-card'); card.style.display='none'; window._triggerCanvasFrontend(document.getElementById('${messageId}-data').textContent)">
+                    <i class='bx bx-play-circle'></i> Preview in Workspace
+                </button>
+            </div>
+        </div>
+        <div id="${messageId}-data" style="display:none">${escapeHTML(text)}</div>`;
+        
+        // Wrap the existing HTML in a simple reveal area, with workspace banner at end
+        html = decisionCardHtml + `
+        <div class="project-code-reveal-area" style="display:${isRevealed ? 'block' : 'none'}">
+            ${html}
+            <div class="open-workspace-banner" onclick="window._triggerCanvasFrontend(document.getElementById('${messageId}-data').textContent)">
+                <div class="workspace-banner-icon"><i class='bx bx-play-circle'></i></div>
+                <div class="workspace-banner-text">
+                    <span class="workspace-banner-title">Open Interactive Preview</span>
+                    <span class="workspace-banner-sub">Launch this project in the Workspace <i class='bx bx-right-arrow-alt'></i></span>
+                </div>
+            </div>
+        </div>`;
+    }
 
     // restore math
     html = html.replace(/__MATH_BLOCK_(\d+)__/g, (_m, idx) => {

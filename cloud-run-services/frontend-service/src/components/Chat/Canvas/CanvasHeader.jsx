@@ -4,7 +4,7 @@ import React from 'react';
  * CanvasHeader component
  * Handles the workspace title, actions (close/expand), and tab navigation
  */
-const CanvasHeader = ({ title, onClose, type, activeTab, setActiveTab, onExport }) => {
+const CanvasHeader = ({ title, onClose, onToggleExpand, isExpanded, type, activeTab, setActiveTab, onExport }) => {
     return (
         <div className="canvas-workspace-header">
             <header className="canvas-header">
@@ -13,8 +13,8 @@ const CanvasHeader = ({ title, onClose, type, activeTab, setActiveTab, onExport 
                     <span className="canvas-title">{title}</span>
                 </div>
                 <div className="canvas-header-right">
-                    <button className="canvas-action-btn" title="Expand">
-                        <i className='bx bx-expand' />
+                    <button className="canvas-action-btn" title={isExpanded ? "Collapse" : "Expand"} onClick={onToggleExpand}>
+                        <i className={`bx ${isExpanded ? 'bx-collapse' : 'bx-expand'}`} />
                     </button>
                     <button className="canvas-close-btn" onClick={onClose} title="Close Canvas">
                         <i className='bx bx-x' />
@@ -40,7 +40,7 @@ const CanvasHeader = ({ title, onClose, type, activeTab, setActiveTab, onExport 
                     </div>
                     <div className="tabs-right">
                         <button className="canvas-tab-btn download-all" onClick={onExport}>
-                            <i className='bx bx-download' /> Export as ZIP
+                            <i className='bx bx-download' /> Export
                         </button>
                     </div>
                 </nav>

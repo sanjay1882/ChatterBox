@@ -15,51 +15,112 @@ import TreevitLoader from './TreevitLoader';
 import Canvas from './Canvas/Canvas';
 
 const extractFrontendFromText = (text) => {
+    if (!text) return null;
+
+    // Helper to validate frontend data
+    const validateFrontend = (blocks, hasHtmlTags) => {
+        const isFrontend = blocks.some(b => ['html', 'css', 'jsx', 'react', 'javascript', 'js'].includes(b.language)) || hasHtmlTags;
+        if (!isFrontend) return null;
+
+        const htmlBlock = blocks.find(b => b.language === 'html');
+        const cssBlock = blocks.find(b => b.language === 'css');
+        let combinedHtml = htmlBlock ? htmlBlock.code : '';
+        if (cssBlock) combinedHtml = `<style>${cssBlock.code}</style>\n${combinedHtml}`;
+        if (!combinedHtml && hasHtmlTags && blocks.length === 0) combinedHtml = text;
+
+        const fileCounts = {};
+        const files = blocks.map(b => {
+            const baseName = b.language === 'html' ? 'index' : b.language === 'css' ? 'style' : 'script';
+            const ext = b.language === 'html' ? 'html' : b.language === 'css' ? 'css' : 'js';
+            fileCounts[ext] = (fileCounts[ext] || 0) + 1;
+            const finalName = fileCounts[ext] === 1 ? `${baseName}.${ext}` : `${baseName}${fileCounts[ext]}.${ext}`;
+            return { name: finalName, code: b.code };
+        });
+
+        if (files.length === 0 && combinedHtml) {
+            files.push({ name: 'index.html', code: combinedHtml });
+        }
+
+        return { type: 'frontend', title: 'Frontend Workspace', content: { language: 'html', code: combinedHtml, files } };
+    };
+
+    // 1. Try parsing if it's already a structured object (e.g. from click)
+    try {
+        const data = JSON.parse(text.trim().replace(/^\s*```(?:json)?|```\s*$/gi, ''));
+        if (data.files || data.code) {
+            const blocks = Array.isArray(data.files) ? data.files.map(f => ({ language: f.name.split('.').pop(), code: f.code })) : 
+                           [{ language: data.language || 'html', code: data.code }];
+            const result = validateFrontend(blocks, false);
+            if (result) return result;
+        }
+    } catch (e) {}
+
+    // 2. Standard extraction logic
     const blocks = [];
     const regex = /```(html|css|javascript|js|jsx|react|typescript|ts)\s*([\s\S]*?)```/gi;
     let match;
     while ((match = regex.exec(text)) !== null) {
-        blocks.push({
-            language: match[1].toLowerCase(),
-            code: match[2].trim()
-        });
+        blocks.push({ language: match[1].toLowerCase(), code: match[2].trim() });
     }
-    
-    const isFrontend = blocks.some(b => ['html', 'css', 'jsx', 'react'].includes(b.language));
-    if (!isFrontend) return null;
+    const hasHtmlTags = /<[a-z][\s\S]*>/i.test(text);
+    return validateFrontend(blocks, hasHtmlTags);
+};
 
-    const htmlBlock = blocks.find(b => b.language === 'html');
-    const cssBlock = blocks.find(b => b.language === 'css');
-    
-    let combinedHtml = htmlBlock ? htmlBlock.code : '';
-    if (cssBlock) {
-        combinedHtml = `<style>${cssBlock.code}</style>\n${combinedHtml}`;
-    }
+const extractQuizFromText = (text) => {
+    if (!text) return null;
 
-    const fileCounts = {};
-    const files = blocks.map(b => {
-        const baseName = b.language === 'html' ? 'index' : 
-                         b.language === 'css' ? 'style' : 'script';
-        const ext = b.language === 'html' ? 'html' : 
-                    b.language === 'css' ? 'css' : 'js';
-        
-        fileCounts[ext] = (fileCounts[ext] || 0) + 1;
-        const finalName = fileCounts[ext] === 1 ? `${baseName}.${ext}` : `${baseName}${fileCounts[ext]}.${ext}`;
-        
-        return {
-            name: finalName,
-            code: b.code
-        };
-    });
-
-    return {
-        type: 'frontend',
-        title: 'Frontend Workspace',
-        content: {
-            html: combinedHtml || (blocks.length > 0 ? blocks[0].code : ''),
-            files
+    // Helper to clean and validate a potential quiz object
+    const validateQuiz = (data) => {
+        if (data && (data.type === 'quiz' || (Array.isArray(data.questions) && data.questions.length > 0))) {
+            return {
+                type: 'quiz',
+                title: data.title || 'Knowledge Check',
+                content: { title: data.title || 'Knowledge Check', questions: data.questions }
+            };
         }
+        return null;
     };
+
+    const tryParse = (str) => {
+        try {
+            const cleaned = str.trim()
+                .replace(/,\s*([\]}])/g, '$1') // remove trailing commas
+                .replace(/^\s*```(?:json)?|```\s*$/gi, ''); // remove backticks
+            const data = JSON.parse(cleaned);
+            return validateQuiz(data);
+        } catch (e) { return null; }
+    };
+
+    // 1. Try parsing the whole thing (catches raw JSON passed from click)
+    const directResult = tryParse(text);
+    if (directResult) return directResult;
+
+    // 2. Try code blocks
+    const codeBlockRegex = /```(?:json)?\s*([\s\S]*?)```/gi;
+    let match;
+    while ((match = codeBlockRegex.exec(text)) !== null) {
+        const result = tryParse(match[1]);
+        if (result) return result;
+    }
+
+    // 3. Fallback: Search for { ... "questions" ... } using a more robust approach
+    // We look for the first { that precedes "questions" and the last } that follows it
+    const qIndex = text.indexOf('"questions"');
+    if (qIndex !== -1) {
+        const firstBrace = text.lastIndexOf('{', qIndex);
+        const lastBrace = text.indexOf('}', qIndex); // Start looking for closing
+        if (firstBrace !== -1) {
+            // Try to find the matching closing brace by searching from the end
+            const potentialEnd = text.lastIndexOf('}');
+            if (potentialEnd > qIndex) {
+                const subStr = text.substring(firstBrace, potentialEnd + 1);
+                const result = tryParse(subStr);
+                if (result) return result;
+            }
+        }
+    }
+
+    return null;
 };
 
 const API_BASE_URL = import.meta.env.DEV ? '/api' : (import.meta.env.VITE_BACKEND_URL || 'http://127.0.0.1:3000');
@@ -416,6 +477,7 @@ export default function ChatApp({
 
     // ── Canvas state ──
     const [isCanvasOpen, setIsCanvasOpen] = useState(false);
+    const [canvasStates, setCanvasStates] = useState({}); // Mapping of sessionId -> isOpen
     const [canvasData, setCanvasData] = useState({
         type: 'code',
         title: 'Canvas Workspace',
@@ -424,6 +486,40 @@ export default function ChatApp({
             code: '// Welcome to the Treevit Canvas\n\nconst workspace = {\n    purpose: "Extended AI outputs",\n    features: [\n        "Code editing",\n        "HTML previews",\n        "Interactive quizzes",\n        "Rich documentation"\n    ],\n    responsive: true,\n    active: true\n};'
         }
     });
+
+    // ── Global Canvas Triggers ──────────────────────────────
+    useEffect(() => {
+        window._triggerCanvasQuiz = (text) => {
+            if (!text && canvasData?.type === 'quiz') {
+                setIsCanvasOpen(true);
+                return;
+            }
+            const quiz = extractQuizFromText(text);
+            if (quiz) {
+                setCanvasData(quiz);
+                setIsCanvasOpen(true);
+            } else {
+                showToast("Could not extract quiz data", "error");
+            }
+        };
+        window._triggerCanvasFrontend = (text) => {
+            if (!text && (canvasData?.type === 'frontend' || canvasData?.type === 'code')) {
+                setIsCanvasOpen(true);
+                return;
+            }
+            const frontend = extractFrontendFromText(text);
+            if (frontend) {
+                setCanvasData(frontend);
+                setIsCanvasOpen(true);
+            } else {
+                showToast("Could not extract frontend code", "error");
+            }
+        };
+        return () => {
+            delete window._triggerCanvasQuiz;
+            delete window._triggerCanvasFrontend;
+        };
+    }, [canvasData]); // Added canvasData to dependencies for accurate fallback
 
     const startNewChat = useCallback(() => {
         setAppMode('chat');
@@ -792,7 +888,12 @@ export default function ChatApp({
             const distFromBottom = box.scrollHeight - box.scrollTop - box.clientHeight;
             const scrolledUp = distFromBottom > 80;
             userScrolledUpRef.current = scrolledUp;
-            setShowScrollBtn(scrolledUp);
+            
+            // Optimization: Only update state when crossing the threshold
+            setShowScrollBtn(prev => {
+                if (prev !== scrolledUp) return scrolledUp;
+                return prev;
+            });
         };
         box.addEventListener('scroll', onScroll, { passive: true });
         return () => box.removeEventListener('scroll', onScroll);
@@ -940,6 +1041,25 @@ export default function ChatApp({
                         browserResult: (m.browserResult && m.browserResult.action) ? m.browserResult : null
                     };
                 }));
+
+                // Restore Canvas data if the last incoming message has a quiz/frontend
+                const lastIncoming = [...data.messages].reverse().find(m => m.role === 'model');
+                if (lastIncoming) {
+                    const lastText = lastIncoming.parts?.[0]?.text || '';
+                    const frontendRes = extractFrontendFromText(lastText);
+                    if (frontendRes) {
+                        setCanvasData(frontendRes);
+                    } else {
+                        const quizRes = extractQuizFromText(lastText);
+                        if (quizRes) {
+                            setCanvasData(quizRes);
+                        }
+                    }
+                    // Restore open state for this session
+                    if (data._id) {
+                        setIsCanvasOpen(!!canvasStates[data._id]);
+                    }
+                }
             }
         } catch (e) { console.error(e); }
         finally { 
@@ -1008,6 +1128,19 @@ export default function ChatApp({
         if (pastedContent) {
             finalMessageContent += (finalMessageContent ? "\n\n" : "") + `[Pasted Context]:\n${pastedContent}`;
         }
+
+        // Implicitly inject formatting commands to trigger Canvas functionality reliably
+        const textLower = text.toLowerCase();
+        const isQuizRequest = /\b(quiz|test me|mcq|multiple choice questions?)\b/.test(textLower);
+        if (isQuizRequest) {
+            finalMessageContent += '\n\n[SYSTEM INSTRUCTION: The user wants a quiz. You MUST respond ONLY with a single JSON code block (```json ... ```) formatting the quiz, and NO other conversational text. Required format: { "type": "quiz", "title": "Quiz Title", "questions": [ { "question": "Question text", "options": ["Option 1", "Option 2", "Option 3", "Option 4"], "answer": "Exact text of correct option", "explanation": "Why it is correct" } ] }]';
+        } else {
+            const isWebsiteRequest = /\b(generate website|create website|build a website|html template|landing page)\b/.test(textLower);
+            if (isWebsiteRequest) {
+                finalMessageContent += '\n\n[SYSTEM INSTRUCTION: The user wants to generate a website. You MUST format your response with the complete HTML, CSS, and JS enclosed in appropriate Markdown code blocks (```html, ```css, ```javascript) so they can be rendered in the Canvas preview. Include no more than a brief introductory sentence.]';
+            }
+        }
+
         let msgDisplayHtml = text;
         let hasHtml = false;
 
@@ -1120,7 +1253,12 @@ export default function ChatApp({
             const animateText = () => {
                 if (displayedText.length < fullText.length) {
                     const bufferSize = fullText.length - displayedText.length;
-                    const chunkSize = Math.max(1, Math.min(bufferSize, Math.ceil(bufferSize / STREAMING_SPEED_MODIFIER) + 1));
+                    // Detect if currently streaming inside a code block
+                    const openFences = (displayedText.match(/```/g) || []).length;
+                    const inCodeBlock = openFences % 2 !== 0;
+                    // Slower streaming inside code blocks for smooth readability, faster for prose
+                    const maxChunk = inCodeBlock ? 8 : 20;
+                    const chunkSize = Math.max(1, Math.min(maxChunk, Math.ceil(bufferSize / STREAMING_SPEED_MODIFIER) + 1));
                     displayedText += fullText.slice(displayedText.length, displayedText.length + chunkSize);
                     let html = formatStreamedText(displayedText, true);
 
@@ -1285,10 +1423,13 @@ export default function ChatApp({
                         }
                     }
 
-                    const canvasRes = extractFrontendFromText(fullText);
+                    const canvasRes = extractFrontendFromText(fullText) || extractQuizFromText(fullText);
                     if (canvasRes) {
                         setCanvasData(canvasRes);
                         setIsCanvasOpen(true);
+                        if (currentSessionId) {
+                            setCanvasStates(prev => ({ ...prev, [currentSessionId]: true }));
+                        }
                     }
 
                     // Final update to ensure content is properly stored (preserve live metadata)
@@ -1682,7 +1823,6 @@ export default function ChatApp({
                                             style={{ cursor: 'pointer', marginLeft: 15 }}
                                         />
 
-                                        {/* Canvas Toggle removed per user request */}
 
                                         {(sourceLinks.length > 0 || browserPreview) && (
                                             <button
@@ -2171,6 +2311,7 @@ export default function ChatApp({
                                     type={canvasData.type}
                                     title={canvasData.title}
                                     content={canvasData.content}
+                                    onSendMessage={(text) => handleSend(text)}
                                 />
                             </div>
                         )}
@@ -3036,7 +3177,7 @@ export default function ChatApp({
                     </div>
                 )
             }
-            }
+            
         </div>
     );
 }
