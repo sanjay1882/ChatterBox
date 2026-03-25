@@ -94,7 +94,7 @@ export default function ChatInput({ onSend, isLoading, onStop }) {
                             onClick={() => setWebSearch(p => !p)}
                             title={webSearch ? 'Web search ON' : 'Web search OFF'}
                         >
-                            <i className='bx bxl-google' />
+                            <i className='bx bx-globe' />
                         </button>
 
                         {/* Actions popup */}

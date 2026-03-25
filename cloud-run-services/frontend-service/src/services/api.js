@@ -1,7 +1,7 @@
 const API_BASE_URL = import.meta.env.DEV ? '/api' : (import.meta.env.VITE_BACKEND_URL || 'http://127.0.0.1:3000');
 
 // ── Stream Chat ─────────────────────────────────────────────────────────────
-export async function streamChat({ formData, token, onChunk, onSessionId, onEnd, onError, onSources }) {
+export async function streamChat({ formData, token, onChunk, onSessionId, onEnd, onError, onSources, onBrowserResult, onAppCommand, onImages }) {
     try {
         const headers = {};
         if (token && token !== 'guest') headers['Authorization'] = `Bearer ${token}`;
@@ -62,8 +62,20 @@ export async function streamChat({ formData, token, onChunk, onSessionId, onEnd,
                     onSessionId?.(raw);
                     currentEvent = 'message'; continue;
                 }
+                if (currentEvent === 'browser_result') {
+                    try { onBrowserResult?.(JSON.parse(raw)); } catch { }
+                    currentEvent = 'message'; continue;
+                }
+                if (currentEvent === 'app_command') {
+                    try { onAppCommand?.(JSON.parse(raw)); } catch { }
+                    currentEvent = 'message'; continue;
+                }
+                if (currentEvent === 'images') {
+                    try { onImages?.(JSON.parse(raw)); } catch { }
+                    currentEvent = 'message'; continue;
+                }
                 if (currentEvent === 'message_ids') {
-                    currentEvent = 'message'; continue; // ignore message IDs
+                    currentEvent = 'message'; continue;
                 }
 
                 try {

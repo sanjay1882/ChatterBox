@@ -44,6 +44,7 @@ export default function Sidebar({
     onOpenGallery,
     navigate,
     location,
+    mode,
 }) {
     const isResizing = React.useRef(false);
 
@@ -77,10 +78,10 @@ export default function Sidebar({
             <div className="logo-details">
                 {sidebarOpen && (
                     <img 
-                        src="/assets/treevit-master-transparent-1024.png" 
+                        src={mode === 'dark' ? "/assets/treevit-personal-dark-512.png" : "/assets/treevit-master-transparent-1024.png"} 
                         alt="Treevit" 
                         className="sidebar-logo-img" 
-                        style={{ width: '30px', height: '30px', objectFit: 'contain', marginRight: '10px' }}
+                        style={{ width: '75px', height: '75px', objectFit: 'contain', marginRight: '10px' }}
                     />
                 )}
                 <div 
@@ -126,11 +127,12 @@ export default function Sidebar({
                 {/* Gallery - Hidden in collapsed */}
                 {sidebarOpen && (
                     <li>
-                        <a
-                            href="#"
+                        <Link
+                            to="/gallery"
                             id="gallery-btn"
-                            onClick={e => { e.preventDefault(); onOpenGallery?.(); if(window.innerWidth <= 768) setSidebarOpen(false); }}
-                            data-tooltip="Gallery"
+                            className={location.pathname === '/gallery' ? 'active' : ''}
+                            onClick={() => { if(window.innerWidth <= 768) setSidebarOpen(false); }}
+                            data-tip="Gallery"
                         >
                             <i className='bx bx-images' />
                             <span className="links_name">
@@ -139,7 +141,7 @@ export default function Sidebar({
                                     <span className="gallery-badge">{galleryCount}</span>
                                 )}
                             </span>
-                        </a>
+                        </Link>
                     </li>
                 )}
 

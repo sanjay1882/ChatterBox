@@ -9,6 +9,7 @@
     flex-direction: column;
     align-items: stretch;
     gap: 6px;
+    position: relative; /* Anchor for scroll-to-bottom button */
 }
 
 .input-box {
@@ -105,28 +106,28 @@
     width: 34px !important;
     height: 34px !important;
     border-radius: 50% !important; /* Circular like Gemini */
-    background: #111111 !important; /* Sleek black */
-    color: #ffffff !important;
+    background: var(--accent) !important;
+    color: var(--bg-primary) !important;
     border: none !important;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.2s;
+    transition: transform 0.2s, background 0.2s;
 }
 
 .send-btn i {
-    color: #ffffff !important;
+    color: var(--bg-primary) !important;
 }
 
 .send-btn:hover:not(:disabled) {
     transform: scale(1.08);
-    background: #333333 !important; /* Subtle dark hover */
+    background: var(--accent-light) !important;
 }
 
 .send-btn:disabled {
     background: transparent !important;
     color: var(--text-disabled) !important;
-    opacity: 0.5;
+    opacity: 0.3;
 }
 
 /* File & Pasted Text Chips — Claude style */
@@ -192,7 +193,7 @@
 #pasted-text-preview {
     border-left: 3px solid var(--accent) !important;
     border-radius: 8px 12px 12px 8px !important;
-    background: color-mix(in srgb, var(--accent) 6%, var(--sarvam-bg-body)) !important;
+    background: var(--bg-hover) !important;
 }
 
 /* Disclaimer text — centered below the input box */
@@ -205,3 +206,125 @@
     opacity: 0.7;
     line-height: 1.4;
 }
+
+/* Scroll to Bottom FAB */
+.scroll-to-bottom-btn {
+    position: absolute;
+    bottom: calc(100% + 12px);
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    width: 36px;
+    height: 36px;
+    border-radius: 50% !important;
+    background: var(--sarvam-bg-surface, #ffffff) !important;
+    border: 1px solid var(--sarvam-border, #e5e7eb) !important;
+    color: var(--sarvam-text-main, #1f1f1f) !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 100;
+}
+
+.scroll-to-bottom-btn.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+.scroll-to-bottom-btn:hover {
+    background: var(--sarvam-bg-elevated, #f0f4f9) !important;
+    transform: translateX(-50%) translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.16);
+}
+
+.scroll-to-bottom-btn i {
+    font-size: 24px;
+}
+
+/* 📱 Responsive Mobile Adjustments */
+@media (max-width: 768px) {
+    .input-area {
+        padding: 0 8px 12px 8px; /* Reduce horizontal padding */
+        max-width: 100%; /* Ensure full width on mobile */
+        gap: 4px;
+    }
+
+    .input-box {
+        border-radius: 20px !important; /* Slightly less rounded for better fit */
+        padding: 10px 12px 6px 12px !important;
+    }
+
+    .input-box textarea {
+        font-size: 15px !important; /* Slightly smaller text for mobile */
+        padding: 2px 4px !important;
+    }
+
+    .input-toolbar {
+        margin-top: 4px;
+    }
+
+    .model-pill {
+        display: none !important; /* Hide model pill on mobile */
+    }
+
+    .toolbar-icon-btn, .mic-btn {
+        width: 32px;
+        height: 32px;
+    }
+
+
+    .model-pill {
+        padding: 3px 8px !important;
+        font-size: 11px !important;
+        border-radius: 10px !important;
+    }
+
+    .send-btn {
+        width: 32px !important;
+        height: 32px !important;
+    }
+
+    .chat-disclaimer {
+        font-size: 10px;
+        margin-top: 2px;
+    }
+
+    /* Adjust FAB for mobile */
+    .scroll-to-bottom-btn {
+        width: 32px;
+        height: 32px;
+        bottom: calc(100% + 8px);
+    }
+    
+    .scroll-to-bottom-btn i {
+        font-size: 20px;
+    }
+
+    /* Action Menu Mobile Enhancements */
+    .input-actions-menu {
+        width: 220px !important;
+        padding: 12px !important;
+        border-radius: 20px !important;
+    }
+
+    .menu-item {
+        margin-bottom: 8px !important;
+    }
+
+    .menu-item.mobile-only-item {
+        display: flex !important;
+    }
+}
+
+.menu-item.mobile-only-item {
+    display: none !important;
+}
+
+
+
+

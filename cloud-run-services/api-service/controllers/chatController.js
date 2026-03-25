@@ -14,6 +14,62 @@ function nowIST() {
     });
 }
 
+const IMAGE_TRIGGER_KEYWORDS = [
+    "show", "show me", "images", "pictures", "photos",
+    "look like", "what does it look like", "visual",
+    "see", "display", "gallery", "view",
+    "places", "tourist", "destination", "location",
+    "city", "country", "beach", "temple", "mountain",
+    "park", "landmark", "travel", "visit",
+    "who is", "person", "celebrity", "actor", "actress",
+    "player", "leader", "appearance", "face", "looks",
+    "food", "dish", "meal", "cuisine",
+    "breakfast", "lunch", "dinner", "snack",
+    "dessert", "street food",
+    "types", "styles", "design", "model", "variant",
+    "clothes", "shoes", "cars", "bike",
+    "phone", "laptop", "furniture",
+    "animal", "bird", "dog", "cat", "breed",
+    "wildlife", "nature", "flower", "tree"
+];
+
+const NO_IMAGE_KEYWORDS = [
+    "code", "programming", "function", "api",
+    "error", "debug", "fix", "algorithm",
+    "math", "solve", "equation",
+    "definition", "meaning", "theory"
+];
+
+// Detect if query is about a person, place, or visual topic
+function shouldFetchImages(message) {
+    const lower = message.toLowerCase().trim();
+
+    // Block non-visual topics immediately
+    if (NO_IMAGE_KEYWORDS.some(kw => lower.includes(kw))) {
+        return false;
+    }
+
+    // Trigger visual topics based on keywords
+    if (IMAGE_TRIGGER_KEYWORDS.some(kw => lower.includes(kw)) ||
+        /^tell me about /i.test(lower) || 
+        /^history of /i.test(lower) || 
+        /^what (is|are) /i.test(lower) || 
+        /^describe /i.test(lower)) {
+        return true;
+    }
+
+    return false;
+}
+
+// Extract a clean search keyword from user message
+function extractImageQuery(message) {
+    return message
+        .replace(/^(who is|who was|tell me about|what is|what are|show me|describe|where is|history of|about)/i, '')
+        .replace(/[?!.,]/g, '')
+        .trim()
+        .slice(0, 100);
+}
+
 
 function extractFirstHttpUrl(text = "") {
     const matches = text.match(/https?:\/\/[^\s)\]>"']+/gi);
@@ -568,9 +624,17 @@ async function executeBrowserCommand({ command, userMessage, sessionId, stateKey
             return { message: "Please provide what you want to search." };
         }
 
+        const engine = req.body.searchEngine || 'duckduckgo';
         let results = [];
         try {
-            results = await scraper.googleSearch(query, 8);
+            if (engine === 'duckduckgo') {
+                const ddgResults = await scraper.duckDuckGoSearch(query, 8);
+                // Filter out the fallback generic ddg link if we want actual results 
+                results = ddgResults.filter(r => r.link && !r.link.startsWith("https://duckduckgo.com/?q="));
+                if (results.length === 0) throw new Error("No specific results returned by DDG API");
+            } else {
+                results = await scraper.googleSearch(query, 8);
+            }
         } catch {
             const fallbackUrl = "https://duckduckgo.com/?q=" + encodeURIComponent(query);
             const fallbackOpenResult = await runBrowserAutomationTask({
@@ -769,7 +833,8 @@ export const streamChat = async (req, res) => {
         creativityLevel,
         interests,
         customRules,
-        agentId
+        agentId,
+        searchEngine = "duckduckgo"
     } = req.body;
 
     const isTemporary = incomingIsTemporary === 'true' || incomingIsTemporary === true;
@@ -978,25 +1043,28 @@ export const streamChat = async (req, res) => {
                     title: openResult.title || ""
                 };
 
+                sessionBrowserResult = openContext;
                 contextBlock += `\nBrowser-Open-Action:\n${JSON.stringify(openContext)}\n`;
                 res.write(`event: browser_result\ndata: ${JSON.stringify(openContext)}\n\n`);
             } catch (openErr) {
                 openErrorMessage = openErr.message || "Failed to open target";
                 console.error("Browser open task failed:", openErrorMessage);
-                res.write(`event: browser_result\ndata: ${JSON.stringify({ action: "open", error: openErrorMessage, previewUrl: openTargetUrl, url: openTargetUrl })}\n\n`);
+                sessionBrowserResult = { action: "open", error: openErrorMessage, previewUrl: openTargetUrl, url: openTargetUrl };
+                res.write(`event: browser_result\ndata: ${JSON.stringify(sessionBrowserResult)}\n\n`);
             }
         }
 
         if (isWebSearchEnabled && !openTargetUrl) {
             try {
-                const data = await scraper.scrapeQuery(userMessage);
-                contextBlock += `\nWeb-Scraped-Data:\n${JSON.stringify(data)}\n`;
-                const sources = (data.results || []).map(r => ({ 
+                const data = await scraper.scrapeQuery(userMessage, searchEngine);
+                contextBlock += `\nWeb-Scraped-Data:\n${JSON.stringify({ query: data.query, results: data.results })}\n`;
+                sessionSources = (data.allSources || data.results || []).map(r => ({ 
                     title: r.title, 
                     link: r.link,
                     domain: r.domain || "" 
                 }));
-                res.write(`event: sources\ndata: ${JSON.stringify(sources)}\n\n`);
+                res.write(`event: sources\ndata: ${JSON.stringify(sessionSources)}\n\n`);
+
 
                 const explicitUrl = extractFirstHttpUrl(userMessage);
                 if (explicitUrl) {
@@ -1069,6 +1137,15 @@ export const streamChat = async (req, res) => {
             parts: [{ text: userMessage }]
         });
 
+        // Kick off image fetch IN PARALLEL with LLM streaming so it's ready by the time streaming ends
+        const imagePromise = shouldFetchImages(userMessage)
+            ? scraper.fetchOpenverseImages(extractImageQuery(userMessage), 4).catch(() => [])
+            : Promise.resolve([]);
+
+        let sessionImages = []; // Local cache to save to DB later
+        let sessionSources = []; // Local cache to save to DB later
+        let sessionBrowserResult = null; // Local cache to save to DB later
+
         if (finalModel.includes("claude")) {
             let claudeMessages = history
                 .filter(msg => msg.role === 'user' || msg.role === 'model')
@@ -1123,6 +1200,14 @@ export const streamChat = async (req, res) => {
                 max_tokens: 8192,
                 messages: claudeMessages,
             });
+
+            // Emit images as soon as they are ready
+            try {
+                sessionImages = await imagePromise;
+                if (sessionImages && sessionImages.length > 0) {
+                    res.write(`event: images\ndata: ${JSON.stringify(sessionImages)}\n\n`);
+                }
+            } catch (imgErr) { console.error('Image fetch error:', imgErr.message); }
 
             stream.on('text', (text) => {
                 responseText += text;
@@ -1195,6 +1280,14 @@ export const streamChat = async (req, res) => {
 
             const completion = await groq.chat.completions.create(completionOptions);
 
+            // Emit images as soon as they are ready (likely now or very soon)
+            try {
+                sessionImages = await imagePromise;
+                if (sessionImages && sessionImages.length > 0) {
+                    res.write(`event: images\ndata: ${JSON.stringify(sessionImages)}\n\n`);
+                }
+            } catch (imgErr) { console.error('Image fetch error:', imgErr.message); }
+
             for await (const chunk of completion) {
                 const text = chunk.choices[0]?.delta?.content || '';
                 if (text) {
@@ -1208,6 +1301,14 @@ export const streamChat = async (req, res) => {
             const chatSession = model.startChat({ history: history });
             const stream = await chatSession.sendMessageStream(geminiParts);
 
+            // Emit images as soon as they are ready
+            try {
+                sessionImages = await imagePromise;
+                if (sessionImages && sessionImages.length > 0) {
+                    res.write(`event: images\ndata: ${JSON.stringify(sessionImages)}\n\n`);
+                }
+            } catch (imgErr) { console.error('Image fetch error:', imgErr.message); }
+
             for await (const chunk of stream.stream) {
                 const text = typeof chunk.text === "function" ? chunk.text() : chunk.text || "";
                 responseText += text;
@@ -1215,10 +1316,16 @@ export const streamChat = async (req, res) => {
             }
         }
 
-        sessionDoc.messages.push({
+        const newMessage = {
             role: "model",
             parts: [{ text: responseText }]
-        });
+        };
+
+        if (sessionImages && sessionImages.length > 0) newMessage.images = sessionImages;
+        if (sessionSources && sessionSources.length > 0) newMessage.sources = sessionSources;
+        if (sessionBrowserResult) newMessage.browserResult = sessionBrowserResult;
+
+        sessionDoc.messages.push(newMessage);
 
         await sessionDoc.save();
         console.log(`Chat saved to session ${sessionId}`);

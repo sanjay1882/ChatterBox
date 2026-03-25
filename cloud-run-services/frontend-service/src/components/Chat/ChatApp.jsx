@@ -13,8 +13,6 @@ import showToast from '../../utils/toast';
 import '../../utils/windowHandlers';
 import TreevitLoader from './TreevitLoader';
 import Canvas from './Canvas/Canvas';
-import PrivacyPolicy from '../Legal/PrivacyPolicy';
-import TermsOfService from '../Legal/TermsOfService';
 
 const extractFrontendFromText = (text) => {
     const blocks = [];
@@ -146,12 +144,12 @@ const TypewriterText = ({ text, speed = 42 }) => {
 };
 
 const SUGGESTIONS = [
-    { id: 'sugg', icon: 'bx-code-block', title: 'Debug My Code', text: "Here's a bug I'm stuck on — can you find the issue and explain what went wrong?", accent: 'linear-gradient(135deg, #6366f1, #818cf8)' },
-    { id: 'sugg2', icon: 'bx-pen', title: 'Polish My Writing', text: 'Rewrite this paragraph to sound more professional and concise, while keeping the tone friendly.', accent: 'linear-gradient(135deg, #10b981, #34d399)' },
-    { id: 'sugg3', icon: 'bx-bar-chart-alt-2', title: 'Explain This Data', text: 'Analyze these numbers and tell me the key trends, outliers, and what actions I should take.', accent: 'linear-gradient(135deg, #f59e0b, #fbbf24)' },
-    { id: 'sugg4', icon: 'bx-brain', title: 'Brainstorm Ideas', text: 'Give me 10 creative, unconventional ideas for my project — think outside the box.', accent: 'linear-gradient(135deg, #ec4899, #f472b6)' },
-    { id: 'sugg5', icon: 'bx-book-open', title: 'Summarize This', text: 'Summarize this article or document into 5 bullet points I can read in 30 seconds.', accent: 'linear-gradient(135deg, #3b82f6, #60a5fa)' },
-    { id: 'sugg6', icon: 'bx-message-square-dots', title: 'Write My Email', text: 'Draft a professional follow-up email after a meeting — firm but polite, keep it short.', accent: 'linear-gradient(135deg, #8b5cf6, #a78bfa)' },
+    { id: 'sugg', icon: 'bx-code-block', title: 'Debug My Code', text: "Here's a bug I'm stuck on — can you find the issue and explain what went wrong?", accent: 'linear-gradient(135deg, #1e293b, #334155)' },
+    { id: 'sugg2', icon: 'bx-pen', title: 'Polish My Writing', text: 'Rewrite this paragraph to sound more professional and concise, while keeping the tone friendly.', accent: 'linear-gradient(135deg, #1e293b, #334155)' },
+    { id: 'sugg3', icon: 'bx-bar-chart-alt-2', title: 'Explain This Data', text: 'Analyze these numbers and tell me the key trends, outliers, and what actions I should take.', accent: 'linear-gradient(135deg, #1e293b, #334155)' },
+    { id: 'sugg4', icon: 'bx-brain', title: 'Brainstorm Ideas', text: 'Give me 10 creative, unconventional ideas for my project — think outside the box.', accent: 'linear-gradient(135deg, #1e293b, #334155)' },
+    { id: 'sugg5', icon: 'bx-book-open', title: 'Summarize This', text: 'Summarize this article or document into 5 bullet points I can read in 30 seconds.', accent: 'linear-gradient(135deg, #1e293b, #334155)' },
+    { id: 'sugg6', icon: 'bx-message-square-dots', title: 'Write My Email', text: 'Draft a professional follow-up email after a meeting — firm but polite, keep it short.', accent: 'linear-gradient(135deg, #1e293b, #334155)' },
 ];
 
 
@@ -272,11 +270,10 @@ const CustomSelect = ({ id, value, onChange, options, placeholder }) => {
         </div>
     );
 };
-
 export default function ChatApp({ 
     initialAppsOpen = false, 
     initialSettingsOpen = false, 
-    initialLegalOpen = null,
+    initialGalleryOpen = false,
     upgradeSuccess = false
 }) {
     const { sessionId, agentId, shareId } = useParams();
@@ -284,7 +281,7 @@ export default function ChatApp({
     const location = useLocation();
 
     const [showBrowserPanel, setShowBrowserPanel] = useState(true);
-    const [browserWidth, setBrowserWidth] = useState(Math.min(420, window.innerWidth * 0.35));
+    const [browserWidth, setBrowserWidth] = useState(window.innerWidth * 0.58);
     const [isResizing, setIsResizing] = useState(false);
 
     // Resize logic for browser panel
@@ -300,8 +297,8 @@ export default function ChatApp({
     const resize = useCallback((e) => {
         if (isResizing) {
             const newWidth = window.innerWidth - e.clientX;
-            // Limit width between 300px and 70% of viewport
-            if (newWidth > 300 && newWidth < window.innerWidth * 0.7) {
+            // Limit width between 300px and 85% of viewport
+            if (newWidth > 300 && newWidth < window.innerWidth * 0.85) {
                 setBrowserWidth(newWidth);
             }
         }
@@ -359,6 +356,7 @@ export default function ChatApp({
     const [sourceLinks, setSourceLinks] = useState([]);
     const [browserPreview, setBrowserPreview] = useState(null);
     const [showEmbeddedPreview, setShowEmbeddedPreview] = useState(false);
+    const [responseImages, setResponseImages] = useState([]); // Openverse images
 
     // ── Input state ─────────────────────────────────────────────
     const [appMode, setAppMode] = useState('chat');
@@ -396,7 +394,7 @@ export default function ChatApp({
         userGender: '', userAge: '', userLanguage: '', userCulture: '',
         userDefaultModel: 'gemini-2.0-flash', userWritingStyle: '', userCreativity: '',
         userInterests: '', userCustomRules: '', userVoice: '',
-        heatwaveMode: false
+        heatwaveMode: false, searchEngine: 'duckduckgo'
     };
 
     const [settings, setSettings] = useState(DEFAULT_SETTINGS);
@@ -418,8 +416,6 @@ export default function ChatApp({
 
     // ── Canvas state ──
     const [isCanvasOpen, setIsCanvasOpen] = useState(false);
-    const [legalOpen, setLegalOpen] = useState(false);
-    const [legalTab, setLegalTab] = useState('privacy'); // privacy | terms
     const [canvasData, setCanvasData] = useState({
         type: 'code',
         title: 'Canvas Workspace',
@@ -490,13 +486,12 @@ export default function ChatApp({
             setSettingsOpen(false);
         }
 
-        if (initialLegalOpen) {
-            setLegalOpen(true);
-            setLegalTab(initialLegalOpen === 'terms' ? 'terms' : 'privacy');
+        if (initialGalleryOpen) {
+            setGalleryOpen(true);
         } else {
-            setLegalOpen(false);
+            setGalleryOpen(false);
         }
-    }, [initialAppsOpen, initialSettingsOpen, initialLegalOpen, settings, theme, mode]);
+    }, [initialAppsOpen, initialSettingsOpen, initialGalleryOpen, settings, theme, mode]);
 
     useEffect(() => {
         // dark = default (no class), light = data-theme="light"
@@ -652,8 +647,8 @@ export default function ChatApp({
     };
 
     const validateSettings = (data) => {
-        if (!data.userLanguage?.trim()) return "Mother Tongue / Primary Language cannot be empty.";
-        if (!data.userCulture?.trim()) return "Cultural Background cannot be empty.";
+        // Optional validation here if strictly required for backend.
+        // Removing required checks to prevent saving blocks on generic settings.
         return null;
     };
 
@@ -693,6 +688,7 @@ export default function ChatApp({
             tempSettings.userCustomRules !== settings.userCustomRules ||
             tempSettings.userVoice !== settings.userVoice ||
             tempSettings.heatwaveMode !== settings.heatwaveMode ||
+            tempSettings.searchEngine !== settings.searchEngine ||
             tempSettings.theme !== theme ||
             tempSettings.mode !== mode
         );
@@ -714,7 +710,8 @@ export default function ChatApp({
         const resetMap = {
             general: ['userGender', 'userAge', 'userLanguage', 'userCulture'],
             ai: ['userDefaultModel', 'userWritingStyle', 'userCreativity', 'userInterests', 'userCustomRules', 'heatwaveMode'],
-            voice: ['userVoice']
+            voice: ['userVoice'],
+            customize: ['searchEngine']
         };
 
         const fieldsToReset = resetMap[section] || [];
@@ -777,6 +774,8 @@ export default function ChatApp({
     const textareaRef = useRef(null);
     const fileInputRef = useRef(null);
     const pastedTextRef = useRef(null);
+    const actionsMenuRef = useRef(null);
+    const modelOptionsRef = useRef(null);
     const ignoreNextSessionLoadRef = useRef(false);
     const openPreviewSetRef = useRef(false);
 
@@ -797,8 +796,29 @@ export default function ChatApp({
         };
         box.addEventListener('scroll', onScroll, { passive: true });
         return () => box.removeEventListener('scroll', onScroll);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []); // mount once — chatboxRef is stable
+    }, []);
+
+    // ── Robust Click-Away for Menus ──────────────────────────────
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            // Check Actions Menu
+            if (showActionsMenu) {
+                const isInside = actionsMenuRef.current?.contains(event.target) || event.target.closest('#plus-btn');
+                if (!isInside) setShowActionsMenu(false);
+            }
+            // Check Model Options
+            if (showModelOptions) {
+                const isInside = modelOptionsRef.current?.contains(event.target) || event.target.closest('.model-options') || event.target.closest('.model-pill');
+                if (!isInside) setShowModelOptions(false);
+            }
+        };
+
+        if (showActionsMenu || showModelOptions) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+        
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [showActionsMenu, showModelOptions]);
 
     // ── Auto resize textarea ───────────────────────────────────
     useEffect(() => {
@@ -914,7 +934,10 @@ export default function ChatApp({
                         editableText: role === 'outgoing' ? getEditableUserText(rawText) : rawText,
                         html,
                         isHtml: role === 'outgoing' && html !== rawText,
-                        loading: false
+                        loading: false,
+                        images: m.images || [],
+                        sources: m.sources || [],
+                        browserResult: (m.browserResult && m.browserResult.action) ? m.browserResult : null
                     };
                 }));
             }
@@ -972,6 +995,7 @@ export default function ChatApp({
         setSourceLinks([]);
         setBrowserPreview(null);
         setShowEmbeddedPreview(false);
+        setResponseImages([]);
         openPreviewSetRef.current = false;
         // Re-engage auto-scroll for the new response
         userScrolledUpRef.current = false;
@@ -1059,6 +1083,7 @@ export default function ChatApp({
         formData.append('model', modelObj.gemini);
 
         formData.append('webSearch', webSearch ? 'true' : 'false');
+        formData.append('searchEngine', settings.searchEngine || 'duckduckgo');
         formData.append('isTemporary', isTemporary ? 'true' : 'false');
         if (currentSessionId) formData.append('sessionId', currentSessionId);
 
@@ -1144,6 +1169,8 @@ export default function ChatApp({
                         const openMatch = fullText.match(/Opened in Browser View:\s*(https?:\/\/[^\s<]+)/i);
                         if (openMatch?.[1]) {
                             setBrowserPreview({ action: 'open', previewUrl: openMatch[1], url: openMatch[1], title: '' });
+                            setBrowserWidth(window.innerWidth * 0.58);
+                            setShowBrowserPanel(true);
                             openPreviewSetRef.current = true;
                         }
                     }
@@ -1163,12 +1190,28 @@ export default function ChatApp({
                 onSources: (sources) => {
                     if (Array.isArray(sources)) {
                         setSourceLinks(sources);
+                        setMessages(p => p.map(m =>
+                            m.id === aiMsgId ? { ...m, sources } : m
+                        ));
                     }
                 },
                 onBrowserResult: (result) => {
                     if (result && typeof result === 'object') {
                         setBrowserPreview(result);
+                        setBrowserWidth(window.innerWidth * 0.58);
+                        setShowBrowserPanel(true);
                         setShowEmbeddedPreview(false);
+                        setMessages(p => p.map(m =>
+                            m.id === aiMsgId ? { ...m, browserResult: result } : m
+                        ));
+                    }
+                },
+                onImages: (images) => {
+                    if (Array.isArray(images) && images.length > 0) {
+                        setResponseImages(images);
+                        setMessages(p => p.map(m =>
+                            m.id === aiMsgId ? { ...m, images } : m
+                        ));
                     }
                 },
                 onAppCommand: (result) => {
@@ -1236,6 +1279,8 @@ export default function ChatApp({
                         const openMatch = fullText.match(/Opened in Browser View:\s*(https?:\/\/[^\s<]+)/i);
                         if (openMatch?.[1]) {
                             setBrowserPreview({ action: 'open', previewUrl: openMatch[1], url: openMatch[1], title: '' });
+                            setBrowserWidth(window.innerWidth * 0.58);
+                            setShowBrowserPanel(true);
                             openPreviewSetRef.current = true;
                         }
                     }
@@ -1246,10 +1291,18 @@ export default function ChatApp({
                         setIsCanvasOpen(true);
                     }
 
-                    // Final update to ensure content is properly stored
+                    // Final update to ensure content is properly stored (preserve live metadata)
                     const html = formatStreamedText(fullText, false);
                     setMessages(p => p.map(m =>
-                        m.id === aiMsgId ? { ...m, content: fullText, html, loading: false } : m
+                        m.id === aiMsgId ? { 
+                            ...m, 
+                            content: fullText, 
+                            html, 
+                            loading: false, 
+                            images: m.images || [],
+                            sources: m.sources || [],
+                            browserResult: m.browserResult || null 
+                        } : m
                     ));
                 },
                 onError: (err) => {
@@ -1513,6 +1566,7 @@ export default function ChatApp({
                 onOpenLegal={() => setLegalOpen(true)}
                 isCanvasOpen={isCanvasOpen}
                 setIsCanvasOpen={setIsCanvasOpen}
+                mode={mode}
             />
 
             {/* Mobile Overlay */}
@@ -1598,27 +1652,29 @@ export default function ChatApp({
                                 <div className="right-heder-bar" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                                 {!isReadOnly && (
                                     <>
-                                        <button
-                                            id="temp-chat-btn"
-                                            className={`temp-chat-btn${isTemporary ? ' active' : ''}`}
-                                            title={isTemporary ? 'Temporary chat ON — messages won\'t be saved. Click to disable.' : 'Enable temporary chat — messages won\'t be saved'}
-                                            onClick={() => {
-                                                const turningOn = !isTemporary;
-                                                setIsTemporary(turningOn);
-                                                if (turningOn) {
-                                                    // Only start fresh if there's an active chat
-                                                    if (messages.length > 0 || currentSessionId) {
-                                                        startNewChat();
+                                        {messages.length === 0 && (
+                                            <button
+                                                id="temp-chat-btn"
+                                                className={`temp-chat-btn${isTemporary ? ' active' : ''}`}
+                                                title={isTemporary ? 'Temporary chat ON — messages won\'t be saved. Click to disable.' : 'Enable temporary chat — messages won\'t be saved'}
+                                                onClick={() => {
+                                                    const turningOn = !isTemporary;
+                                                    setIsTemporary(turningOn);
+                                                    if (turningOn) {
+                                                        // Only start fresh if there's an active chat
+                                                        if (messages.length > 0 || currentSessionId) {
+                                                            startNewChat();
+                                                        }
+                                                        showToast('Temporary chat enabled — messages won\'t be saved');
+                                                    } else {
+                                                        showToast('Temporary chat disabled — messages will be saved');
                                                     }
-                                                    showToast('Temporary chat enabled — messages won\'t be saved');
-                                                } else {
-                                                    showToast('Temporary chat disabled — messages will be saved');
-                                                }
-                                            }}
-                                        >
-                                            <i className={`bx ${isTemporary ? 'bx-eye' : 'bx-eye-slash'}`} />
-                                            <span>{isTemporary ? 'Temp' : 'Temp'}</span>
-                                        </button>
+                                                }}
+                                            >
+                                                <i className={`bx ${isTemporary ? 'bx-eye' : 'bx-eye-slash'}`} />
+                                                <span>{isTemporary ? 'Temp' : 'Temp'}</span>
+                                            </button>
+                                        )}
                                         <i
                                             className='bx bx-forward-big'
                                             onClick={handleShareSession}
@@ -1707,10 +1763,34 @@ export default function ChatApp({
                                             )
                                         ) : (
                                             <>
+                                                {/* Openverse Image Gallery (at the TOP) */}
+                                                {!msg.loading && msg.images && msg.images.length > 0 && (
+                                                    <div className="response-images-grid">
+                                                        {msg.images.map((img, i) => (
+                                                            <a
+                                                                key={i}
+                                                                href={img.source}
+                                                                target="_blank"
+                                                                rel="noreferrer"
+                                                                className="response-image-card"
+                                                            >
+                                                                <img
+                                                                    src={img.url}
+                                                                    alt={img.title}
+                                                                    onError={e => e.target.closest('.response-image-card').style.display='none'}
+                                                                />
+                                                                <div className="response-image-info">
+                                                                    <span className="response-image-title">{img.title || 'Image'}</span>
+                                                                    {img.creator && <span className="response-image-credit">© {img.creator}</span>}
+                                                                </div>
+                                                            </a>
+                                                        ))}
+                                                    </div>
+                                                )}
+
                                                 <div className="chat-content" style={msg.loading && !msg.html ? { background: 'none', padding: '0', borderRadius: '0' } : {}}>
                                                     <AnimatedMessage html={msg.html} message={msg.content} isLoading={msg.loading} />
                                                 </div>
-                                                {/* Translation Result */}
                                                 {translations[msg.id] && (
                                                     <div className="translation-result">
                                                         <div className="translation-header">
@@ -1725,6 +1805,24 @@ export default function ChatApp({
                                                             }}></i>
                                                         </div>
                                                         <MarkdownContent className="translation-content" html={translations[msg.id].html} />
+                                                    </div>
+                                                )}
+
+                                                {/* Sources link row for persistence */}
+                                                {!msg.loading && msg.sources && msg.sources.length > 0 && (
+                                                    <div className="message-sources-row">
+                                                        <span className="sources-label">Sources:</span>
+                                                        <div className="sources-chips">
+                                                            {msg.sources.map((src, i) => {
+                                                                const domain = src.domain || (src.link ? new URL(src.link).hostname.replace('www.', '') : '');
+                                                                return (
+                                                                    <a key={i} href={src.link} target="_blank" rel="noreferrer" className="source-chip">
+                                                                        <img src={`https://www.google.com/s2/favicons?domain=${domain}&sz=32`} alt="" onError={(e) => e.target.style.display = 'none'} />
+                                                                        <span>{src.title || domain}</span>
+                                                                    </a>
+                                                                );
+                                                            })}
+                                                        </div>
                                                     </div>
                                                 )}
                                             </>
@@ -1918,14 +2016,19 @@ export default function ChatApp({
                                                 title="More Options"
                                                 onClick={e => { e.stopPropagation(); setShowActionsMenu(p => !p); }}
                                             >
-                                                <i className='bx bx-plus' style={{ fontSize: '20px' }} />
+                                                <i className='bx bx-plus' />
                                             </button>
 
                                             {/* Actions menu */}
                                             {showActionsMenu && (
-                                                <div className="input-actions-menu show" id="input-actions-menu" style={{ position: 'absolute', bottom: '100%', left: 0, marginBottom: '8px', zIndex: 100 }}>
+                                                <div 
+                                                    ref={actionsMenuRef}
+                                                    className="input-actions-menu show" 
+                                                    id="input-actions-menu" 
+                                                    style={{ position: 'absolute', bottom: '100%', left: 0, marginBottom: '8px', zIndex: 100 }}
+                                                >
                                                     <div className="menu-item">
-                                                        <label htmlFor="file-upload" className="menu-icon-btn" title="Upload File" style={{ cursor: 'pointer' }}>
+                                                        <label htmlFor="file-upload" className="menu-icon-btn" title="Upload File">
                                                             <i className="bx bx-paperclip" />
                                                             <span>Upload File</span>
                                                         </label>
@@ -1952,12 +2055,12 @@ export default function ChatApp({
                                                         <div
                                                             className={`menu-icon-btn${webSearch ? ' active' : ''}`}
                                                             id="web-search"
-                                                            title="Google Web Search"
+                                                            title="Web Search"
                                                             onClick={() => { setWebSearch(p => !p); setShowActionsMenu(false); }}
                                                             style={{ cursor: 'pointer' }}
                                                         >
-                                                            <i className='bx bxl-google' />
-                                                            <span>Google Search</span>
+                                                            <i className='bx bx-globe' />
+                                                            <span>Web Search</span>
                                                         </div>
                                                     </div>
 
@@ -1973,14 +2076,46 @@ export default function ChatApp({
                                                             <span>Generate Image</span>
                                                         </div>
                                                     </div>
+
+                                                    {/* Mobile-only Theme Toggle */}
+                                                    <div className="menu-item mobile-only-item">
+                                                        <div
+                                                            className="menu-icon-btn"
+                                                            id="theme-toggle-btn"
+                                                            title="Switch Theme"
+                                                            onClick={() => { setMode(prev => prev === 'dark' ? 'light' : 'dark'); setShowActionsMenu(false); }}
+                                                            style={{ cursor: 'pointer' }}
+                                                        >
+                                                            <i className={`bx ${mode === 'dark' ? 'bx-sun' : 'bx-moon'}`} />
+                                                            <span>{mode === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Mobile-only Model Selection */}
+                                                    <div className="menu-item mobile-only-item">
+                                                        <div 
+                                                            className="menu-icon-btn"
+                                                            onClick={() => setShowModelOptions(p => !p)}
+                                                            style={{ cursor: 'pointer' }}
+                                                        >
+                                                            <i className="bx bx-chip" />
+                                                            <span>Model: {MODELS.find(m => m.value === selectedModel)?.label || 'Auto'}</span>
+                                                            <i className={`bx bx-chevron-${showModelOptions ? 'up' : 'down'}`} style={{ marginLeft: 'auto' }} />
+                                                        </div>
+                                                    </div>
                                                 </div>
+
                                             )}
                                         </div>
 
                                         {/* Right tools */}
                                         <div className="input-toolbar-right" style={{ position: 'relative' }}>
                                             {/* Model selector */}
-                                            <div className={`model-pill ${showModelOptions ? 'active' : ''}`} onClick={() => setShowModelOptions(p => !p)}>
+                                            <div 
+                                                ref={modelOptionsRef}
+                                                className={`model-pill ${showModelOptions ? 'active' : ''}`} 
+                                                onClick={() => setShowModelOptions(p => !p)}
+                                            >
                                                 <span id="model-display">{MODELS.find(m => m.value === selectedModel)?.label || 'Auto'}</span>
                                                 <i className='bx bx-chevron-down' style={{ fontSize: '16px' }} />
                                             </div>
@@ -2245,7 +2380,7 @@ export default function ChatApp({
                                 <h3>Image Gallery</h3>
                                 <span className="gallery-count">{galleryImages.length} image{galleryImages.length !== 1 ? 's' : ''}</span>
                             </div>
-                            <button className="gallery-close-btn" onClick={() => setGalleryOpen(false)}>
+                            <button className="gallery-close-btn" onClick={() => { setGalleryOpen(false); navigate('/chat'); }}>
                                 <i className='bx bx-x' />
                             </button>
                         </div>
@@ -2286,7 +2421,6 @@ export default function ChatApp({
                                                     </button>
                                                 </div>
                                             </div>
-                                            <p className="gallery-item-prompt">{img.prompt.length > 60 ? img.prompt.slice(0, 60) + '…' : img.prompt}</p>
                                         </div>
                                     ))}
                                 </div>
@@ -2309,15 +2443,15 @@ export default function ChatApp({
                             </div>
                             <div className="settings-container">
                                 <div className="settings-sidebar">
-                                    {['general', 'ai-behavior', 'voice'].map(tab => (
+                                    {['general', 'ai-behavior', 'voice', 'customize'].map(tab => (
                                         <button
                                             key={tab}
                                             className={`settings-tab-btn${settingsTab === tab ? ' active' : ''}`}
                                             data-tab={tab}
                                             onClick={() => setSettingsTab(tab)}
                                         >
-                                            <i className={`bx ${tab === 'general' ? 'bx-user' : tab === 'ai-behavior' ? 'bx-brain' : 'bx-volume-full'}`} />
-                                            {tab === 'general' ? 'General' : tab === 'ai-behavior' ? 'AI Behavior' : 'Voice'}
+                                            <i className={`bx ${tab === 'general' ? 'bx-user' : tab === 'ai-behavior' ? 'bx-brain' : tab === 'customize' ? 'bx-slider-alt' : 'bx-volume-full'}`} />
+                                            {tab === 'general' ? 'General' : tab === 'ai-behavior' ? 'AI Behavior' : tab === 'customize' ? 'Customize' : 'Voice'}
                                         </button>
                                     ))}
                                 </div>
@@ -2456,12 +2590,11 @@ export default function ChatApp({
                                                     </div>
                                                 </div>
 
-                                                <div className="settings-actions" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '20px' }}>
+                                                <div className="settings-actions">
                                                     <button 
                                                         type="button"
                                                         className="reset-all-btn" 
                                                         onClick={() => setResetConfirm({ open: true, section: 'general' })}
-                                                        style={{ margin: 0 }}
                                                     >
                                                         <i className='bx bx-rotate-left' /> Reset to Default
                                                     </button>
@@ -2541,12 +2674,11 @@ export default function ChatApp({
                                                     />
                                                 </div>
 
-                                                <div className="settings-actions" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '20px' }}>
+                                                <div className="settings-actions">
                                                     <button 
                                                         type="button"
                                                         className="reset-all-btn" 
                                                         onClick={() => setResetConfirm({ open: true, section: 'ai' })}
-                                                        style={{ margin: 0 }}
                                                     >
                                                         <i className='bx bx-rotate-left' /> Reset to Default
                                                     </button>
@@ -2585,17 +2717,47 @@ export default function ChatApp({
                                                     <i className='bx bx-play' /> Test Voice
                                                 </button>
                                             </div>
-                                            <div className="settings-actions" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '20px' }}>
+                                            <div className="settings-actions">
                                                 <button 
                                                     type="button"
                                                     className="reset-all-btn" 
                                                     onClick={() => setResetConfirm({ open: true, section: 'voice' })}
-                                                    style={{ margin: 0 }}
                                                 >
                                                     <i className='bx bx-rotate-left' /> Reset to Default
                                                 </button>
                                                 <button id="save-voice-btn" className="save-btn" type="button" onClick={handleSaveGeneral}>Save Voice Settings</button>
                                             </div>
+                                        </div>
+                                    )}
+                                    {/* Customize Tab */}
+                                    {settingsTab === 'customize' && (
+                                        <div id="tab-customize" className="settings-tab-content active">
+                                            <form onSubmit={handleSaveGeneral}>
+                                                <div className="form-group custom-select-wrapper-group">
+                                                    <label>Search Engine</label>
+                                                    <CustomSelect
+                                                        id="user-search-engine"
+                                                        value={tempSettings.searchEngine}
+                                                        onChange={v => setTempSettings(s => ({ ...s, searchEngine: v }))}
+                                                        placeholder="DuckDuckGo"
+                                                        options={[
+                                                            { value: 'duckduckgo', label: '1. DuckDuck GO' },
+                                                            { value: 'google', label: '2. Google' }
+                                                        ]}
+                                                    />
+                                                    <p className="settings-hint">Select the search engine used for web searches.</p>
+                                                </div>
+                                                <div className="settings-actions">
+                                                    <button 
+                                                        type="button"
+                                                        className="reset-all-btn" 
+                                                        onClick={() => setResetConfirm({ open: true, section: 'customize' })}
+                                                    >
+                                                        <i className='bx bx-rotate-left' /> Reset to Default
+                                                    </button>
+                                                    <button type="submit" className="save-btn">Save Customize Settings</button>
+                                                </div>
+                                            </form>
                                         </div>
                                     )}
                                 </div>
@@ -2610,11 +2772,11 @@ export default function ChatApp({
                 <div className="modal-overlay show" style={{ zIndex: 10001 }}>
                     <div className="confirm-modal show">
                         <div className="confirm-modal-content">
-                            <div className="confirm-header">
-                                <i className='bx bx-refresh' style={{ color: 'var(--accent)' }} />
+                            <div className="confirm-modal-header">
+                                <i className='bx bx-refresh' />
                                 <h3>Reset {resetConfirm.section === 'ai' ? 'AI Behavior' : resetConfirm.section.charAt(0).toUpperCase() + resetConfirm.section.slice(1)} Settings?</h3>
                             </div>
-                            <div className="confirm-body">
+                            <div className="confirm-modal-body">
                                 <p>Are you sure you want to reset all <strong>{resetConfirm.section === 'ai' ? 'AI Behavior' : resetConfirm.section}</strong> settings to their defaults?</p>
                                 <p>This action cannot be undone unless you Discard all changes later.</p>
                             </div>
@@ -2643,11 +2805,11 @@ export default function ChatApp({
                 <div className="modal-overlay show" style={{ zIndex: 10001 }}>
                     <div className="confirm-modal show">
                         <div className="confirm-modal-content">
-                            <div className="confirm-header">
+                            <div className="confirm-modal-header">
                                 <i className='bx bx-error-circle' />
                                 <h3>Unsaved Changes</h3>
                             </div>
-                            <div className="confirm-body">
+                            <div className="confirm-modal-body">
                                 <p style={{ fontWeight: 500, color: 'var(--sarvam-text-main)' }}>You have modified your preferences, but they have not been saved yet.</p>
                                 <p>If you leave this page without saving, all changes will be lost.</p>
                             </div>
@@ -2874,37 +3036,7 @@ export default function ChatApp({
                     </div>
                 )
             }
-            {/* Legal Modal */}
-            {legalOpen && (
-                <div className="gallery-modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) setLegalOpen(false); }} style={{ zIndex: 6000 }}>
-                    <div className="gallery-modal" style={{ maxWidth: '800px', height: '80vh', display: 'flex', flexDirection: 'column' }}>
-                        <div className="gallery-modal-header" style={{ flexShrink: 0 }}>
-                            <div className="gallery-title" style={{ display: 'flex', gap: '20px' }}>
-                                <button 
-                                    className={`legal-tab-btn ${legalTab === 'privacy' ? 'active' : ''}`}
-                                    onClick={() => setLegalTab('privacy')}
-                                    style={{ background: legalTab === 'privacy' ? 'var(--accent)' : 'transparent', border: '1px solid var(--accent)', color: '#fff', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer' }}
-                                >
-                                    Privacy Policy
-                                </button>
-                                <button 
-                                    className={`legal-tab-btn ${legalTab === 'terms' ? 'active' : ''}`}
-                                    onClick={() => setLegalTab('terms')}
-                                    style={{ background: legalTab === 'terms' ? 'var(--accent)' : 'transparent', border: '1px solid var(--accent)', color: '#fff', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer' }}
-                                >
-                                    Terms of Service
-                                </button>
-                            </div>
-                            <button className="gallery-close-btn" onClick={() => { setLegalOpen(false); navigate('/chat'); }}>
-                                <i className='bx bx-x' />
-                            </button>
-                        </div>
-                        <div className="gallery-modal-body" style={{ background: 'var(--sarvam-bg-surface)', borderRadius: '0 0 12px 12px', overflowY: 'auto', padding: '20px', flex: 1 }}>
-                           {legalTab === 'privacy' ? <PrivacyPolicy /> : <TermsOfService />}
-                        </div>
-                    </div>
-                </div>
-            )}
+            }
         </div>
     );
 }

@@ -11,6 +11,26 @@ const partSchema = new mongoose.Schema({
 const messageSchema = new mongoose.Schema({
     role: { type: String, required: true },
     parts: [partSchema],
+    images: [{
+        url: String,
+        title: String,
+        creator: String,
+        license: String,
+        thumbnail: String,
+        source: String
+    }],
+    sources: [{
+        title: String,
+        link: String,
+        domain: String
+    }],
+    browserResult: {
+        action: String,
+        url: String,
+        previewUrl: String,
+        title: String,
+        content: String
+    },
     timestamp: { type: Date, default: Date.now }
 });
 

@@ -33,6 +33,50 @@ export async function googleSearch(query, maxLinks = 10) {
     }
 }
 
+export async function duckDuckGoSearch(query, maxLinks = 10) {
+    try {
+        const response = await fetch("https://lite.duckduckgo.com/lite/", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; rv:102.0) Gecko/20100101 Firefox/102.0'
+            },
+            body: new URLSearchParams({ q: query }).toString(),
+            timeout: 10000
+        });
+
+        const html = await response.text();
+        const $ = cheerio.load(html);
+        const results = [];
+
+        $('.result-snippet').each((i, el) => {
+            if (results.length >= maxLinks) return;
+            const tr = $(el).closest('tr').prev();
+            const a = tr.find('.result-link');
+            if (a.length) {
+                results.push({
+                    title: a.text().trim(),
+                    link: a.attr('href'),
+                    snippet: $(el).text().trim()
+                });
+            }
+        });
+
+        if (results.length === 0) {
+            results.push({
+                link: "https://duckduckgo.com/?q=" + encodeURIComponent(query),
+                title: "DuckDuckGo Search Results",
+                snippet: "Perform a search on DuckDuckGo directly."
+            });
+        }
+        
+        return results;
+    } catch (error) {
+        console.error("DuckDuckGo HTML Scrape Error:", error.message);
+        throw new Error(`DuckDuckGo scrape error: ${error.message}`);
+    }
+}
+
 function cleanText(text) {
     return text
         .replace(/\s+/g, ' ')
@@ -81,13 +125,40 @@ export async function fetchAndExtract(url) {
     }
 }
 
-export async function scrapeQuery(query) {
+export async function fetchOpenverseImages(query, count = 4) {
     try {
-        // Find top 3 results
-        const results = await googleSearch(query, 3);
+        const url = `https://api.openverse.org/v1/images/?format=json&q=${encodeURIComponent(query)}&page_size=${count}&image_type=photo&size=large&orientation=landscape&license_type=commercial&mature=false`;
+        const response = await fetch(url, {
+            headers: { 'User-Agent': 'ChatterBox/1.0' },
+            timeout: 8000
+        });
+        if (!response.ok) throw new Error(`Openverse HTTP ${response.status}`);
+        const data = await response.json();
+        return (data.results || []).slice(0, count).map(img => ({
+            url: img.url,
+            title: img.title || '',
+            creator: img.creator || '',
+            license: img.license || '',
+            thumbnail: img.thumbnail || img.url,
+            source: img.foreign_landing_url || img.url
+        }));
+    } catch (error) {
+        console.error('Openverse image fetch error:', error.message);
+        return [];
+    }
+}
+
+export async function scrapeQuery(query, engine = 'duckduckgo') {
+    try {
+        // Find top 10 results based on engine
+        const allResults = engine === 'duckduckgo' 
+            ? await duckDuckGoSearch(query, 10) 
+            : await googleSearch(query, 10);
+            
+        const topResultsToScrape = allResults.slice(0, 3);
         const detailedResults = [];
 
-        for (const res of results) {
+        for (const res of topResultsToScrape) {
             try {
                 const scraped = await fetchAndExtract(res.link);
                 detailedResults.push({
@@ -108,7 +179,8 @@ export async function scrapeQuery(query) {
 
         return {
             query,
-            results: detailedResults
+            results: detailedResults,
+            allSources: allResults
         };
     } catch (error) {
         console.error("Scrape Query Error:", error.message);

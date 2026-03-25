@@ -49,6 +49,12 @@ export function formatStreamedText(text) {
         return `__MATH_INLINE_${mathBlocks.length - 1}__`;
     });
 
+    // Handle streaming (incomplete) display math
+    processedText = processedText.replace(/\$\$([\s\S]*)$/g, (match, content) => {
+        mathBlocks.push({ content: content, display: true });
+        return `__MATH_BLOCK_${mathBlocks.length - 1}__`;
+    });
+
     const escapeHTML = (str) =>
         String(str).replace(/[&<>"']/g, (tag) => (
             { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[tag]
@@ -151,7 +157,7 @@ export function formatStreamedText(text) {
         }
 
         // Pass code-block placeholders through raw (restored later)
-        if (trimmed.match(/^__CODE_BLOCK_\d+__$/)) {
+        if (trimmed.match(/^__(?:CODE|MATH)_BLOCK_\d+__$/)) {
             html += trimmed;
             continue;
         }
@@ -222,11 +228,35 @@ export function formatStreamedText(text) {
     // restore math
     html = html.replace(/__MATH_BLOCK_(\d+)__/g, (_m, idx) => {
         const block = mathBlocks[parseInt(idx, 10)];
+        if (!block) return _m;
+        try {
+            if (window.katex) {
+                return window.katex.renderToString(block.content, { 
+                    displayMode: block.display, 
+                    throwOnError: false,
+                    trust: true
+                });
+            }
+        } catch (err) {
+            console.error("KaTeX error:", err);
+        }
         return block.display ? `<div class="math-block">${escapeHTML(block.content)}</div>` : `<span class="math-inline">${escapeHTML(block.content)}</span>`;
     });
 
     html = html.replace(/__MATH_INLINE_(\d+)__/g, (_m, idx) => {
         const block = mathBlocks[parseInt(idx, 10)];
+        if (!block) return _m;
+        try {
+            if (window.katex) {
+                return window.katex.renderToString(block.content, { 
+                    displayMode: block.display, 
+                    throwOnError: false,
+                    trust: true
+                });
+            }
+        } catch (err) {
+            console.error("KaTeX error:", err);
+        }
         return block.display ? `<div class="math-block">${escapeHTML(block.content)}</div>` : `<span class="math-inline">${escapeHTML(block.content)}</span>`;
     });
 

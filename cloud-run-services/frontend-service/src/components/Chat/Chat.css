@@ -138,7 +138,7 @@
 
 .user-avatar {
     background: linear-gradient(135deg, var(--accent), #6d28d9);
-    border: 1px solid rgba(124, 106, 247, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.4);
     color: #fff;
 }
 
@@ -186,7 +186,7 @@ body.white-mode .user-avatar {
 
 .user-bubble {
     background: var(--user-bubble);
-    border: 1px solid rgba(124, 106, 247, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.2);
 
     color: var(--text-primary);
     text-align: right;
@@ -198,7 +198,7 @@ body.white-mode .user-avatar {
     border-radius: 12px;
     padding: 10px;
     background: var(--bg-elevated);
-    border: 1px solid rgba(124, 106, 247, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 /* Ensure all markdown elements in chat-content are left-aligned */
@@ -1163,9 +1163,9 @@ pre {
     max-width: 90vw;
     border-radius: 16px;
     overflow: hidden;
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-    border: 1px solid rgba(124, 106, 247, 0.25);
-    box-shadow: 0 8px 40px rgba(124, 106, 247, 0.18), 0 2px 12px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(135deg, #09090b 0%, #18181b 50%, #27272a 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4), 0 2px 12px rgba(0, 0, 0, 0.3);
     margin: 4px 0 4px 0;
     position: relative;
     animation: fadeIn 0.4s ease;
@@ -1176,9 +1176,9 @@ pre {
     height: 220px;
     background: linear-gradient(110deg,
             rgba(255, 255, 255, 0.03) 0%,
-            rgba(124, 106, 247, 0.12) 30%,
-            rgba(168, 85, 247, 0.22) 50%,
-            rgba(124, 106, 247, 0.12) 70%,
+            rgba(255, 255, 255, 0.08) 30%,
+            rgba(255, 255, 255, 0.15) 50%,
+            rgba(255, 255, 255, 0.08) 70%,
             rgba(255, 255, 255, 0.03) 100%);
     background-size: 300% 100%;
     animation: shimmerSlide 2s ease-in-out infinite;
@@ -1219,7 +1219,7 @@ pre {
 
 .img-gen-icon {
     font-size: 20px;
-    color: #a78bfa;
+    color: var(--accent);
     animation: pulse 2s ease-in-out infinite;
 }
 
@@ -1242,7 +1242,7 @@ pre {
     left: -60%;
     width: 60%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, #a78bfa, #7c6af7, transparent);
+    background: linear-gradient(90deg, transparent, var(--accent), var(--accent-light), transparent);
     border-radius: 99px;
     animation: barSweep 1.6s ease-in-out infinite;
 }
@@ -1265,7 +1265,7 @@ pre {
     border-radius: 14px;
     overflow: hidden;
     background: var(--bg-elevated);
-    border: 1px solid rgba(124, 106, 247, 0.2);
+    border: 1px solid var(--border-md);
     box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
     animation: fadeIn 0.4s ease;
 }
@@ -1289,14 +1289,14 @@ pre {
 .gen-image-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.4);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 12px;
     opacity: 0;
-    transition: opacity 0.25s ease;
-    backdrop-filter: blur(2px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(8px);
 }
 
 .gen-image-wrap:hover .gen-image-overlay {
@@ -1317,23 +1317,29 @@ pre {
 }
 
 .gen-preview-btn {
-    background: rgba(255, 255, 255, 0.15);
-    color: #fff;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
 }
 
 .gen-preview-btn:hover {
-    background: rgba(255, 255, 255, 0.25);
+    background: var(--accent-dim);
 }
 
 .gen-download-btn {
-    background: rgba(124, 106, 247, 0.8);
-    color: #fff;
+    background: var(--accent);
+    color: var(--bg-primary);
+    border: 1px solid var(--accent);
 }
 
 .gen-download-btn:hover {
-    background: var(--accent);
-    box-shadow: 0 4px 14px rgba(124, 106, 247, 0.5);
+    background: var(--accent-light);
+    color: var(--bg-primary);
+}
+
+.gen-download-btn:hover {
+    background: var(--accent-light);
+    box-shadow: var(--shadow-md);
 }
 
 .gen-image-caption {
@@ -1467,8 +1473,8 @@ pre {
 }
 
 .gallery-item:hover {
-    border-color: rgba(124, 106, 247, 0.4);
-    box-shadow: 0 4px 20px rgba(124, 106, 247, 0.15);
+    border-color: var(--accent);
+    box-shadow: var(--shadow-lg);
     transform: translateY(-2px);
 }
 
@@ -1476,6 +1482,7 @@ pre {
     position: relative;
     aspect-ratio: 1;
     overflow: hidden;
+    border-radius: inherit;
 }
 
 .gallery-item-img-wrap img {
@@ -1483,7 +1490,8 @@ pre {
     height: 100%;
     object-fit: cover;
     display: block;
-    transition: transform 0.3s ease;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: inherit;
 }
 
 .gallery-item:hover .gallery-item-img-wrap img {
@@ -1493,29 +1501,22 @@ pre {
 .gallery-item-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.4);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 12px;
     opacity: 0;
-    transition: opacity 0.25s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(8px);
+    border-radius: inherit;
 }
 
 .gallery-item:hover .gallery-item-overlay {
     opacity: 1;
 }
 
-.gallery-item-prompt {
-    padding: 8px 10px;
-    font-size: 11px;
-    color: var(--text-muted);
-    margin: 0;
-    line-height: 1.4;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
+
 
 /* Error state for image gen */
 .img-gen-error {

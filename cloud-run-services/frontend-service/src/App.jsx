@@ -1,3 +1,4 @@
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { CreditsProvider } from './contexts/CreditsContext';
@@ -7,6 +8,8 @@ import UpgradeModal from './components/Upgrade/UpgradeModal';
 import ErrorBoundary from './components/Common/ErrorBoundary';
 import PrivacyPolicy from './components/Legal/PrivacyPolicy';
 import TermsOfService from './components/Legal/TermsOfService';
+import PrivacyPage from './components/Legal/PrivacyPage';
+import TermsPage from './components/Legal/TermsPage';
 
 function ProtectedRoute({ user, children }) {
   if (!user) return <Navigate to="/login" replace />;
@@ -18,6 +21,16 @@ function InnerApp() {
 
   const params = new URLSearchParams(window.location.search);
   const shareId = params.get('share');
+
+  // Handle theme
+  useEffect(() => {
+    const mode = localStorage.getItem('app-theme-mode') || 'dark';
+    if (mode === 'light') {
+      document.body.setAttribute('data-theme', 'light');
+    } else {
+      document.body.removeAttribute('data-theme');
+    }
+  }, []);
 
   // Handle successful upgrade redirect
   const upgradeStatus = params.get('upgrade');
@@ -94,12 +107,15 @@ function InnerApp() {
       <Route path="/apps/:agentId/:sessionId?" element={<ProtectedRoute user={user}><ChatApp initialAppsOpen={true} /><UpgradeModal /></ProtectedRoute>} />
       <Route path="/settings" element={<ProtectedRoute user={user}><ChatApp initialSettingsOpen={true} /><UpgradeModal /></ProtectedRoute>} />
       
-      {/* Legal Routes in Container */}
-      <Route path="/privacy" element={<ProtectedRoute user={user}><ChatApp initialLegalOpen="privacy" /><UpgradeModal /></ProtectedRoute>} />
-      <Route path="/privacy-policy" element={<ProtectedRoute user={user}><ChatApp initialLegalOpen="privacy" /><UpgradeModal /></ProtectedRoute>} />
-      <Route path="/terms" element={<ProtectedRoute user={user}><ChatApp initialLegalOpen="terms" /><UpgradeModal /></ProtectedRoute>} />
-      <Route path="/terms-of-service" element={<ProtectedRoute user={user}><ChatApp initialLegalOpen="terms" /><UpgradeModal /></ProtectedRoute>} />
-      <Route path="/terms-of-use" element={<ProtectedRoute user={user}><ChatApp initialLegalOpen="terms" /><UpgradeModal /></ProtectedRoute>} />
+      {/* Legal Routes - Separate Pages */}
+      <Route path="/privacy" element={<PrivacyPage />} />
+      <Route path="/privacy-policy" element={<PrivacyPage />} />
+      <Route path="/terms" element={<TermsPage />} />
+      <Route path="/terms-of-service" element={<TermsPage />} />
+      <Route path="/terms-of-use" element={<TermsPage />} />
+      
+      {/* Gallery Route */}
+      <Route path="/gallery" element={<ProtectedRoute user={user}><ChatApp initialGalleryOpen={true} /><UpgradeModal /></ProtectedRoute>} />
       
       {/* Redirect everything else to home or login */}
       <Route path="*" element={<Navigate to={user ? "/" : "/login"} replace />} />

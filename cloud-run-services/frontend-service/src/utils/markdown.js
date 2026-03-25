@@ -18,6 +18,11 @@ export function renderMarkdown(text, isStreaming = false) {
 
     let responseText = text;
 
+    // ── Think blocks ──────────────────────────────────────────────────────────
+    responseText = responseText.replace(/<think>([\s\S]*?)<\/think>/g, (match, content) => {
+        return `<div class="think-block-wrapper"><details class="think-block-details"><summary>💭 Thought</summary><div class="think-block-content">${escapeHtml(content)}</div></details></div>`;
+    });
+
     // ── Code blocks ──────────────────────────────────────────────────────────
     responseText = responseText.replace(/```(\w+)?\n?([\s\S]*?)```/g, (_, lang, code) => {
         const langLabel = lang || '';
@@ -76,6 +81,26 @@ export function renderMarkdown(text, isStreaming = false) {
     responseText = responseText.replace(/\*(.+?)\*/gs, '<em>$1</em>');
     responseText = responseText.replace(/__(.+?)__/gs, '<strong>$1</strong>');
     responseText = responseText.replace(/_([^_]+)_/gs, '<em>$1</em>');
+    
+    // ── LaTeX Display Math ────────────────────────────────────────────────
+    responseText = responseText.replace(/\$\$\s*([\s\S]*?)\s*\$\$/g, (match, formula) => {
+        try {
+            if (window.katex) {
+                return `<div class="md-math-display">${window.katex.renderToString(formula, { displayMode: true, throwOnError: false })}</div>`;
+            }
+        } catch (e) { console.error("KaTeX Error:", e); }
+        return `<div class="md-math-display">${formula}</div>`;
+    });
+
+    // ── LaTeX Inline Math ─────────────────────────────────────────────────
+    responseText = responseText.replace(/\$([^$\n]+?)\$/g, (match, formula) => {
+        try {
+            if (window.katex) {
+                return `<span class="md-math-inline">${window.katex.renderToString(formula, { displayMode: false, throwOnError: false })}</span>`;
+            }
+        } catch (e) { console.error("KaTeX Error:", e); }
+        return `<span class="md-math-inline">${formula}</span>`;
+    });
 
     // ── Headings ─────────────────────────────────────────────────────────────
     responseText = responseText.replace(/^#### (.+)$/gm, '<h4 class="md-h4">$1</h4>');
@@ -128,7 +153,8 @@ export function renderMarkdown(text, isStreaming = false) {
 
     // ── Auto-linkify plain URLs ──────────────────────────────────────────────
     // Avoid double-linking URLs that are already inside <a> tags or buttons
-    responseText = responseText.replace(/(?<!href=")(?<!">)(https?:\/\/[^\s<]+)/g, (url) => {
+    // Also ignore URLs that are likely part of an attribute (preceded by =")
+    responseText = responseText.replace(/(?<!href=")(?<!=")(?<!">)(https?:\/\/[^\s<]+)/g, (url) => {
         // Truncate display text for long URLs
         const displayUrl = url.length > 50 ? url.substring(0, 47) + '...' : url;
         return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="url-button"><span>${displayUrl}</span><i class='bx bx-link-external'></i></a>`;
@@ -153,7 +179,8 @@ export function linkify(text) {
     });
 
     // Then, linkify remaining plain URLs and truncate display text
-    return processed.replace(/(?<!href=")(?<!">)(https?:\/\/[^\s<]+)/g, (url) => {
+    // Exclude URLs preceded by href=" , =" (attributes), or ">" (already linked)
+    return processed.replace(/(?<!href=")(?<!=")(?<!">)(https?:\/\/[^\s<]+)/g, (url) => {
         const displayUrl = url.length > 50 ? url.substring(0, 47) + '...' : url;
         return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="url-button"><span>${displayUrl}</span><i class='bx bx-link-external'></i></a>`;
     });
